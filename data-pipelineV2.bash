@@ -46,7 +46,8 @@ do
 #  echo "Video ${i} downsamling and restriction done"
 #  python3 "${SCRIPT_LOCATION}/get-new-bboxes.py" ${i} "${DEEPFAKE_LOCATION}"
 
-
+   echo "${WAV2LIP_LOCATION}"
+   
    cd "${WAV2LIP_LOCATION}"
    
    source wav2lip/bin/activate
