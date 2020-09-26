@@ -46,17 +46,16 @@ do
 #  echo "Video ${i} downsamling and restriction done"
 #  python3 "${SCRIPT_LOCATION}/get-new-bboxes.py" ${i} "${DEEPFAKE_LOCATION}"
 
-  
-# TODO: Change for Wav2Lip
-# TODO: deleted flags from v1: --mat, --results_dir, --bboxes (should we keep this one? wav2lip requires an int list instead of a file)
-# TODO: Do we need a new conda environment? 
-
-# source ~/anaconda3/etc/profile.d/conda.sh
-# conda activate lipgan
 
    cd "${WAV2LIP_LOCATION}"
+   
+   source wav2lip/bin/activate
+   
+   
    python3 inference.py --checkpoint_path "${WAV2LIP_CHECKPOINT}" --face "${VIDEO_LOCATION}/cam${i}-lipgan/cam${i}-first-4k.mp4" --fps 29.97 --audio "audio/${AUDIO_FILENAME}.wav"
    mv results/result_voice.mp4 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-wav2lip.mp4"
+   
+   deactivate
    
 # conda deactivate
 
