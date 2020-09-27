@@ -39,7 +39,7 @@ for i in {1..${NUM_VIDEOS}}
 do
     
 ################## Create deepfake ##################
-   echo "Creating deepfake for video ${i} with Wav2Lip..."
+   echo "Creating deepfake for video $i with Wav2Lip..."
     
    mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip"
 #  ffmpeg -i "${VIDEO_LOCATION}/camera${i}.MP4" -ss 0.0 -frames:v 4000 -framerate 29.97 -vf scale=1280:720 -crf 0 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-first-4k.mp4"
