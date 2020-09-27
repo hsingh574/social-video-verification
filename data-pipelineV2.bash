@@ -54,9 +54,9 @@ do
    echo "Converting deepfake video to frames..."
 
 
-   mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/frames"
-   ffmpeg -i "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-wav2lip.mp4" -loglevel quiet -q:v 2 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/frames/frames%04d.jpg" 
-   echo "Deepfake for Video ${i} frame generation done."
+#   mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/frames"
+#   ffmpeg -i "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-wav2lip.mp4" -loglevel quiet -q:v 2 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/frames/frames%04d.jpg" 
+#   echo "Deepfake for Video ${i} frame generation done."
    
    echo "Cropping faces..."
    

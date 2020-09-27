@@ -63,34 +63,34 @@ saveCrop = False
 
 
 for f in range(5000,numImg + 1):
-	number = '{0:04d}'.format(f)
-        filename = sys.argv[2] + "frames" + number + ".jpg"
+    number = '{0:04d}'.format(f)
+    filename = sys.argv[2] + "frames" + number + ".jpg"
 
-	print("Processing file: {}".format(f))
-	img = dlib.load_rgb_image(filename)
-	dets = cnn_face_detector(img, 1)
-	h, w = img.shape[:2]
+    print("Processing file: {}".format(f))
+    img = dlib.load_rgb_image(filename)
+    dets = cnn_face_detector(img, 1)
+    h, w = img.shape[:2]
 
-	#print("Number of faces detected: {}".format(len(dets)))
-	sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
-	
-	# Only keep most confident face-- we only expect one face per frame
-	if(len(dets) == 0):
-		print('No faces detected. Using last detection result.')
-	else:
-		d = sortedDets[0]
-	
-	if (saveCrop):
-		y1 = max(d.rect.top() - padding, 0)
-		y2 = min(d.rect.bottom() + padding, h)
-		x1 = max(d.rect.left() - padding, 0)
-		x2 = min(d.rect.right() + padding, w)
-		cropImg = img[y1:y2, x1:x2]
-		
-		cropImg = cv2.cvtColor(cropImg, cv2.COLOR_BGR2RGB)
-		cv2.imwrite(outDir + "%04d.jpg" % f,cropImg)
+    #print("Number of faces detected: {}".format(len(dets)))
+    sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
+    
+    # Only keep most confident face-- we only expect one face per frame
+    if(len(dets) == 0):
+        print('No faces detected. Using last detection result.')
+    else:
+        d = sortedDets[0]
+    
+    if (saveCrop):
+        y1 = max(d.rect.top() - padding, 0)
+        y2 = min(d.rect.bottom() + padding, h)
+        x1 = max(d.rect.left() - padding, 0)
+        x2 = min(d.rect.right() + padding, w)
+        cropImg = img[y1:y2, x1:x2]
+        
+        cropImg = cv2.cvtColor(cropImg, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(outDir + "%04d.jpg" % f,cropImg)
 
-	# Save detection box coordinates
-	boundingFile.write('%d, %d, %d, %d\n' % (d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom()))
+    # Save detection box coordinates
+    boundingFile.write('%d, %d, %d, %d\n' % (d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom()))
 
 boundingFile.close()
