@@ -20,12 +20,11 @@ for f in range(1,numImg+1):
     filename = inDir + "frames" + '{0:04d}'.format(f) + ".jpg"
     
     box = boundingFile.readline().split(',')
+    if box[0]=='':
+        continue
     
-    try:
-        boxInt = [[int(box[0]),int(box[1]), int(box[2]), int(box[3])]]
-    except ValueError as e:
-        print(f'box0: {box[0]}, box1: {box[1]}, box2: {box[2]}, box3: {box[3]}')
-        raise ValueError(e)
+    
+    boxInt = [[int(box[0]),int(box[1]), int(box[2]), int(box[3])]]
      
     print("Processing file: {}".format(f))
     img = io.imread(filename)
