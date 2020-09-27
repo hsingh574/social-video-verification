@@ -35,7 +35,7 @@ set -euo pipefail
 # TODO: Double check this is still true for Wav2Lip, if not true, then can to re-generate 
 
 
-for i in {1..$NUM_VIDEOS}
+for ((i=1; i<= $NUM_VIDEOS; i++));
 do
     
 ################## Create deepfake ##################
