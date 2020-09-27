@@ -43,23 +43,11 @@ do
     
    mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip"
 
-   echo "${WAV2LIP_LOCATION}"
    cd "${WAV2LIP_LOCATION}"
    
-   source wav2lip/bin/activate
-   
-   echo "${VIDEO_LOCATION}/cam${i}-lipgan/cam${i}-first-4k.mp4"
-   echo "audio/${AUDIO_FILENAME}.wav"
-   
-   
-#  python3 inference.py --checkpoint_path "${WAV2LIP_CHECKPOINT}" --face "${VIDEO_LOCATION}/cam${i}-lipgan/cam${i}-first-4k.mp4" --audio "audio/${AUDIO_FILENAME}.wav"
+#  wav2lip/bin/python3 inference.py --checkpoint_path "${WAV2LIP_CHECKPOINT}" --face "${VIDEO_LOCATION}/cam${i}-lipgan/cam${i}-first-4k.mp4" --audio "audio/${AUDIO_FILENAME}.wav"
 #  mv results/result_voice.mp4 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-wav2lip.mp4"
-   
-   echo "before decativation"
-   
-   deactivate
-   
-   echo "after decativation"
+
 
 ################## Process deepfake ##################
 
