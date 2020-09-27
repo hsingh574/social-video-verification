@@ -34,6 +34,8 @@ set -euo pipefail
 # To run lipGan on our machine, we needed to downsample & restrict the video length to the first 4000 frames
 # TODO: Double check this is still true for Wav2Lip, if not true, then can to re-generate 
 
+mkdir -p "${DEEPFAKE_LOCATION}/bounding-boxes"
+
 
 for ((i=1; i<= $NUM_VIDEOS; i++));
 do
@@ -61,6 +63,7 @@ do
    echo "Cropping faces..."
    
    mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cropped"
+   
    wav2lip/bin/python3 "${SCRIPT_LOCATION}/cnn_face_detector.py" "${SCRIPT_LOCATION}/mmod_human_face_detector.dat" "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/frames/" "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cropped/" "${DEEPFAKE_LOCATION}/bounding-boxes/cam${i}-post-wav2lip-"
    echo "Cropping faces for Video ${i} done."
    
