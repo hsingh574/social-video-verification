@@ -42,12 +42,8 @@ do
    echo "Creating deepfake for video $i with Wav2Lip..."
     
    mkdir -p "${DEEPFAKE_LOCATION}/cam${i}-wav2lip"
-#  ffmpeg -i "${VIDEO_LOCATION}/camera${i}.MP4" -ss 0.0 -frames:v 4000 -framerate 29.97 -vf scale=1280:720 -crf 0 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-first-4k.mp4"
-#  echo "Video ${i} downsamling and restriction done"
-#  python3 "${SCRIPT_LOCATION}/get-new-bboxes.py" ${i} "${DEEPFAKE_LOCATION}"
 
    echo "${WAV2LIP_LOCATION}"
-   
    cd "${WAV2LIP_LOCATION}"
    
    source wav2lip/bin/activate
@@ -60,8 +56,6 @@ do
    mv results/result_voice.mp4 "${DEEPFAKE_LOCATION}/cam${i}-wav2lip/cam${i}-wav2lip.mp4"
    
    deactivate
-   
-# conda deactivate
 
 ################## Process deepfake ##################
 
