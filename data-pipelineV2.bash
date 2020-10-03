@@ -68,7 +68,7 @@ do
 
    cd "${3}"
    
-   wav2lip/bin/python3 inference.py --checkpoint_path "${4}" --face "${5}/cam${i}-lipgan/cam${i}-first-4k.mp4" --audio "audio/${6}.wav" --pads 0 40 0 0 --resize_factor 0.8
+   wav2lip/bin/python3 inference.py --checkpoint_path "${4}" --face "${5}/cam${i}-lipgan/cam${i}-first-4k.mp4" --audio "audio/${6}.wav" --pads 0 40 0 0 --resize_factor 2
    mv results/result_voice.mp4 "${1}/cam${i}-wav2lip/cam${i}-wav2lip.mp4"
 
 
