@@ -108,16 +108,18 @@ if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
     
 else
     cd ${VIDEO_LOCATION_BASE}
+    
 # loop over all ID directories in base directory
-    for dir in * ;
+    for dir in */ ;
     do
-        echo ${dir}
+        echo ${dir%?}
         
-        #if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
+        if [[ ${dir%?} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
+            echo ${dir%?}
         #    DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir}"
         #    VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir}"
         #    singleID ${DEEPFAKE_LOCATION} ${NUM_VIDEOS} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${VIDEO_LOCATION} ${AUDIO_FILENAME} ${SCRIPT_LOCATION}
-        #fi
+        fi
             
     done
 
