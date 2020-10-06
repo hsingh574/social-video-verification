@@ -109,14 +109,15 @@ if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
 else
 
 # loop over all ID directories in base directory
-    for dir in ${DEEPFAKE_LOCATION_BASE}/*/
+    for dir in ${DEEPFAKE_LOCATION_BASE}/*/ ;
     do
         echo ${dir}
-        if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
-            DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir}"
-            VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir}"
-            singleID ${DEEPFAKE_LOCATION} ${NUM_VIDEOS} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${VIDEO_LOCATION} ${AUDIO_FILENAME} ${SCRIPT_LOCATION}
-        fi
+        
+        #if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
+        #    DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir}"
+        #    VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir}"
+        #    singleID ${DEEPFAKE_LOCATION} ${NUM_VIDEOS} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${VIDEO_LOCATION} ${AUDIO_FILENAME} ${SCRIPT_LOCATION}
+        #fi
             
     done
 
