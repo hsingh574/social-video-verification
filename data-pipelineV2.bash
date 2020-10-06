@@ -109,7 +109,7 @@ if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
 else
 
 # loop over all ID directories in base directory
-    for dir in ${DEEPFAKE_LOCATION_BASE}/*/ ;
+    for dir in ${VIDEO_LOCATION_BASE}/*/ ;
     do
         echo ${dir}
         
