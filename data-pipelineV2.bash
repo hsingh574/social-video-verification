@@ -116,9 +116,9 @@ else
         
         if [[ ${dir%?} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
             echo ${dir%?}
-        #    DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir}"
-        #    VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir}"
-        #    singleID ${DEEPFAKE_LOCATION} ${NUM_VIDEOS} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${VIDEO_LOCATION} ${AUDIO_FILENAME} ${SCRIPT_LOCATION}
+            DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir%?}"
+            VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir%?}"
+            singleID ${DEEPFAKE_LOCATION} ${NUM_VIDEOS} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${VIDEO_LOCATION} ${AUDIO_FILENAME} ${SCRIPT_LOCATION}
         fi
             
     done
