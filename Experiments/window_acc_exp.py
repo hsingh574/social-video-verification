@@ -9,6 +9,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.covariance import MinCovDet
 from scipy.cluster.hierarchy import linkage, fcluster
 
+def mahalanobis_calculate(data, num_pcs):
+    pca = PCA(num_pcs)
+    T = pca.fit_transform(StandardScaler().fit_transform(data))
+    # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
+    robust_cov = MinCovDet().fit(T)
+    # Get the Mahalanobis distance
+    m = robust_cov.mahalanobis(T)
+    return m
 
 def detectFakesTree(link, thresh):
     ratio = link[-1][-2] / link[-2][-2]
@@ -24,15 +32,6 @@ def detectFakesTree(link, thresh):
         numFakes = 0
         c = 0
     return numFakes, c
-
-def mahalanobis_calculate(data, num_pcs):
-    pca = PCA(num_pcs)
-    T = pca.fit_transform(StandardScaler().fit_transform(data))
-    # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
-    robust_cov = MinCovDet().fit(T)
-    # Get the Mahalanobis distance
-    m = robust_cov.mahalanobis(T)
-    return m
 
 
 def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
@@ -78,9 +77,6 @@ def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2,
     
     return numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3
     
-    
-    
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
@@ -100,20 +96,22 @@ def parse_args():
 
 
 def main():
+    
+    
+    #This experiment will take a LONG time to run for all participants. 
+    #Running it for 1 participant takes a bit over an hour. 
+    
     args = parse_args()
-        
     
     for i in range(args.num_participants):
         if i == 16:
             continue
-        
         
         data2 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake2-ID{i+1}.mat'))
         data3 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake3-ID{i+1}.mat'))
         data4 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake4-ID{i+1}.mat'))
         
         fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
-        
         
         cam1 = data3['cam1'][:fullLen,:]
         cam2 = data3['cam2'][:fullLen,:]
@@ -134,15 +132,10 @@ def main():
                            cam4[intervalWin:(2*intervalWin),:], 
                            data4['fake'][(2*intervalWin):fullLen,:]])
     
-        #calculate L2 between real/fake mouth landmarks for all frames
-        #baseline = np.linalg.norm(cam4 - fake4, axis = 1)
     
-        #Iterate over thresholds too
-        #threshes = [1.1, 1.3, 1.5, 1.7, 1.9, 2.1]
-        #window_sizes = [50,150,250,350]
-        
+        #Iterate over diffrent thresholds and window sizes
         threshes = [1.3]
-        window_sizes = [150,250, 350]
+        window_sizes = [150]
         
         
 # =============================================================================
@@ -151,7 +144,7 @@ def main():
 #         (3) FP if window does not have fake & fake is detected
 #         (4) FN if window contains a faked frame & fake is not detected
 # =============================================================================
-    
+        
         for t in threshes:
             for j in window_sizes:
                 numWin = fullLen - j
@@ -164,10 +157,7 @@ def main():
                     numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
             fake3, fake4, start, end, args.num_pcs, t)
                     
-                    if len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0:
-                        isFake = 1
-                    else:
-                        isFake = 0
+                    isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
                         
                     #0 fakes case
                     if numFakes0 ==0:
@@ -232,15 +222,10 @@ def main():
                             
                     
                 print(f'ID: {i}. Threshold: {t}. Window size: {j}.'
-                          f'Acc0: {np.mean(acc0, axis = 1)}. Acc1: {np.mean(acc1, axis = 1)}.'
-                          f'Acc2: {np.mean(acc2, axis = 1)}. Acc3: {np.mean(acc3, axis = 1)}.')
+                          f'TP: {np.mean(acc0, axis = 1)}. TN: {np.mean(acc1, axis = 1)}.'
+                          f'FP: {np.mean(acc2, axis = 1)}. FN: {np.mean(acc3, axis = 1)}.')
+        
                     
-                    
-            
-                    
-                    
-                    
-
 
 if __name__ == "__main__":
     main()

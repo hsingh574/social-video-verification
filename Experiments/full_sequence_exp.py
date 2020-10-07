@@ -6,10 +6,18 @@ import os
 import numpy as np
 from scipy.io import loadmat
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
 from sklearn.covariance import MinCovDet
 from scipy.cluster.hierarchy import linkage, fcluster
+from pywt import wavedec2, dwt_max_level
 
+def mahalanobis_calculate(data, num_pcs):
+    pca = PCA(num_pcs)
+    T = pca.fit_transform(data)
+    # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
+    robust_cov = MinCovDet().fit(T)
+    # Get the Mahalanobis distance
+    m = robust_cov.mahalanobis(T)
+    return m
 
 # numFakes will be the number of
 # fakes detected, and c will be a vector of numCams integers, which are 
@@ -32,39 +40,26 @@ def detectFakesTree(link, thresh):
     return numFakes, c
 
 
+def resultsHelper(numFakes, cLst, result):
+    if numFakes[0] == 0:
+        result[0][0] = 1
+    
+    if numFakes[1] == 1:
+        if (np.all(cLst[0] == np.array([1,1,1,2,1,1])) or np.all(cLst[0] == np.array([2,2,2,1,2,2]))):
+            result[0][1] = 1
+            
+    if numFakes[2] == 2:
+        if (np.all(cLst[1] == np.array([1,1,2,2,1,1])) or np.all(cLst[1] == np.array([2,2,1,1,2,2]))):
+            result[0][2] = 1
+            
+    if numFakes[3] == 3:
+        if (np.all(cLst[2] == np.array([1,2,2,2,1,1])) or np.all(cLst[2] == np.array([2,1,1,1,2,2]))):
+            result[0][3] = 1
+    return result
 
 
-def mahalanobis_calculate(data, num_pcs):
-    pca = PCA(num_pcs)
-    T = pca.fit_transform(data)
-    # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
-    robust_cov = MinCovDet().fit(T)
-    # Get the Mahalanobis distance
-    m = robust_cov.mahalanobis(T)
-    return m
 
-def socialVerificationOnlyPCA(data2,data3,data4, thresh, num_pcs):
-    result = np.zeros((1,4))
-    fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
-    
-    
-    
-    cam1_dist = mahalanobis_calculate(data2['cam1'][:fullLen,:], num_pcs)
-    cam2_dist = mahalanobis_calculate(data2['cam2'][:fullLen,:], num_pcs)
-    cam3_dist = mahalanobis_calculate(data2['cam3'][:fullLen,:], num_pcs)
-    cam4_dist = mahalanobis_calculate(data2['cam4'][:fullLen,:], num_pcs)
-    cam5_dist = mahalanobis_calculate(data2['cam5'][:fullLen,:], num_pcs)
-    cam6_dist = mahalanobis_calculate(data2['cam6'][:fullLen,:], num_pcs)
-    fake2_dist = mahalanobis_calculate(data2['fake'][:fullLen,:], num_pcs)
-    fake3_dist = mahalanobis_calculate(data3['fake'][:fullLen,:], num_pcs)
-    fake4_dist = mahalanobis_calculate(data4['fake'][:fullLen,:], num_pcs)
-    
-    X0 = np.array([cam1_dist, cam2_dist, cam3_dist, cam4_dist, cam5_dist, cam6_dist])
-    X1 = np.array([cam1_dist, cam2_dist, cam3_dist, fake4_dist, cam5_dist, cam6_dist])
-    X2 = np.array([cam1_dist, cam2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
-    X3 = np.array([cam1_dist, fake2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
-    
-    
+def clusterHelper(X0, X1, X2, X3, thresh, result):
     #Test for tracking failures and remove
     badInds = []
     
@@ -77,9 +72,7 @@ def socialVerificationOnlyPCA(data2,data3,data4, thresh, num_pcs):
     X2 = np.delete(X2, badInds, axis = 1)
     X3 = np.delete(X3, badInds, axis = 1)
     
-    
     #generate the linkage matrices with euclidean metric, we will cluster data ourselves
-    
     link0 = linkage(X0)
     link1 = linkage(X1)
     link2 = linkage(X2)
@@ -90,22 +83,68 @@ def socialVerificationOnlyPCA(data2,data3,data4, thresh, num_pcs):
     numFakes2, c2 = detectFakesTree(link2, thresh)
     numFakes3, c3 = detectFakesTree(link3, thresh)
     
-    if numFakes0 == 0:
-        result[0][0] = 1
+    return resultsHelper([numFakes0, numFakes1, numFakes2, numFakes3], [c1,c2,c3], result)
     
-    if numFakes1 == 1:
-        if (np.all(c1 == np.array([1,1,1,2,1,1])) or np.all(c1 == np.array([2,2,2,1,2,2]))):
-            result[0][1] = 1
-            
-    if numFakes2 == 2:
-        if (np.all(c2 == np.array([1,1,2,2,1,1])) or np.all(c2 == np.array([2,2,1,1,2,2]))):
-            result[0][2] = 1
-            
-    if numFakes3 == 3:
-        if (np.all(c3 == np.array([1,2,2,2,1,1])) or np.all(c3 == np.array([2,1,1,1,2,2]))):
-            result[0][3] = 1
-            
-    return result
+    
+def createDecompVector(coeff):
+    output = []
+    for i in range(len(coeff)):
+        for j in range(len(coeff[i])):
+            output.append(coeff[i][j].flatten())
+    return np.hstack(output)
+
+def socialVerificationNoPCA(data2,data3,data4, thresh):
+    result = np.zeros((1,4))
+    fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
+    
+    level = dwt_max_level(fullLen, 'haar')
+    
+    cam1_dist = createDecompVector(wavedec2(data2['cam1'][:fullLen,:], level = level, wavelet ='haar'))
+    cam2_dist = createDecompVector(wavedec2(data2['cam2'][:fullLen,:], level = level, wavelet ='haar'))
+    cam3_dist = createDecompVector(wavedec2(data2['cam3'][:fullLen,:], level = level, wavelet ='haar'))
+    cam4_dist = createDecompVector(wavedec2(data2['cam4'][:fullLen,:], level = level, wavelet ='haar'))
+    cam5_dist = createDecompVector(wavedec2(data2['cam5'][:fullLen,:], level = level, wavelet ='haar'))
+    cam6_dist = createDecompVector(wavedec2(data2['cam6'][:fullLen,:], level = level, wavelet ='haar'))
+    fake2_dist = createDecompVector(wavedec2(data2['fake'][:fullLen,:], level = level, wavelet ='haar'))
+    fake3_dist = createDecompVector(wavedec2(data3['fake'][:fullLen,:], level = level, wavelet ='haar'))
+    fake4_dist = createDecompVector(wavedec2(data4['fake'][:fullLen,:], level = level, wavelet ='haar'))
+    
+    X0 = np.array([cam1_dist, cam2_dist, cam3_dist, cam4_dist, cam5_dist, cam6_dist])
+    X1 = np.array([cam1_dist, cam2_dist, cam3_dist, fake4_dist, cam5_dist, cam6_dist])
+    X2 = np.array([cam1_dist, cam2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
+    X3 = np.array([cam1_dist, fake2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
+    
+    return clusterHelper(X0, X1, X2, X3, thresh, result)
+    
+
+
+
+
+def socialVerificationOnlyPCA(data2,data3,data4, thresh, num_pcs):
+    #storing the accuracy for the 0,1,2,3 fake cases
+    result = np.zeros((1,4))
+    fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
+    
+    cam1_dist = mahalanobis_calculate(data2['cam1'][:fullLen,:], num_pcs)
+    cam2_dist = mahalanobis_calculate(data2['cam2'][:fullLen,:], num_pcs)
+    cam3_dist = mahalanobis_calculate(data2['cam3'][:fullLen,:], num_pcs)
+    cam4_dist = mahalanobis_calculate(data2['cam4'][:fullLen,:], num_pcs)
+    cam5_dist = mahalanobis_calculate(data2['cam5'][:fullLen,:], num_pcs)
+    cam6_dist = mahalanobis_calculate(data2['cam6'][:fullLen,:], num_pcs)
+    fake2_dist = mahalanobis_calculate(data2['fake'][:fullLen,:], num_pcs)
+    fake3_dist = mahalanobis_calculate(data3['fake'][:fullLen,:], num_pcs)
+    fake4_dist = mahalanobis_calculate(data4['fake'][:fullLen,:], num_pcs)
+    
+    
+    X0 = np.array([cam1_dist, cam2_dist, cam3_dist, cam4_dist, cam5_dist, cam6_dist])
+    X1 = np.array([cam1_dist, cam2_dist, cam3_dist, fake4_dist, cam5_dist, cam6_dist])
+    X2 = np.array([cam1_dist, cam2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
+    X3 = np.array([cam1_dist, fake2_dist, fake3_dist, fake4_dist, cam5_dist, cam6_dist])
+    
+    return clusterHelper(X0, X1, X2, X3, thresh, result)
+    
+    
+    
 
 
 
@@ -131,13 +170,18 @@ def parse_args():
 def main():
     args = parse_args()
     
+    #there is no data for ID 17
     if args.num_participants >= 17:
-        out = np.zeros((args.num_participants-1, 4))
+        averagePCA = np.zeros((args.num_participants-1, 4))
+        averageSimple = np.zeros((args.num_participants-1, 4))
     else:
-        out = np.zeros((args.num_participants, 4))
+        averagePCA = np.zeros((args.num_participants, 4))
+        averageSimple = np.zeros((args.num_participants, 4))
         
     
     for i in range(args.num_participants):
+        
+        #there is no data for ID 17
         if i == 16:
             continue
         
@@ -146,16 +190,24 @@ def main():
         data3 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake3-ID{i+1}.mat'))
         data4 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake4-ID{i+1}.mat'))
         
-        result = socialVerificationOnlyPCA(data2,data3,data4,args.threshold, args.num_pcs)
+        resultPCA = socialVerificationOnlyPCA(data2,data3,data4,args.threshold, args.num_pcs)
         
-        print(f'Iteration: {i+1}. Result: {result}')
+        resultSimple = socialVerificationNoPCA(data2,data3,data4, args.threshold)
+        
+        print(f'Iteration: {i+1}. PCA Result: {resultPCA}')
+        print(f'Iteration: {i+1}. SimpleMethod Result: {resultSimple}')
+        
         
         if i > 16:
-            out[i-1] = result
+            averagePCA[i-1] = resultPCA
+            averageSimple[i-1] = resultSimple
+            
         else:
-            out[i] = result
+            averagePCA[i] = resultPCA
+            averageSimple[i] = resultSimple
         
-    print(f'Average accuracy: {np.mean(out, axis = 0)}')
+    print(f'Average accuracy PCA: {np.mean(averagePCA, axis = 0)}')
+    print(f'Average accuracy No PCA: {np.mean(averageSimple, axis = 0)}')
 
 
 
