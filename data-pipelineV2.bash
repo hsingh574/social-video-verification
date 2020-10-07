@@ -114,6 +114,18 @@ else
     do
         echo ${dir%?}
         
+        
+        
+        #hardcoded for now because generation stopped midway
+        #TODO: remove this for general case
+        
+        if [[ ${dir%?} =~ ID(1)$ || ${dir%?} =~ ID(10)$ || ${dir%?} =~ ID(11)$ || ${dir%?} =~ ID(12)$ || ${dir%?} =~ ID(13)$ || ${dir%?} =~ ID(14)$ || ${dir%?} =~ ID(17)$ ]]; then
+        continue
+        fi
+        
+        
+        
+        
         if [[ ${dir%?} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
             echo ${dir%?}
             DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir%?}"
