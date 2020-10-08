@@ -119,7 +119,7 @@ else
         #hardcoded for now because generation stopped midway
         #TODO: remove this for general case
         
-        if [[ ${dir%?} =~ ID(1)$ || ${dir%?} =~ ID(10)$ || ${dir%?} =~ ID(11)$ || ${dir%?} =~ ID(12)$ || ${dir%?} =~ ID(13)$ || ${dir%?} =~ ID(14)$ || ${dir%?} =~ ID(17)$ || ${dir%?} =~ ID(18)$ || ${dir%?} =~ ID(19)$ || ${dir%?} =~ ID(20)$ || ${dir%?} =~ ID(21)$ || ${dir%?} =~ ID(22)$ || ${dir%?} =~ ID(23)$ || ${dir%?} =~ ID(2)$ || ${dir%?} =~ ID(15)$ || ${dir%?} =~ ID(16)$ ]]; then
+        if [[ ${dir%?} =~ ID(1)$ || ${dir%?} =~ ID(10)$ || ${dir%?} =~ ID(11)$ || ${dir%?} =~ ID(12)$ || ${dir%?} =~ ID(13)$ || ${dir%?} =~ ID(14)$ || ${dir%?} =~ ID(17)$ || ${dir%?} =~ ID(18)$ || ${dir%?} =~ ID(19)$ || ${dir%?} =~ ID(20)$ || ${dir%?} =~ ID(21)$ || ${dir%?} =~ ID(22)$ || ${dir%?} =~ ID(23)$ || ${dir%?} =~ ID(24)$ || ${dir%?} =~ ID(25)$ || ${dir%?} =~ ID(2)$ || ${dir%?} =~ ID(3)$ || ${dir%?} =~ ID(4)$ || ${dir%?} =~ ID(5)$ || ${dir%?} =~ ID(6)$ || ${dir%?} =~ ID(7)$ || ${dir%?} =~ ID(15)$ || ${dir%?} =~ ID(16)$ ]]; then
         continue
         fi
         
