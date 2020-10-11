@@ -47,7 +47,7 @@ if __name__ == '__main__':
     exclude_list  = [14,23]
     ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]
     
-    inPathBase = "media/eleanor/New-Volume/deepfake-data/Dataset"
+    inPathBase = "/media/eleanor/New-Volume/deepfake-data/Dataset"
     outPathBase = "/media/eleanor/New-Volume/socialvv"
     
     if not(os.path.isdir(os.path.join(outPathBase, "wav2lip_landmarks"))):
