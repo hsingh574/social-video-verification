@@ -170,19 +170,19 @@ def parse_args():
 def main():
     args = parse_args()
     
-    #there is no data for ID 17
-    if args.num_participants >= 17:
-        averagePCA = np.zeros((args.num_participants-1, 4))
-        averageSimple = np.zeros((args.num_participants-1, 4))
-    else:
-        averagePCA = np.zeros((args.num_participants, 4))
-        averageSimple = np.zeros((args.num_participants, 4))
+    exclude_list  = [14,23, 7, 17]
+    
+    
+    averagePCA = np.zeros((args.num_participants-len(exclude_list), 4))
+    averageSimple = np.zeros((args.num_participants-len(exclude_list), 4))
+    
+    avg_index = 0
         
     
     for i in range(args.num_participants):
         
         #there is no data for ID 17
-        if i == 16:
+        if i+1 in exclude_list:
             continue
         
         
@@ -194,17 +194,13 @@ def main():
         
         resultSimple = socialVerificationNoPCA(data2,data3,data4, args.threshold)
         
-        print(f'Iteration: {i+1}. PCA Result: {resultPCA}')
-        print(f'Iteration: {i+1}. SimpleMethod Result: {resultSimple}')
+        print(f'ID: {i+1}. PCA Result: {resultPCA}')
+        print(f'ID: {i+1}. SimpleMethod Result: {resultSimple}')
         
+        averagePCA[avg_index] = resultPCA
+        averageSimple[avg_index] = resultSimple
         
-        if i > 16:
-            averagePCA[i-1] = resultPCA
-            averageSimple[i-1] = resultSimple
-            
-        else:
-            averagePCA[i] = resultPCA
-            averageSimple[i] = resultSimple
+        avg_index += 1
         
     print(f'Average accuracy PCA: {np.mean(averagePCA, axis = 0)}')
     print(f'Average accuracy No PCA: {np.mean(averageSimple, axis = 0)}')
