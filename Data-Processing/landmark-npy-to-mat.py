@@ -41,7 +41,7 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
 
 if __name__ == '__main__':
 
-    fakeCam = 4          
+    fakeCams = [i for i in range(1, 7)]  #fake each cam at least once         
     numCams = 7 # six real cameras + one fake
     numParticipants = 25
     exclude_list  = [14,23]
@@ -55,18 +55,18 @@ if __name__ == '__main__':
         
     landmarkBase = os.path.join(outPathBase, "wav2lip_landmarks")
     
+    for fakeCam in fakeCams:
+        for ID in ids:
+            inPathReal = os.path.join(inPathBase, f"ID{ID}")
+            inPathFake = os.path.join(outPathBase, f"ID{ID}", f"cam{fakeCam}-wav2lip", "landmarks")
+            outPath = os.path.join(landmarkBase, f"mouth-data-fake{fakeCam}-ID{ID}.mat")
+            print(f"Saving output to: {outPath}")
+        
+            # LipGAN's output is shifted from the input by five frames
+            shift = 0        
+        
+            lengthLst = [(len(os.listdir(os.path.join(inPathReal, f'cam{i}-landmarks'))) - shift) for i in range(1,7)]
+            lengthLst.append(len(os.listdir(inPathFake)))
+            numF = min(lengthLst)
     
-    for ID in ids:
-        inPathReal = os.path.join(inPathBase, f"ID{ID}")
-        inPathFake = os.path.join(outPathBase, f"ID{ID}", f"cam{fakeCam}-wav2lip", "landmarks")
-        outPath = os.path.join(landmarkBase, f"mouth-data-fake{fakeCam}-ID{ID}.mat")
-        print(f"Saving output to: {outPath}")
-    
-        # LipGAN's output is shifted from the input by five frames
-        shift = 0        
-    
-        lengthLst = [(len(os.listdir(os.path.join(inPathReal, f'cam{i}-landmarks'))) - shift) for i in range(1,7)]
-        lengthLst.append(len(os.listdir(inPathFake)))
-        numF = min(lengthLst)
-
-        landmark2mat(inPathReal, inPathFake, numCams,outPath,numF,fakeCam, shift)
+            landmark2mat(inPathReal, inPathFake, numCams,outPath,numF,fakeCam, shift)
