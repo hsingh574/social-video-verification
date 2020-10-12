@@ -44,8 +44,8 @@ if __name__ == '__main__':
     fakeCams = [i for i in range(1, 7)]  #fake each cam at least once         
     numCams = 7 # six real cameras + one fake
     numParticipants = 25
-    exclude_list  = [14,23, 7] #TODO: put 17 back here
-    ids = [i for i in range(1, numParticipants+1) if i in exclude_list] #TODO change this back to normal
+    exclude_list  = [17]
+    ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]
     
     inPathBase = "/media/eleanor/New-Volume/deepfake-data/Dataset"
     outPathBase = "/media/eleanor/New-Volume/socialvv"

@@ -93,9 +93,9 @@ def parse_args():
     parser.add_argument('--rocOn', action = 'store_false')
     parser.add_argument('--roc-window-size', type=int, default=250, help = "Window size to use when generating ROC curve")
     parser.add_argument('--acc-threshold', type=float, default=1.3, help = "Threshold to use when generating ACC curve")
-    parser.add_argument('--accOn', action = 'store_false')
-    parser.add_argument("--thresholds", nargs="+", default=[1.3,1.5])
-    parser.add_argument("--window-sizes", nargs="+", default=[200,250])
+    parser.add_argument('--accOn', action = 'store_true')
+    parser.add_argument("--thresholds", nargs="+", default=[1.3])
+    parser.add_argument("--window-sizes", nargs="+", default=[250])
     
     
     args = parser.parse_args()
@@ -108,16 +108,15 @@ def main():
     #This experiment will take a LONG time to run for all participants. 
     #Running it for 1 participant takes a bit over an hour. 
     
+    exclude_list = [17]
+    
     args = parse_args()
     
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
         
-    threshNum = len(args.thresholds)
-    if args.num_participants >= 17:
-        n  = args.num_participants - 1
-    else:
-        n = args.num_participants
+    threshNum = len(args.thresholds)        
+    n = args.num_participants - len(exclude_list)
     
     if args.rocOn:
         tpResults = np.zeros((threshNum,3,n))
@@ -126,15 +125,11 @@ def main():
     if args.accOn:
         accResults = np.zeros((4,len(args.window_sizes),n))
         
-        
+    person = 0
+    
     for i in range(args.num_participants):
-        if i == 16:
+        if i+1 in exclude_list:
             continue
-        
-        if i > 16:
-            person = i -1
-        else:
-            person = i
             
         if args.accOn:
             accs = np.zeros((4, len(args.window_sizes)))
@@ -274,6 +269,8 @@ def main():
             
         if args.accOn:
             accResults[:,:,person] = accs
+            
+        person += 1
                         
     if args.rocOn:
         meanTP = np.mean(tpResults, axis = 2)     
