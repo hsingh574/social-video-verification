@@ -118,7 +118,7 @@ else
         
         #dont generate for ID17
         
-        if [[ ${dir%?} =~ ID(17)$ ]]; then
+        if [[ !(${dir%?} =~ ID(23)$) && !(${dir%?} =~ ID(7)$) ]]; then
         continue
         fi
         
