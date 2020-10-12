@@ -247,9 +247,9 @@ def main():
                             
                     #print(f'Window Start: {start}')
                     
-                print(f'ID: {i}. Threshold: {t}. Window size: {j}.'
-                          f'TP: {np.mean(acc0, axis = 1)}. TN: {np.mean(acc1, axis = 1)}.'
-                          f'FP: {np.mean(acc2, axis = 1)}. FN: {np.mean(acc3, axis = 1)}.')
+                print(f'ID: {i}. Threshold: {t}. Window size: {j}. Each Case has TP, TN, FP, FN. '
+                          f'0 fake: {np.mean(acc0, axis = 1)}. 1 fake: {np.mean(acc1, axis = 1)}. '
+                          f'2 fake: {np.mean(acc2, axis = 1)}. 3 fake: {np.mean(acc3, axis = 1)}.')
                 
                 if (args.rocOn and j == args.roc_window_size):
                     tpResults[ind,0,person] = np.sum(acc1[0,:]) / (np.sum(acc1[0,:]) + np.sum(acc1[3,:]) + 1e-7)
