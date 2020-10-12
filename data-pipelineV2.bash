@@ -68,9 +68,7 @@ do
 
    cd "${3}"
    
-   #replace cam${i}-lipgan/cam${i}-first-4k.mp4 with camera${i}.MP4
-   
-   wav2lip/bin/python3 inference.py --checkpoint_path "${4}" --face "${5}/camera${i}.MP4" --audio "audio/${6}.wav" --pads 0 40 0 0 --blending
+   wav2lip/bin/python3 inference.py --checkpoint_path "${4}" --face "${5}/cam${i}-lipgan/cam${i}-first-4k.mp4" --audio "audio/${6}.wav" --pads 0 40 0 0 --blending
    mv results/result_voice.mp4 "${1}/cam${i}-wav2lip/cam${i}-wav2lip.mp4"
 
 
@@ -118,10 +116,9 @@ else
         
         
         
-        #hardcoded for now because generation stopped midway
-        #TODO: remove this for general case
+        #dont generate for ID17
         
-        if [[ ${dir%?} =~ ID(1)$ || ${dir%?} =~ ID(10)$ || ${dir%?} =~ ID(11)$ || ${dir%?} =~ ID(12)$ || ${dir%?} =~ ID(13)$ || ${dir%?} =~ ID(14)$ || ${dir%?} =~ ID(17)$ || ${dir%?} =~ ID(18)$ || ${dir%?} =~ ID(19)$ || ${dir%?} =~ ID(20)$ || ${dir%?} =~ ID(21)$ || ${dir%?} =~ ID(22)$ || ${dir%?} =~ ID(23)$ || ${dir%?} =~ ID(24)$ || ${dir%?} =~ ID(25)$ || ${dir%?} =~ ID(2)$ || ${dir%?} =~ ID(3)$ || ${dir%?} =~ ID(4)$ || ${dir%?} =~ ID(5)$ || ${dir%?} =~ ID(6)$ || ${dir%?} =~ ID(7)$ || ${dir%?} =~ ID(15)$ || ${dir%?} =~ ID(16)$ ]]; then
+        if [[ ${dir%?} =~ ID(17)$ ]]; then
         continue
         fi
         
