@@ -245,7 +245,7 @@ def main():
                         else:
                             acc3[3][start] = 1
                             
-                    print(f'Window Start: {start}')
+                    #print(f'Window Start: {start}')
                     
                 print(f'ID: {i}. Threshold: {t}. Window size: {j}.'
                           f'TP: {np.mean(acc0, axis = 1)}. TN: {np.mean(acc1, axis = 1)}.'
