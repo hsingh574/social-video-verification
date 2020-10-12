@@ -188,9 +188,9 @@ def main():
                         
                     #0 fakes case
                     if numFakes0 ==0:
-                        acc0[1][start] = 1 
+                        acc0[1][start] = 1 #TN
                     else:
-                        acc0[2][start] = 1
+                        acc0[2][start] = 1 #FP
                         
                         
                     #1 fake case
@@ -246,10 +246,7 @@ def main():
                             acc3[3][start] = 1
                             
                     #print(f'Window Start: {start}')
-                    
-                print(f'ID: {i}. Threshold: {t}. Window size: {j}. Each Case has TP, TN, FP, FN. '
-                          f'0 fake: {np.mean(acc0, axis = 1)}. 1 fake: {np.mean(acc1, axis = 1)}. '
-                          f'2 fake: {np.mean(acc2, axis = 1)}. 3 fake: {np.mean(acc3, axis = 1)}.')
+
                 
                 if (args.rocOn and j == args.roc_window_size):
                     tpResults[ind,0,person] = np.sum(acc1[0,:]) / (np.sum(acc1[0,:]) + np.sum(acc1[3,:]) + 1e-7)
@@ -259,6 +256,18 @@ def main():
                     fpResults[ind,0,person] = np.sum(acc1[2,:]) / (np.sum(acc1[2,:]) + np.sum(acc1[1,:]) +1e-7)
                     fpResults[ind,1,person] = np.sum(acc2[2,:]) / (np.sum(acc2[2,:]) + np.sum(acc2[1,:])+ 1e-7)
                     fpResults[ind,2,person] = np.sum(acc3[2,:]) / (np.sum(acc3[2,:]) + np.sum(acc3[1,:])+ 1e-7)
+                    
+                    
+                    print_results0 = [0, np.sum(acc0[1,:])/acc0.shape[1], np.sum(acc0[2,:])/acc0.shape[1], 0]
+                    print_results1 = [tpResults[ind,0,person], 1-fpResults[ind,0,person], fpResults[ind,0,person], 1-tpResults[ind,0,person]]
+                    print_results2 = [tpResults[ind,1,person], 1-fpResults[ind,1,person], fpResults[ind,1,person], 1-tpResults[ind,1,person]]
+                    print_results3 = [tpResults[ind,2,person], 1-fpResults[ind,2,person], fpResults[ind,2,person], 1-tpResults[ind,2,person]]
+                    
+                    
+                    
+                    print(f'ID: {i}. Threshold: {t}. Window size: {j}. Each Case has TP, TN, FP, FN. '
+                          f'0 fake: {print_results0}. 1 fake: {print_results1}. '
+                          f'2 fake: {print_results2}. 3 fake: {print_results3}.')
 
                 if (args.accOn and t == args.acc_threshold):
                     
