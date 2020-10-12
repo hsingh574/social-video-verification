@@ -118,14 +118,16 @@ else
         
         #dont generate for ID17
         
-        if [[ !(${dir%?} =~ ID(23)$) && !(${dir%?} =~ ID(7)$) ]]; then
+        if [[ ${dir%?} =~ ID(17)$ ]]; then
         continue
         fi
         
         
         
         
-        if [[ ${dir%?} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
+        #if [[ ${dir%?} =~ ID([1-9]|[1-9]{1}[0-9]{1})$ ]]; then
+        
+        if [[ ${dir%?} =~ ID(7)$ || ${dir%?} =~ ID(23)$ ]]; then
             echo ${dir%?}
             DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir%?}"
             VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir%?}"
