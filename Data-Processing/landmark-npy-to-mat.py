@@ -45,15 +45,18 @@ if __name__ == '__main__':
     numCams = 7 # six real cameras + one fake
     numParticipants = 25
     exclude_list  = [14,23, 7, 17]
-    ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]
+    ids = [i for i in range(1, numParticipants+1) if i in exclude_list]
     
     inPathBase = "/media/eleanor/New-Volume/deepfake-data/Dataset"
     outPathBase = "/media/eleanor/New-Volume/socialvv"
     
-    if not(os.path.isdir(os.path.join(outPathBase, "wav2lip_landmarks"))):
-        os.makedirs(os.path.join(outPathBase, "wav2lip_landmarks"))
+    
+    landmarkPath = "wav2lip_landmarks2"
+    
+    if not(os.path.isdir(os.path.join(outPathBase, landmarkPath))):
+        os.makedirs(os.path.join(outPathBase, landmarkPath))
         
-    landmarkBase = os.path.join(outPathBase, "wav2lip_landmarks")
+    landmarkBase = os.path.join(outPathBase, landmarkPath)
     
     for fakeCam in fakeCams:
         for ID in ids:
