@@ -86,7 +86,7 @@ def parse_args():
                     help='Directory where processed landmark files live')
     parser.add_argument('--num_pcs', type=int, default=5,
                     help='Number of principal components to use')
-    parser.add_argument('--num_participants', type=int, default=1,
+    parser.add_argument('--num_participants', type=int, default=25,
                     help='Number of participants')
     parser.add_argument('--save-dir', type=str, default='results',
                     help='Directory to save results')
