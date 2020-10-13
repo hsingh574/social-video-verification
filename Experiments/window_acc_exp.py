@@ -275,13 +275,13 @@ def main():
         print(twoFake.shape)
         print(threeFake.shape)
         
-        oneFake = oneFake[oneFake[:,1].argsort()]
-        twoFake = twoFake[twoFake[:,1].argsort()]
-        threeFake = threeFake[threeFake[:,1].argsort()]
+        oneFake = oneFake[oneFake[:,0].argsort()]
+        twoFake = twoFake[twoFake[:,0].argsort()]
+        threeFake = threeFake[threeFake[:,0].argsort()]
         
-        plt.errorbar(oneFake[:,0],oneFake[:,1], stdTP[:,0],stdFP[:,0], label = 'One Fake')
-        plt.errorbar(twoFake[:,0],twoFake[:,1], stdTP[:,1],stdFP[:,1], label = 'Two Fakes')
-        plt.errorbar(twoFake[:,0],twoFake[:,1], stdTP[:,2],stdFP[:,2], label = 'Three Fakes')
+        plt.errorbar(oneFake[0],oneFake[1], stdTP[:,0],stdFP[:,0], label = 'One Fake')
+        plt.errorbar(twoFake[0],twoFake[1], stdTP[:,1],stdFP[:,1], label = 'Two Fakes')
+        plt.errorbar(twoFake[0],twoFake[1], stdTP[:,2],stdFP[:,2], label = 'Three Fakes')
         plt.xlabel("False Positive Rate")
         plt.ylabel("True Positive Rate")
         plt.xlim([0,1])
