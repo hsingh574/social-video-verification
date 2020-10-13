@@ -136,11 +136,15 @@ def main():
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
         
+        
+        
     threshNum = len(args.thresholds)  
       
     #n = args.num_participants - len(exclude_list)
-    
-    n = args.num_participants
+    if args.num_participants >= 17:
+        n = args.num_participants - len(exclude_list)
+    else:
+        n = args.num_participants
     if args.rocOn:
         tpResults = np.zeros((threshNum,3,n))
         fpResults = np.zeros((threshNum,3,n))
