@@ -102,6 +102,27 @@ def parse_args():
     return args
 
 
+def calculate_acc_helper(option1, option2, numFakes, c, correctAnswer, isFake):
+    acc = np.zeros((4,))
+    
+    if numFakes == correctAnswer:
+        if isFake==0:
+            acc[2] = 1
+        else:
+            if (np.all(c == option1) or np.all(c == option2)):
+                acc[0] = 1
+            else:
+                acc[3] = 1
+    elif not(numFakes == 0):
+        acc[2] = 1
+    else:
+        if isFake == 0:
+            acc[1] = 1
+        else:
+            acc[3] = 1
+    return acc
+
+
 
 def main():
     
@@ -193,60 +214,17 @@ def main():
                         acc0[1][start] = 1 #TN
                     else:
                         acc0[2][start] = 1 #FP
-                        
-                        
-                    #1 fake case
-                    if numFakes1 ==1:
-                        if isFake==0:
-                            acc1[2][start] = 1
-                        else:
-                            if (np.all(c1 == np.array([1,1,1,2,1,1])) or np.all(c1 == np.array([2,2,2,1,2,2]))):
-                                acc1[0][start] = 1
-                            else:
-                                acc1[3][start] = 1
-                    elif numFakes1 > 1:
-                        acc1[2][start] = 1
-                    else:
-                        if isFake == 0:
-                            acc1[1][start] = 1
-                        else:
-                            acc1[3][start] = 1
-                            
-                    #2 fakes case
-                    if numFakes2 ==2:
-                        if isFake==0:
-                            acc2[2][start] = 1
-                        else:
-                            if (np.all(c2 == np.array([1,1,2,2,1,1])) or np.all(c2 == np.array([2,2,1,1,2,2]))):
-                                acc2[0][start] = 1
-                            else:
-                                acc2[3][start] = 1
-                    elif ((numFakes2 == 1) or (numFakes2 > 2)):
-                        acc2[2][start] = 1
-                    else:
-                        if isFake == 0:
-                            acc2[1][start] = 1
-                        else:
-                            acc2[3][start] = 1
-                            
-                    #3 fakes case
+
+                    acc1[:,start] = calculate_acc_helper(np.array([1,1,1,2,1,1]), 
+                        np.array([2,2,2,1,2,2]), numFakes1, c1, 1, isFake)
                     
-                    if numFakes3 ==3:
-                        if isFake==0:
-                            acc3[2][start] = 1
-                        else:
-                            if (np.all(c3 == np.array([1,2,2,2,1,1])) or np.all(c3 == np.array([2,1,1,1,2,2]))):
-                                acc3[0][start] = 1
-                            else:
-                                acc3[3][start] = 1
-                    elif ((numFakes3 == 1) or (numFakes3 == 2) or (numFakes3 > 3)):
-                        acc3[2][start] = 1
-                    else:
-                        if isFake == 0:
-                            acc3[1][start] = 1
-                        else:
-                            acc3[3][start] = 1
-                            
+                    acc2[:,start] = calculate_acc_helper(np.array([1,1,2,2,1,1]), 
+                        np.array([2,2,1,1,2,2]), numFakes2, c2, 2, isFake)
+                    
+                    
+                    acc3[:,start] = calculate_acc_helper(np.array([1,2,2,2,1,1]), 
+                        np.array([2,1,1,1,2,2]), numFakes3, c3, 2, isFake)
+                    
                     #print(f'Window Start: {start}')
 
                 
@@ -292,6 +270,10 @@ def main():
         oneFake = np.array([meanFP[:,0],meanTP[:,0] ])
         twoFake = np.array([meanFP[:,1],meanTP[:,1] ])
         threeFake = np.array([meanFP[:,2],meanTP[:,2] ])
+        
+        print(oneFake.shape)
+        print(twoFake.shape)
+        print(threeFake.shape)
         
         oneFake = oneFake[oneFake[:,1].argsort()]
         twoFake = twoFake[twoFake[:,1].argsort()]
