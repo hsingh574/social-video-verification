@@ -49,29 +49,40 @@ face_detector_path = ("/home/socialvv/social-video-verification-v2/"
                       "social-video-verification/Data-Processing/"
                       "mmod_human_face_detector.dat")
 
-cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
+
 
 baseDir = "/home/socialvv/socialvv"
 
-@wrap_non_picklable_objects
 def parallel_detection(cam, ID):
     
+    #loading in model every time is an annoying slowdown, 
+    #but I can't find a way to pickle it and I think this is an overall speedup
+    
+    cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
     
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
     #count number of frames in directory
     numImg = len([name for name in os.listdir(frameDir) if os.path.isfile(os.path.join(frameDir, name))])
     
+    img_list = []
+    
     with open(boundingBoxFile, 'w+') as out:
         #temporary for testing
-        for f in range(1, min(numImg + 1, 300)):
+        for f in range(1, min(numImg + 1, 50)):
             number = '{0:04d}'.format(f)
             filename = os.path.join(frameDir, "frames" + number + ".jpg")
             img = dlib.load_rgb_image(filename)
-            dets = cnn_face_detector(img, 1)
-            h, w = img.shape[:2]
-            sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
-            if(len(dets) == 0):
+            img_list.append(img)
+            
+            
+            
+            
+            
+        dets = cnn_face_detector(img_list, 1)
+        for det in dets:
+            sortedDets = sorted(det, key=lambda a: a.confidence, reverse=True)
+            if(len(det) == 0):
                 print('No faces detected. Using last detection result.')
             else:
                 d = sortedDets[0]
