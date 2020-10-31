@@ -67,10 +67,7 @@ def helper(d):
             val = q.get()
             if val is None:
                 break
-            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
-                                            d.rect.top(), 
-                                            d.rect.right(), 
-                                            d.rect.bottom()))
+            out.write(val)
         q.task_done()
         # Finish up
         q.task_done()
@@ -92,7 +89,13 @@ def processor(f):
         print('No faces detected. Using last detection result.')
     else:
         d = sortedDets[0]
-    q.put(d)
+        
+    #put the rectangles in the q
+    to_put = f'%d, %d, %d, %d\n' % (d.rect.left(), 
+                                            d.rect.top(), 
+                                            d.rect.right(), 
+                                           d.rect.bottom())
+    q.put(to_put)
     
 
 start = time.time()
