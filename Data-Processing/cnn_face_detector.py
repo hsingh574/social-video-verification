@@ -49,6 +49,8 @@ import sys
 import dlib
 import os
 import cv2
+from joblib import Parallel, delayed
+import time
 
 print("Dlib using cuda?")
 print(dlib.DLIB_USE_CUDA)
@@ -61,11 +63,9 @@ padding = 100
 boundingFile = open(sys.argv[4] + "bounding-boxes.txt","w+")
 saveCrop = False
 
-
-for f in range(1,numImg + 1):
+def helper(f):
     number = '{0:04d}'.format(f)
     filename = sys.argv[2] + "frames" + number + ".jpg"
-
     print("Processing file: {}".format(f))
     img = dlib.load_rgb_image(filename)
     dets = cnn_face_detector(img, 1)
@@ -93,4 +93,11 @@ for f in range(1,numImg + 1):
     # Save detection box coordinates
     boundingFile.write('%d, %d, %d, %d\n' % (d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom()))
 
+
+n_jobs = -1
+
+start = time.time()
+Parallel(n_jobs=n_jobs)(delayed(helper)(f) for f in range(1,numImg + 1))
+end = time.time()
+print('{:.4f} s'.format(end-start))
 boundingFile.close()
