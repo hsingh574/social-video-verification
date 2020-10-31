@@ -62,7 +62,7 @@ boundingFile = open(sys.argv[4] + "bounding-boxes.txt","w+")
 saveCrop = False
 
 
-for f in range(numImg + 1):
+for f in range(1,numImg + 1):
     number = '{0:04d}'.format(f)
     filename = sys.argv[2] + "frames" + number + ".jpg"
 
