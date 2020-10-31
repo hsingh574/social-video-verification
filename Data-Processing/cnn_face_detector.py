@@ -38,6 +38,7 @@ import dlib
 import os
 from joblib import Parallel, delayed
 import time
+from joblib import wrap_non_picklable_objects
 
 print("Dlib using cuda?")
 print(dlib.DLIB_USE_CUDA)
@@ -48,13 +49,13 @@ face_detector_path = ("/home/socialvv/social-video-verification-v2/"
                       "social-video-verification/Data-Processing/"
                       "mmod_human_face_detector.dat")
 
-
+cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
 
 baseDir = "/home/socialvv/socialvv"
 
-
+@wrap_non_picklable_objects
 def parallel_detection(cam, ID):
-    cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
+    
     
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
@@ -63,7 +64,7 @@ def parallel_detection(cam, ID):
     
     with open(boundingBoxFile, 'w+') as out:
         #temporary for testing
-        for f in range(1, max(numImg + 1, 300)):
+        for f in range(1, min(numImg + 1, 300)):
             number = '{0:04d}'.format(f)
             filename = os.path.join(frameDir, "frames" + number + ".jpg")
             img = dlib.load_rgb_image(filename)
