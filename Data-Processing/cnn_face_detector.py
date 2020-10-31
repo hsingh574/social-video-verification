@@ -59,10 +59,9 @@ cnn_face_detector = dlib.cnn_face_detection_model_v1(sys.argv[1])
 numImg = len([name for name in os.listdir(sys.argv[2]) if os.path.isfile(os.path.join(sys.argv[2], name))])
 padding = 100
 
-boundingFile = open(sys.argv[3] + "bounding-boxes.txt","w+")
 
 def helper(d):
-    with open(sys.argv[4] + "bounding-boxes.txt","w+") as out:
+    with open(sys.argv[3] + "bounding-boxes.txt","w+") as out:
         while True:
             val = q.get()
             if val is None:
