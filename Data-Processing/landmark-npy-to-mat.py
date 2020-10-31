@@ -48,7 +48,7 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
     
 def helper(fakeCam, i, ID):
     inPathReal = os.path.join(inPathBase, f"ID{ID}")
-    inPathFake = os.path.join(outPathBase, f"ID{ID}", f"cam{fakeCam}-wav2lip", "landmarks")
+    inPathFake = os.path.join(outPathBase, f"ID{ID}", f"cam{fakeCam}-wav2lip", "landmarksv2")
     outPath = os.path.join(landmarkBase, f"mouth-data-fake{fakeCam}-ID{ID}-I{i}.mat")
     print(f"Saving output to: {outPath}")
     # LipGAN's output is shifted from the input by five frames
