@@ -85,9 +85,8 @@ do
    
  '
    echo "Cropping faces..."
-   
-   mkdir -p "${1}/cam${i}-wav2lip/croppedv2"   
-   wav2lip/bin/python3 "${7}/cnn_face_detector.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-wav2lip/frames/" "${1}/cam${i}-wav2lip/croppedv2/" "${1}/bounding-boxes/cam${i}-post-wav2lipv2-"
+    
+   wav2lip/bin/python3 "${7}/cnn_face_detector.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-wav2lip/frames/" "${1}/bounding-boxes/cam${i}-post-wav2lipv2-"
    echo "Cropping faces for Video ${i} done."
    
    echo "Running 2D landmark detection..."
