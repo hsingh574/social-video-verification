@@ -56,7 +56,7 @@ baseDir = "/home/socialvv/socialvv"
 def parallel_detection(cam, ID):
     cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
     
-    frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip')
+    frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
     #count number of frames in directory
     numImg = len([name for name in os.listdir(frameDir) if os.path.isfile(os.path.join(frameDir, name))])
