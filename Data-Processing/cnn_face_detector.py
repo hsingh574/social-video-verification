@@ -48,12 +48,14 @@ face_detector_path = ("/home/socialvv/social-video-verification-v2/"
                       "social-video-verification/Data-Processing/"
                       "mmod_human_face_detector.dat")
 
-cnn_face_detector_model = dlib.cnn_face_detection_model_v1(face_detector_path)
+
 
 baseDir = "/home/socialvv/socialvv"
 
 
-def parallel_detection(cam, ID, cnn_face_detector):
+def parallel_detection(cam, ID, face_detector_path ):
+    cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
+    
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
     #count number of frames in directory
@@ -89,6 +91,6 @@ if __name__ == '__main__':
     n_jobs = -1
     
     start = time.time()
-    Parallel(n_jobs=n_jobs)(delayed(parallel_detection)(cam,ID, cnn_face_detector_model) for cam in range(1,numCams+1) for ID in ids)
+    Parallel(n_jobs=n_jobs)(delayed(parallel_detection)(cam,ID) for cam in range(1,numCams+1) for ID in ids)
     end = time.time()
     print('{:.4f} s'.format(end-start))
