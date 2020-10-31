@@ -40,18 +40,21 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
                          'cam5':dataMat[:,:,4],'cam6': dataMat[:,:,5],'fake':dataMat[:,:,6]})
 
 if __name__ == '__main__':
-
-    fakeCams = [i for i in range(1, 7)]  #fake each cam at least once         
+    
+    #fakeCams = [i for i in range(1, 7)]  #fake each cam at least once         
+    fakeCams = [1]
+    
     numCams = 7 # six real cameras + one fake
     numParticipants = 25
     exclude_list  = [17]
-    ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]
+    temp_list = [1]
+    #ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]
+    ids = [i for i in range(1, numParticipants+1) if i in temp_list]          
+    inPathBase = "/home/socialvv/Dataset"
+    outPathBase = "/home/socialvv/socialvv"
     
-    inPathBase = "/media/eleanor/New-Volume/deepfake-data/Dataset"
-    outPathBase = "/media/eleanor/New-Volume/socialvv"
     
-    
-    landmarkPath = "wav2lip_landmarks2"
+    landmarkPath = "wav2lip_landmarksLarger"
     
     if not(os.path.isdir(os.path.join(outPathBase, landmarkPath))):
         os.makedirs(os.path.join(outPathBase, landmarkPath))
