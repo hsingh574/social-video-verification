@@ -53,7 +53,7 @@ face_detector_path = ("/home/socialvv/social-video-verification-v2/"
 baseDir = "/home/socialvv/socialvv"
 
 
-def parallel_detection(cam, ID, face_detector_path ):
+def parallel_detection(cam, ID):
     cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
     
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip')
