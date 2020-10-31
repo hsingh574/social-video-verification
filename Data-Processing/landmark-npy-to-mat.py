@@ -69,17 +69,16 @@ if __name__ == '__main__':
     exclude_list  = [17]
     
     #ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
-    ids = [14] * 5
+    ids = [14] * 15
     
     if not(os.path.isdir(os.path.join(outPathBase, landmarkPath))):
         os.makedirs(os.path.join(outPathBase, landmarkPath))
         
     landmarkBase = os.path.join(outPathBase, landmarkPath)
     
-    n_jobs = 5
+    n_jobs = -1
     
     start = time.time()
-    # n_jobs is the number of parallel jobs
     Parallel(n_jobs=n_jobs)(delayed(helper)(fakeCam, i,ID) for fakeCam in fakeCams for i,ID in enumerate(ids))
     end = time.time()
     print('{:.4f} s'.format(end-start))
