@@ -48,22 +48,35 @@ This object behaves just like a list of lists and can be iterated over.
 import sys
 import dlib
 import os
-import cv2
 from joblib import Parallel, delayed
+from multiprocessing import Process, JoinableQueue
 import time
 
 print("Dlib using cuda?")
 print(dlib.DLIB_USE_CUDA)
 
 cnn_face_detector = dlib.cnn_face_detection_model_v1(sys.argv[1])
-outDir = sys.argv[3]
 numImg = len([name for name in os.listdir(sys.argv[2]) if os.path.isfile(os.path.join(sys.argv[2], name))])
 padding = 100
 
 boundingFile = open(sys.argv[4] + "bounding-boxes.txt","w+")
-saveCrop = False
 
-def helper(f):
+def helper(d):
+    with open(sys.argv[4] + "bounding-boxes.txt","w+") as out:
+        while True:
+            val = q.get()
+            if val is None:
+                break
+            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
+                                            d.rect.top(), 
+                                            d.rect.right(), 
+                                            d.rect.bottom()))
+        q.task_done()
+        # Finish up
+        q.task_done()
+
+
+def processor(f):
     number = '{0:04d}'.format(f)
     filename = sys.argv[2] + "frames" + number + ".jpg"
     print("Processing file: {}".format(f))
@@ -79,25 +92,15 @@ def helper(f):
         print('No faces detected. Using last detection result.')
     else:
         d = sortedDets[0]
+    q.put(d)
     
-    if (saveCrop):
-        y1 = max(d.rect.top() - padding, 0)
-        y2 = min(d.rect.bottom() + padding, h)
-        x1 = max(d.rect.left() - padding, 0)
-        x2 = min(d.rect.right() + padding, w)
-        cropImg = img[y1:y2, x1:x2]
-        
-        cropImg = cv2.cvtColor(cropImg, cv2.COLOR_BGR2RGB)
-        cv2.imwrite(outDir + "%04d.jpg" % f,cropImg)
-
-    # Save detection box coordinates
-    boundingFile.write('%d, %d, %d, %d\n' % (d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom()))
-
-
-n_jobs = -1
 
 start = time.time()
-Parallel(n_jobs=n_jobs)(delayed(helper)(f) for f in range(1,numImg + 1))
+q = JoinableQueue()
+p = Process(target=helper, args=(q,))
+p.start()
+Parallel(n_jobs=-1, verbose=0)(delayed(processor)(f) for f in range(1,numImg + 1))
+q.put(None) # Poison pill
+p.join()
 end = time.time()
-print('{:.4f} s'.format(end-start))
-boundingFile.close()
+print('{:.4f} s'.format(end-start)) 
