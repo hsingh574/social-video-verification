@@ -64,8 +64,7 @@ def parallel_detection(cam, ID):
     numImg = len([name for name in os.listdir(frameDir) if os.path.isfile(os.path.join(frameDir, name))])
     
     with open(boundingBoxFile, 'w+') as out:
-        #temporary for testing
-        for f in range(1, min(numImg + 1, 50)):
+        for f in range(1, numImg + 1):
             number = '{0:04d}'.format(f)
             filename = os.path.join(frameDir, "frames" + number + ".jpg")
             img = dlib.load_rgb_image(filename)
@@ -86,8 +85,7 @@ if __name__ == '__main__':
     numCams = 6
     numParticipants = 25
     exclude_list  = [17]
-    #ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
-    ids = [1,2,3]
+    ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
     
     n_jobs = -1
     
