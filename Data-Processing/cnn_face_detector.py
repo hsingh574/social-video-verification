@@ -67,9 +67,10 @@ def parallel_detection(cam, ID):
     
     img_list = []
     
+    #cannot do batch inference
     with open(boundingBoxFile, 'w+') as out:
         #temporary for testing
-        for f in range(1, min(numImg + 1, 50)):
+        for f in range(1, min(numImg + 1, 20)):
             number = '{0:04d}'.format(f)
             filename = os.path.join(frameDir, "frames" + number + ".jpg")
             img = dlib.load_rgb_image(filename)
