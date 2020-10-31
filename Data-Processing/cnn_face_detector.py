@@ -91,7 +91,7 @@ def processor(f):
         d = sortedDets[0]
         
     #put the rectangles in the q
-    to_put = f'%d, %d, %d, %d\n' % (d.rect.left(), 
+    to_put = '%d, %d, %d, %d\n' % (d.rect.left(), 
                                             d.rect.top(), 
                                             d.rect.right(), 
                                            d.rect.bottom())
