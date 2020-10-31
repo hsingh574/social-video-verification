@@ -83,17 +83,21 @@ do
    ffmpeg -i "${1}/cam${i}-wav2lip/cam${i}-wav2lip.mp4" -loglevel quiet -q:v 2 "${1}/cam${i}-wav2lip/frames/frames%04d.jpg" 
    echo "Deepfake for Video ${i} frame generation done."
    
- '
+ 
    echo "Cropping faces..."
     
    wav2lip/bin/python3 "${7}/cnn_face_detector.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-wav2lip/frames/" "${1}/bounding-boxes/cam${i}-post-wav2lipv2-"
    echo "Cropping faces for Video ${i} done."
+   
+   
    
    echo "Running 2D landmark detection..."
    
    mkdir -p "${1}/cam${i}-wav2lip/landmarksv2"
    wav2lip/bin/python3 "${7}/detectFeatures.py" "${1}/cam${i}-wav2lip/frames/" "${1}/cam${i}-wav2lip/landmarksv2" "${1}/bounding-boxes/cam${i}-post-wav2lipv2-bounding-boxes.txt"
    echo "Running 2D landmark detection for Video ${i} done."
+   
+   '
    
 done
 
