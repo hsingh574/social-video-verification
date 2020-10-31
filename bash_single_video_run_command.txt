@@ -1,0 +1,1 @@
+bash -i singleVideoProcess.bash /media/eleanor/New-Volume/socialvv/ID1-identity cam3-identity /home/socialvv/social-video-verification-v2/social-video-verification/Data-Processing/
