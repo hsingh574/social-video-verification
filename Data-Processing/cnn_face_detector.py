@@ -33,76 +33,62 @@
 #   via the command:
 #       pip install numpy
 
-'''
-This detector returns a mmod_rectangles object. This object contains a list of mmod_rectangle objects.
-These objects can be accessed by simply iterating over the mmod_rectangles object
-The mmod_rectangle object has two member variables, a dlib.rectangle object, and a confidence score.
-    
-It is also possible to pass a list of images to the detector.
-- like this: dets = cnn_face_detector([image list], upsample_num, batch_size = 128)
 
-In this case it will return a mmod_rectangless object.
-This object behaves just like a list of lists and can be iterated over.
-'''
-
-import sys
 import dlib
 import os
 from joblib import Parallel, delayed
-from multiprocessing import Process, JoinableQueue
 import time
 
 print("Dlib using cuda?")
 print(dlib.DLIB_USE_CUDA)
 
-cnn_face_detector = dlib.cnn_face_detection_model_v1(sys.argv[1])
-numImg = len([name for name in os.listdir(sys.argv[2]) if os.path.isfile(os.path.join(sys.argv[2], name))])
-padding = 100
 
 
-def helper(d):
-    with open(sys.argv[3] + "bounding-boxes.txt","w+") as out:
-        while True:
-            val = q.get()
-            if val is None:
-                break
-            out.write(val)
-        q.task_done()
-        # Finish up
-        q.task_done()
+face_detector_path = ("/home/socialvv/social-video-verification-v2/"
+                      "social-video-verification/Data-Processing/"
+                      "mmod_human_face_detector.dat")
+
+cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
+
+baseDir = "/home/socialvv/socialvv"
 
 
-def processor(f):
-    number = '{0:04d}'.format(f)
-    filename = sys.argv[2] + "frames" + number + ".jpg"
-    print("Processing file: {}".format(f))
-    img = dlib.load_rgb_image(filename)
-    dets = cnn_face_detector(img, 1)
-    h, w = img.shape[:2]
-
-    #print("Number of faces detected: {}".format(len(dets)))
-    sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
+def parallel_detection(cam, ID):
+    frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip')
+    boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
+    #count number of frames in directory
+    numImg = len([name for name in os.listdir(frameDir) if os.path.isfile(os.path.join(frameDir, name))])
     
-    # Only keep most confident face-- we only expect one face per frame
-    if(len(dets) == 0):
-        print('No faces detected. Using last detection result.')
-    else:
-        d = sortedDets[0]
-        
-    #put the rectangles in the q
-    to_put = '%d, %d, %d, %d\n' % (d.rect.left(), 
-                                            d.rect.top(), 
-                                            d.rect.right(), 
-                                           d.rect.bottom())
-    q.put(to_put)
+    with open(boundingBoxFile, 'w+') as out:
+        #temporary for testing
+        for f in range(1, max(numImg + 1, 300)):
+            number = '{0:04d}'.format(f)
+            filename = os.path.join(frameDir, "frames" + number + ".jpg")
+            img = dlib.load_rgb_image(filename)
+            dets = cnn_face_detector(img, 1)
+            h, w = img.shape[:2]
+            sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
+            if(len(dets) == 0):
+                print('No faces detected. Using last detection result.')
+            else:
+                d = sortedDets[0]
+            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
+                                                d.rect.top(), 
+                                                d.rect.right(), 
+                                               d.rect.bottom()))
     
 
-start = time.time()
-q = JoinableQueue()
-p = Process(target=helper, args=(q,))
-p.start()
-Parallel(n_jobs=-1, verbose=0)(delayed(processor)(f) for f in range(1,numImg + 1))
-q.put(None) # Poison pill
-p.join()
-end = time.time()
-print('{:.4f} s'.format(end-start)) 
+if __name__ == '__main__':
+    
+    numCams = 6
+    numParticipants = 25
+    exclude_list  = [17]
+    #ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
+    ids = [1,2,3]
+    
+    n_jobs = -1
+    
+    start = time.time()
+    Parallel(n_jobs=n_jobs)(delayed(parallel_detection)(cam,ID) for cam in range(1,numCams+1) for ID in ids)
+    end = time.time()
+    print('{:.4f} s'.format(end-start))
