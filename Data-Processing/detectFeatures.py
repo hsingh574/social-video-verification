@@ -6,6 +6,7 @@ import numpy as np
 import os
 import time
 from joblib import Parallel, delayed
+import shutil
 
 baseDir = "/home/socialvv/socialvv"
 
@@ -17,7 +18,14 @@ def parallel_generation(cam,ID):
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',
                                    f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
+    
+    delDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarks')
     outDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarksv2')
+    
+    
+    if os.path.isdir(delDir):
+        shutil.rmtree(delDir)
+        
     
     if not(os.path.isdir(outDir)):
         os.makedirs(outDir)
