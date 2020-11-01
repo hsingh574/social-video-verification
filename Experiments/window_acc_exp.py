@@ -3,7 +3,7 @@
 import argparse
 import os
 import numpy as np
-from scipy.io import loadmat
+from scipy.io import loadmat, savemat
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.covariance import MinCovDet
@@ -49,6 +49,7 @@ def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2,
     camFake2 = mahalanobis_calculate(fake3[start:end,:], num_pcs)
     camFake3 = mahalanobis_calculate(fake4[start:end,:], num_pcs)
     
+    #X0 is no fakes, X1 is 1 fake, etc.
     X0 = np.array([cam1Out, cam2Out, cam3Out, cam4Out, cam5Out, cam6Out])
     X1 = np.array([cam1Out, cam2Out, cam3Out, camFake3, cam5Out, cam6Out])
     X2 = np.array([cam1Out, cam2Out, camFake2, camFake3, cam5Out, cam6Out])
@@ -86,16 +87,16 @@ def parse_args():
                     help='Directory where processed landmark files live')
     parser.add_argument('--num_pcs', type=int, default=5,
                     help='Number of principal components to use')
-    parser.add_argument('--num_participants', type=int, default=25,
+    parser.add_argument('--num_participants', type=int, default=1,
                     help='Number of participants')
-    parser.add_argument('--save-dir', type=str, default='results',
+    parser.add_argument('--save-dir', type=str, default='/users/harman/desktop/results',
                     help='Directory to save results')
     parser.add_argument('--rocOn', action = 'store_false')
-    parser.add_argument('--roc-window-size', type=int, default=250, help = "Window size to use when generating ROC curve")
+    parser.add_argument('--roc-window-size', type=int, default=50, help = "Window size to use when generating ROC curve")
     parser.add_argument('--acc-threshold', type=float, default=1.3, help = "Threshold to use when generating ACC curve")
     parser.add_argument('--accOn', action = 'store_true')
-    parser.add_argument("--thresholds", nargs="+", default=[1.3])
-    parser.add_argument("--window-sizes", nargs="+", default=[250])
+    parser.add_argument("--thresholds", nargs="+", default=[1.3,1.5,1.7])
+    parser.add_argument("--window-sizes", nargs="+", default=[50])
     
     
     args = parser.parse_args()
@@ -107,65 +108,57 @@ def calculate_acc_helper(option1, option2, numFakes, c, correctAnswer, isFake):
     
     if numFakes == correctAnswer:
         if isFake==0:
-            acc[2] = 1
+            acc[2] = 1  #FP, detected some number of fakes where there was none
         else:
             if (np.all(c == option1) or np.all(c == option2)):
-                acc[0] = 1
+                acc[0] = 1 #TP, detected some number of fakes where there was some
             else:
-                acc[3] = 1
+                acc[3] = 1 #FN, failed to detect some number of fakes where there was some
     elif not(numFakes == 0):
-        acc[2] = 1
+        acc[2] = 1 #FP deteected some number of fakes, but was wrong number of fakes
     else:
         if isFake == 0:
-            acc[1] = 1
+            acc[1] = 1 #TN, correctly got no fakes 
         else:
-            acc[3] = 1
+            acc[3] = 1 #FN incorrectly got no fakes
     return acc
 
 
 
-def main():
-    
-    #This experiment will take a LONG time to run for all participants. 
-    #Running it for 1 participant takes a bit over an hour. 
-    
-    exclude_list = [17]
+def main():  
     
     args = parse_args()
     
+    exclude_list  = [17]
+    ids = [i for i in range(1, args.num_participants+1) if i not in exclude_list] 
+    n = len(ids)
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
-        
-        
-        
-    threshNum = len(args.thresholds)  
-      
-    #n = args.num_participants - len(exclude_list)
-    if args.num_participants >= 17:
-        n = args.num_participants - len(exclude_list)
-    else:
-        n = args.num_participants
+
+    #Iterate over diffrent thresholds and window sizes
+    threshes = args.thresholds
+    window_sizes = args.window_sizes
+    threshNum = len(threshes)  
     if args.rocOn:
         tpResults = np.zeros((threshNum,3,n))
         fpResults = np.zeros((threshNum,3,n))
-        
     if args.accOn:
-        accResults = np.zeros((4,len(args.window_sizes),n))
+        accResults = np.zeros((4,len(window_sizes),n))
         
     person = 0
     
-    for i in range(args.num_participants):
-        if i+1 in exclude_list:
-            continue
-            
+    for i in ids:  
+        print(f'Processing ID{i}')          
         if args.accOn:
             accs = np.zeros((4, len(args.window_sizes)))
         
-        data2 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake2-ID{i+1}.mat'))
-        data3 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake3-ID{i+1}.mat'))
-        data4 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake4-ID{i+1}.mat'))
+        data2 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake2-ID{i}.mat'))
+        data3 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake3-ID{i}.mat'))
+        data4 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake4-ID{i}.mat'))
         
         fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
+        
+        print(f'Total number of frames to work over: {fullLen}')
         
         cam1 = data3['cam1'][:fullLen,:]
         cam2 = data3['cam2'][:fullLen,:]
@@ -179,17 +172,14 @@ def main():
         fake2 = np.vstack([data2['fake'][:intervalWin,:], 
                            cam2[intervalWin:(2*intervalWin),:], 
                            data2['fake'][(2*intervalWin):fullLen,:]])
+    
         fake3 = np.vstack([data3['fake'][:intervalWin,:], 
                            cam3[intervalWin:(2*intervalWin),:], 
                            data3['fake'][(2*intervalWin):fullLen,:]])
+    
         fake4 = np.vstack([data4['fake'][:intervalWin,:], 
                            cam4[intervalWin:(2*intervalWin),:], 
                            data4['fake'][(2*intervalWin):fullLen,:]])
-    
-    
-        #Iterate over diffrent thresholds and window sizes
-        threshes = args.thresholds
-        window_sizes = args.window_sizes
         
         
 # =============================================================================
@@ -200,58 +190,59 @@ def main():
 # =============================================================================
         
         for ind, t in enumerate(threshes):
+            print(f'Processing threshold {t}')
             for ind2, j in enumerate(window_sizes):
+                print(f'Processing window size {j}')
                 numWin = fullLen - j
-                acc0 = acc1 = acc2 = acc3 = np.zeros((4,numWin))
+                acc0 = acc1 = acc2 = acc3 = np.zeros((numWin,4))
                 for start in range(fullLen):
                     end = start + j
                     if end > fullLen-1:
                         continue
+                    print(f'Start: {start}')
+                    print(f'End: {end}')
                     
                     numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
             fake3, fake4, start, end, args.num_pcs, t)
                     
                     isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
+                    print(f'isFake = {isFake}')
                         
                     #0 fakes case
                     if numFakes0 ==0:
-                        acc0[1][start] = 1 #TN
+                        acc0[start][1] = 1 #TN
                     else:
-                        acc0[2][start] = 1 #FP
+                        acc0[start][2] = 1 #FP
 
-                    acc1[:,start] = calculate_acc_helper(np.array([1,1,1,2,1,1]), 
+                    acc1[start,:] = calculate_acc_helper(np.array([1,1,1,2,1,1]), 
                         np.array([2,2,2,1,2,2]), numFakes1, c1, 1, isFake)
                     
-                    acc2[:,start] = calculate_acc_helper(np.array([1,1,2,2,1,1]), 
+                    acc2[start,:] = calculate_acc_helper(np.array([1,1,2,2,1,1]), 
                         np.array([2,2,1,1,2,2]), numFakes2, c2, 2, isFake)
                     
                     
-                    acc3[:,start] = calculate_acc_helper(np.array([1,2,2,2,1,1]), 
-                        np.array([2,1,1,1,2,2]), numFakes3, c3, 2, isFake)
+                    acc3[start,:] = calculate_acc_helper(np.array([1,2,2,2,1,1]), 
+                        np.array([2,1,1,1,2,2]), numFakes3, c3, 3, isFake)
                     
-                    #print(f'Window Start: {start}')
-
+                    
+                #save the results to do more statistics with later
+                saveDir = os.path.join(args.save_dir,f'ID{i}',f'thresh_{ind}')
+                if not(os.path.isdir(saveDir)):
+                    os.makedirs(saveDir)
+                saveDict = {'acc0':acc0, 'acc1': acc1, 
+                            'acc2':acc2, 'acc3': acc3, 
+                            'thresh': t, 'window_size':j }
+                savemat(os.path.join(saveDir,f'window_{j}.mat'), saveDict)
                 
+                            
                 if (args.rocOn and j == args.roc_window_size):
-                    tpResults[ind,0,person] = np.sum(acc1[0,:]) / (np.sum(acc1[0,:]) + np.sum(acc1[3,:]) + 1e-7)
-                    tpResults[ind,1,person] = np.sum(acc2[0,:]) / (np.sum(acc2[0,:]) + np.sum(acc2[3,:]) + 1e-7)
-                    tpResults[ind,2,person] = np.sum(acc3[0,:]) / (np.sum(acc3[0,:]) + np.sum(acc3[3,:]) + 1e-7)
+                    tpResults[ind,0,person] = np.sum(acc1[:,0]) / (np.sum(acc1[:,0]) + np.sum(acc1[:,3]) + 1e-7)
+                    tpResults[ind,1,person] = np.sum(acc2[:,0]) / (np.sum(acc2[:,0]) + np.sum(acc2[:,3]) + 1e-7)
+                    tpResults[ind,2,person] = np.sum(acc3[:,0]) / (np.sum(acc3[:,0]) + np.sum(acc3[:,3]) + 1e-7)
                     
-                    fpResults[ind,0,person] = np.sum(acc1[2,:]) / (np.sum(acc1[2,:]) + np.sum(acc1[1,:]) +1e-7)
-                    fpResults[ind,1,person] = np.sum(acc2[2,:]) / (np.sum(acc2[2,:]) + np.sum(acc2[1,:])+ 1e-7)
-                    fpResults[ind,2,person] = np.sum(acc3[2,:]) / (np.sum(acc3[2,:]) + np.sum(acc3[1,:])+ 1e-7)
-                    
-                    
-                    print_results0 = [0, np.sum(acc0[1,:])/acc0.shape[1], np.sum(acc0[2,:])/acc0.shape[1], 0]
-                    print_results1 = [tpResults[ind,0,person], 1-fpResults[ind,0,person], fpResults[ind,0,person], 1-tpResults[ind,0,person]]
-                    print_results2 = [tpResults[ind,1,person], 1-fpResults[ind,1,person], fpResults[ind,1,person], 1-tpResults[ind,1,person]]
-                    print_results3 = [tpResults[ind,2,person], 1-fpResults[ind,2,person], fpResults[ind,2,person], 1-tpResults[ind,2,person]]
-                    
-                    
-                    
-                    print(f'ID: {i}. Threshold: {t}. Window size: {j}. Each Case has TP, TN, FP, FN. '
-                          f'0 fake: {print_results0}. 1 fake: {print_results1}. '
-                          f'2 fake: {print_results2}. 3 fake: {print_results3}.')
+                    fpResults[ind,0,person] = np.sum(acc1[:,2]) / (np.sum(acc1[:,2]) + np.sum(acc1[:,1]) +1e-7)
+                    fpResults[ind,1,person] = np.sum(acc2[:,2]) / (np.sum(acc2[:,2]) + np.sum(acc2[:,1]) +1e-7)
+                    fpResults[ind,2,person] = np.sum(acc3[:,2]) / (np.sum(acc3[:,2]) + np.sum(acc3[:,1]) +1e-7)
 
                 if (args.accOn and t == args.acc_threshold):
                     
@@ -266,22 +257,22 @@ def main():
         person += 1
                         
     if args.rocOn:
+        
         meanTP = np.mean(tpResults, axis = 2)     
         meanFP = np.mean(fpResults,axis = 2)
         stdTP = np.std(tpResults,axis = 2)
         stdFP = np.std(fpResults,axis = 2)
         
+        #meanTP of shape: [num_thresholds, 3]
+        
         oneFake = np.array([meanFP[:,0],meanTP[:,0] ])
         twoFake = np.array([meanFP[:,1],meanTP[:,1] ])
-        threeFake = np.array([meanFP[:,2],meanTP[:,2] ])
+        threeFake = np.array([meanFP[:,2],meanTP[:,2] ])        
         
-        print(oneFake.shape)
-        print(twoFake.shape)
-        print(threeFake.shape)
+        oneFake = oneFake[oneFake[:,0].argsort(),]
+        twoFake = twoFake[twoFake[:,0].argsort(),]
+        threeFake = threeFake[threeFake[:,0].argsort(),]
         
-        oneFake = oneFake[oneFake[:,0].argsort()]
-        twoFake = twoFake[twoFake[:,0].argsort()]
-        threeFake = threeFake[threeFake[:,0].argsort()]
         
         plt.errorbar(oneFake[0],oneFake[1], stdTP[:,0],stdFP[:,0], label = 'One Fake')
         plt.errorbar(twoFake[0],twoFake[1], stdTP[:,1],stdFP[:,1], label = 'Two Fakes')
