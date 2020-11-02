@@ -10,11 +10,11 @@ import shutil
 
 baseDir = "/home/socialvv/socialvv"
 
+fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D)
+
 
 
 def parallel_generation(cam,ID):
-    fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D)
-    
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
     boundingBoxFile = os.path.join(baseDir, f'ID{ID}','bounding-boxes',
                                    f'cam{cam}-post-wav2lipv2-bounding-boxes.txt')
