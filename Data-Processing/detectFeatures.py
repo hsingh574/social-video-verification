@@ -25,6 +25,10 @@ def parallel_generation(cam,ID):
     
     if os.path.isdir(delDir):
         shutil.rmtree(delDir)
+    
+    if os.path.isdir(outDir):
+        shutil.rmtree(outDir)
+    
         
     
     if not(os.path.isdir(outDir)):
@@ -59,9 +63,16 @@ if __name__ == '__main__':
     exclude_list  = [17]
     ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
     
-    n_jobs = -1
+    #n_jobs = -1
     
     start = time.time()
-    Parallel(n_jobs=n_jobs)(delayed(parallel_generation)(cam,ID) for cam in range(1,numCams+1) for ID in ids)
+    
+    
+    for ID in ids:
+        for cam in range(1, numCams+1):
+            parallel_generation(cam, ID)
+            
+    
+    #Parallel(n_jobs=n_jobs)(delayed(parallel_generation)(cam,ID) for cam in range(1,numCams+1) for ID in ids)
     end = time.time()
     print('{:.4f} s'.format(end-start))
