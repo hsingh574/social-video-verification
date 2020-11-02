@@ -5,19 +5,35 @@ import os
 import numpy as np
 from scipy.io import loadmat, savemat
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import StandardScaler
-from sklearn.covariance import MinCovDet
 from scipy.cluster.hierarchy import linkage, fcluster
 import matplotlib.pyplot as plt
 
+
+
+def mahalanobis(T, eigenval):
+    
+    cov = np.linalg.pinv(np.diag(eigenval.T))
+    return np.sqrt(np.sum(np.multiply(T @ cov, T), axis = 1))
+
+
+
 def mahalanobis_calculate(data, num_pcs):
+
     pca = PCA(num_pcs)
-    T = pca.fit_transform(StandardScaler().fit_transform(data))
-    # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
-    robust_cov = MinCovDet().fit(T)
-    # Get the Mahalanobis distance
-    m = robust_cov.mahalanobis(T)
-    return m
+    T = pca.fit_transform(data)
+    eigenval = pca.explained_variance_
+    return mahalanobis(T, eigenval)
+
+#previous version: This takes longer and 
+#returns a different value from the matlab version   
+# =============================================================================
+#     T = pca.fit_transform(StandardScaler(with_std=False).fit_transform(data))
+#     # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
+#     robust_cov = MinCovDet().fit(T)
+#     # Get the Mahalanobis distance
+#     m = robust_cov.mahalanobis(T)
+#     return m
+# =============================================================================
 
 def detectFakesTree(link, thresh):
     ratio = link[-1][-2] / link[-2][-2]
@@ -194,7 +210,10 @@ def main():
             for ind2, j in enumerate(window_sizes):
                 print(f'Processing window size {j}')
                 numWin = fullLen - j
-                acc0 = acc1 = acc2 = acc3 = np.zeros((numWin,4))
+                acc0 = np.zeros((numWin,4))
+                acc1 = np.zeros((numWin,4))
+                acc2 = np.zeros((numWin,4))
+                acc3 = np.zeros((numWin,4))
                 for start in range(fullLen):
                     end = start + j
                     if end > fullLen-1:
@@ -206,8 +225,7 @@ def main():
             fake3, fake4, start, end, args.num_pcs, t)
                     
                     isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
-                    print(f'isFake = {isFake}')
-                        
+                    
                     #0 fakes case
                     if numFakes0 ==0:
                         acc0[start][1] = 1 #TN
