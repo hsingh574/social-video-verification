@@ -13,6 +13,19 @@ baseDir = "/home/socialvv/socialvv"
 fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D)
 
 
+def delete_helper(cam, ID):
+    delDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarks')
+    outDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarksv2')
+    
+    if os.path.isdir(delDir):
+        shutil.rmtree(delDir)
+    
+    if os.path.isdir(outDir):
+        shutil.rmtree(outDir)
+    
+    
+    
+
 
 def parallel_generation(cam,ID):
     frameDir = os.path.join(baseDir, f'ID{ID}',f'cam{cam}-wav2lip', 'frames')
@@ -63,11 +76,16 @@ if __name__ == '__main__':
     numCams = 6
     numParticipants = 25
     exclude_list  = [17]
-    ids = [i for i in range(1, numParticipants+1) if i not in exclude_list]   
+    ids = [i for i in range(6, numParticipants+1) if i not in exclude_list]   
     
     #n_jobs = -1
     
     start = time.time()
+    
+    
+    for ID in ids:
+        for cam in range(1, numCams+1):
+            delete_helper(cam, ID)
     
     
     for ID in ids:

@@ -72,6 +72,9 @@ def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2,
     X3 = np.array([cam1Out, camFake1, camFake2, camFake3, cam5Out, cam6Out])
     
     #Test for tracking failures and remove
+    
+    #delete the columns which have an element greater than 10
+    
     badInds = []
     
     for i, row in enumerate(X0.T):
