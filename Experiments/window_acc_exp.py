@@ -250,9 +250,9 @@ def main():
                 saveDir = os.path.join(args.save_dir,f'ID{i}',f'thresh_{ind}')
                 if not(os.path.isdir(saveDir)):
                     os.makedirs(saveDir)
-                saveDict = {'acc0':acc0, 'acc1': acc1, 
-                            'acc2':acc2, 'acc3': acc3, 
-                            'thresh': t, 'window_size':j }
+                saveDict = {'acc0x':acc0, 'acc1x': acc1, 
+                            'acc2x':acc2, 'acc3x': acc3, 
+                            'threshx': t, 'window_size':j }
                 savemat(os.path.join(saveDir,f'window_{j}.mat'), saveDict)
                 
                             
@@ -295,9 +295,15 @@ def main():
         threeFake = threeFake[threeFake[:,0].argsort(),]
         
         
+        print(max(stdTP[:,0]))
+        print(max(stdFP[:,0]))
+        
+        
+        
+        
         plt.errorbar(oneFake[0],oneFake[1], stdTP[:,0],stdFP[:,0], label = 'One Fake')
         plt.errorbar(twoFake[0],twoFake[1], stdTP[:,1],stdFP[:,1], label = 'Two Fakes')
-        plt.errorbar(twoFake[0],twoFake[1], stdTP[:,2],stdFP[:,2], label = 'Three Fakes')
+        plt.errorbar(threeFake[0],threeFake[1], stdTP[:,2],stdFP[:,2], label = 'Three Fakes')
         plt.xlabel("False Positive Rate")
         plt.ylabel("True Positive Rate")
         plt.xlim([0,1])
