@@ -22,6 +22,8 @@ def parallel_generation(cam,ID):
     delDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarks')
     outDir = os.path.join(baseDir,f'ID{ID}',f'cam{cam}-wav2lip', 'landmarksv2')
     
+    print(outDir)
+    
     
     if os.path.isdir(delDir):
         shutil.rmtree(delDir)
