@@ -46,10 +46,10 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
     sio.savemat(outPath,{'cam1':dataMat[:,:,0],'cam2':dataMat[:,:,1],'cam3':dataMat[:,:,2],'cam4':dataMat[:,:,3],
                          'cam5':dataMat[:,:,4],'cam6': dataMat[:,:,5],'fake':dataMat[:,:,6]})
     
-def helper(fakeCam, i, ID):
+def helper(fakeCam, ID):
     inPathReal = os.path.join(inPathBase, f"ID{ID}")
     inPathFake = os.path.join(outPathBase, f"ID{ID}", f"cam{fakeCam}-wav2lip", "landmarksv2")
-    outPath = os.path.join(landmarkBase, f"mouth-data-fake{fakeCam}-ID{ID}-I{i}.mat")
+    outPath = os.path.join(landmarkBase, f"mouth-data-fake{fakeCam}-ID{ID}.mat")
     print(f"Saving output to: {outPath}")
     # LipGAN's output is shifted from the input by five frames
     shift = 0   
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     n_jobs = -1
     
     start = time.time()
-    Parallel(n_jobs=n_jobs)(delayed(helper)(fakeCam, i,ID) for fakeCam in fakeCams for i,ID in enumerate(ids))
+    Parallel(n_jobs=n_jobs)(delayed(helper)(fakeCam, ID) for fakeCam in fakeCams for ID in ids)
     end = time.time()
     print('{:.4f} s'.format(end-start))
             
