@@ -57,6 +57,7 @@ def helper(fakeCam, ID):
     lengthLst.append(len(os.listdir(inPathFake)))
     numF = min(lengthLst)
     landmark2mat(inPathReal, inPathFake, numCams,outPath,numF,fakeCam, shift)
+    print(f"Done! Saved output to: {outPath}")
     
 
 if __name__ == '__main__':
