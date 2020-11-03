@@ -73,10 +73,17 @@ if __name__ == '__main__':
         
     landmarkBase = os.path.join(outPathBase, landmarkPath)
     
-    n_jobs = -1
+    #n_jobs = -1
     
     start = time.time()
-    Parallel(n_jobs=n_jobs)(delayed(helper)(fakeCam, ID) for fakeCam in fakeCams for ID in ids)
+    
+    for fakeCam in fakeCams:
+        for ID in ids:
+            helper(fakeCam, ID)
+    
+    
+    #Parallel(n_jobs=n_jobs)(delayed(helper)(fakeCam, ID) for fakeCam in fakeCams for ID in ids)
+    
     end = time.time()
     print('{:.4f} s'.format(end-start))
             
