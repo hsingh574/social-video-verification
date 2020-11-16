@@ -2,12 +2,12 @@
 % method vs 0, 1, 2, and 3 lipgan fakes present in a set of videos. 
 %
 % Written by Eleanor Tursman
-% Last updated 7/2020
+% Last updated 10/2020
 
 clearvars; close all;
 fprintf('Stress Test: Interleaved Baselines \n');
 
-method = 'onlyPCA'; %options: 'onlyPCA', 'simpleMouth', 'noPCA'
+method = 'stats'; %options: 'onlyPCA', 'simpleMouth', 'noPCA', 'stats'
 
 % Iterate over people
 people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','18','19','20','21','22','23','24','25'};
@@ -42,8 +42,7 @@ for p=1:length(people)
     
     % Iterate over thresholds too
     threshes = [1.1 1.3 1.5 1.7 1.9 2.1];
-
-
+    
     mkdir(['Output/ID' person])
     mkdir(['Output/ID' person '/thresh_1/'])
     mkdir(['Output/ID' person '/thresh_2/'])
@@ -55,11 +54,9 @@ for p=1:length(people)
     parfor t=1:length(threshes) %parfor on/off for this line
         thresh = threshes(t);
         
-
-
-
-	for i=[50 150 250 350]
+        for i=[50 150 250 350]
             fprintf('Window size: %d\n',i);
+            
             numWin = fullLen - i;
             
             % format: row 1- TP, row 2- TN, row 3- FP, row 4- FN
@@ -78,12 +75,57 @@ for p=1:length(people)
                 if (endF > fullLen)
                     continue;
                 end
+
+
+		if (strcmp(method, 'stats'))
+		    
+		    cam1Out = cam1(curRange, :);
+		    cam2Out = cam2(curRange, :);
+		    cam3Out = cam3(curRange, :);
+		    cam4Out = cam4(curRange, :);
+		    cam5Out = cam5(curRange, :);
+		    cam6Out = cam6(curRange, :);
+		    
+		    camFake1 = fake2(curRange, :);
+		    camFake2 = fake3(curRange, :);
+		    camFake3 = fake4(curRange, :);
+	
+	            X0 = cat(3, cam1Out, cam2Out, cam3Out, cam4Out, cam5Out, cam6Out);
+		    X1 = cat(3, cam1Out, cam2Out, cam3Out, camFake3, cam5Out, cam6Out);
+		    X2 = cat(3, cam1Out, cam2Out, camFake2, camFake3, cam5Out, cam6Out);
+		    X3 = cat(3, cam1Out, camFake1, camFake2, camFake3, cam5Out, cam6Out);
+
+   		    %computing mean and variance of each landmark across time
+		    %each shape is (40,6)
+
+		    X0_mean = squeeze(mean(X0, 1));
+		    X1_mean = squeeze(mean(X1, 1));
+		    X2_mean = squeeze(mean(X2, 1));
+		    X3_mean = squeeze(mean(X3, 1));
+	   	    X0_var = squeeze(var(X0, 0, 1));
+		    X1_var = squeeze(var(X1, 0, 1));
+		    X2_var = squeeze(var(X2, 0, 1)); 
+		    X3_var = squeeze(var(X3, 0, 1));
+		    
+		    
+		    
+		    X0_max = squeeze(max(X0, [],1));
+		    X1_max = squeeze(max(X1, [],1)); 
+		    X2_max = squeeze(max(X2, [],1));
+		    X3_max = squeeze(max(X3, [],1));
+		   
+		    disp(X1_var) 
+		    
+		    %need to output numFakes0, numFakes1,2,3
+		    %also o1,o2,o3 which are all length 6 lists of 1 and 2s
+
+
                 
                 % Use one of three methods to detect fakes
-                if (strcmp(method,'onlyPCA'))
+		elseif (strcmp(method,'onlyPCA'))
                     % hierarchical clustering directly on mahalanobis
                     % distances
-                    
+                    disp(size(cam1(curRange,:))) 
                     k = 5;
                     cam1Out = cpca(cam1(curRange,:),'k',k);
                     cam2Out = cpca(cam2(curRange,:),'k',k);
@@ -108,7 +150,7 @@ for p=1:length(people)
                     X2(:,badInds) = [];
                     X3(:,badInds) = [];
                     
-                    [~,tree0] = clusterdata(X0,4);
+		    [~,tree0] = clusterdata(X0,4);
                     [~,tree1] = clusterdata(X1,4);
                     [~,tree2] = clusterdata(X2,4);
                     [~,tree3] = clusterdata(X3,4);
@@ -293,6 +335,6 @@ for p=1:length(people)
 end
 
 %% Helpers
-function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
-save(fname, 'acc0', 'acc1','acc2','acc3','base','thresh','person');
-end
+%function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
+%save(fname, 'acc0', 'acc1','acc2','acc3','base','thresh','person');
+%end

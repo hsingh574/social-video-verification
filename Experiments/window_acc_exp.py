@@ -3,8 +3,8 @@
 import argparse
 import os
 import numpy as np
-from scipy.io import loadmat, savemat
 from sklearn.decomposition import PCA
+from scipy.io import loadmat, savemat
 from scipy.cluster.hierarchy import linkage, fcluster
 import matplotlib.pyplot as plt
 
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 def mahalanobis(T, eigenval):
     
     cov = np.linalg.pinv(np.diag(eigenval.T))
-    return np.sqrt(np.sum(np.multiply(T @ cov, T), axis = 1))
+    return np.sqrt(np.sum(np.multiply(np.matmul(T, cov), T), axis=1)) #T @ cov, T), axis = 1))
 
 
 
@@ -102,13 +102,13 @@ def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2,
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
 
-    parser.add_argument('--data-dir', type=str, default='Data',
+    parser.add_argument('--data-dir', type=str, default='DataShort',
                     help='Directory where processed landmark files live')
     parser.add_argument('--num_pcs', type=int, default=5,
                     help='Number of principal components to use')
     parser.add_argument('--num_participants', type=int, default=1,
                     help='Number of participants')
-    parser.add_argument('--save-dir', type=str, default='/users/harman/desktop/results',
+    parser.add_argument('--save-dir', type=str, default='results',
                     help='Directory to save results')
     parser.add_argument('--rocOn', action = 'store_false')
     parser.add_argument('--roc-window-size', type=int, default=50, help = "Window size to use when generating ROC curve")
@@ -167,17 +167,17 @@ def main():
     person = 0
     
     for i in ids:  
-        print(f'Processing ID{i}')          
+        print("Processing ID", str(i))          
         if args.accOn:
             accs = np.zeros((4, len(args.window_sizes)))
         
-        data2 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake2-ID{i}.mat'))
-        data3 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake3-ID{i}.mat'))
-        data4 = loadmat(os.path.join(args.data_dir, f'mouth-data-fake4-ID{i}.mat'))
+        data2 = loadmat(os.path.join(args.data_dir, "mouth-data-fake2-ID{}.mat".format(i)))
+        data3 = loadmat(os.path.join(args.data_dir, "mouth-data-fake3-ID{}.mat".format(i)))
+        data4 = loadmat(os.path.join(args.data_dir, "mouth-data-fake4-ID{}.mat".format(i)))
         
         fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
         
-        print(f'Total number of frames to work over: {fullLen}')
+        print("Total number of frames to work over: {}".format(fullLen))
         
         cam1 = data3['cam1'][:fullLen,:]
         cam2 = data3['cam2'][:fullLen,:]
@@ -209,9 +209,9 @@ def main():
 # =============================================================================
         
         for ind, t in enumerate(threshes):
-            print(f'Processing threshold {t}')
+            print("Processing threshold {}".format(t))
             for ind2, j in enumerate(window_sizes):
-                print(f'Processing window size {j}')
+                print('Processing window size ', str(j))
                 numWin = fullLen - j
                 acc0 = np.zeros((numWin,4))
                 acc1 = np.zeros((numWin,4))
@@ -221,8 +221,8 @@ def main():
                     end = start + j
                     if end > fullLen-1:
                         continue
-                    print(f'Start: {start}')
-                    print(f'End: {end}')
+                    print('Start: ', str(start))
+                    print('End: ', str(end))
                     
                     numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
             fake3, fake4, start, end, args.num_pcs, t)
@@ -247,13 +247,13 @@ def main():
                     
                     
                 #save the results to do more statistics with later
-                saveDir = os.path.join(args.save_dir,f'ID{i}',f'thresh_{ind}')
+                saveDir = os.path.join(args.save_dir,"ID{}".format(i),"thresh_{}".format(ind))
                 if not(os.path.isdir(saveDir)):
                     os.makedirs(saveDir)
                 saveDict = {'acc0x':acc0, 'acc1x': acc1, 
                             'acc2x':acc2, 'acc3x': acc3, 
                             'threshx': t, 'window_size':j }
-                savemat(os.path.join(saveDir,f'window_{j}.mat'), saveDict)
+                savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
                 
                             
                 if (args.rocOn and j == args.roc_window_size):
@@ -309,8 +309,8 @@ def main():
         plt.xlim([0,1])
         plt.ylim([0,1])
         plt.legend()
-        plt.title(f"ROC Curve. Window size = {args.roc_window_size}")
-        plt.savefig(os.path.join(args.save_dir, f"roc_window_size_{args.roc_window_size}.jpg"))
+        plt.title("ROC Curve. Window size = {}".format(args.roc_window_size))
+        plt.savefig(os.path.join(args.save_dir, "roc_window_size_{}.jpg".format(args.roc_window_size)))
         
         
     if args.accOn:
@@ -325,9 +325,9 @@ def main():
         plt.ylim([0,1])
         plt.xlabel("Window Size")
         plt.ylabel("Accuracy")
-        plt.title(f"Detection Accuracy vs. Window Size with Threshold = {args.acc_threshold}")
+        plt.title("Detection Accuracy vs. Window Size with Threshold = {}".format(args.acc_threshold))
         plt.legend()
-        plt.savefig(os.path.join(args.save_dir, f"acc_vs_window_size_thresh{args.acc_threshold}.jpg"))
+        plt.savefig(os.path.join(args.save_dir, "acc_vs_window_size_thresh{}.jpg".format(args.acc_threshold)))
         
                     
 

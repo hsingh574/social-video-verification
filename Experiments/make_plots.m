@@ -9,7 +9,7 @@ clearvars; close all;
 histogramOn = false;
 accOn = true;
 prOn = false;
-rocOn = false;
+rocOn = true;
 angle = false;
 
 datasetName = 'onlyPCA';
@@ -21,7 +21,6 @@ if(angle)
     thresh = 2; % ind in [1.1 1.3 1.5]
     
     for p=1:length(people)
-        
         
         fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
@@ -179,7 +178,10 @@ if (accOn)
     
     for p=1:length(people)
         
-        
+	if p==17
+		continue	
+	end
+
         fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
         % load the data
@@ -224,8 +226,8 @@ if (accOn)
     ylabel('Accuracy');
     title('Detection Accuracy vs Window Size');
     set(gca,'FontSize',20);
-    legend('No Fakes','One Fake','Two Fakes','Three Fakes');
-    
+    legend('No Fakes','One Fake','Two Fakes','Three Fakes','Location','SouthEast');
+    savefig('acc_full.fig')
 end
 
 %% precision recall
@@ -245,6 +247,10 @@ if(prOn)
     
     for p=1:length(people)
         
+	if p==17
+		continue
+	end
+
         fnameRoot = ['Output/ID' num2str(p) '/'];
         
         data1 = load([fnameRoot 'thresh_1/' datasetName '_window_' num2str(win) '.mat']);
@@ -330,7 +336,11 @@ if (rocOn)
     fpZeroFake = zeros(threshNum,1,length(people));
     
     for p=1:length(people)
-        
+	
+	if p==17
+		continue
+	end
+		    
         fnameRoot = ['Output/ID' num2str(p) '/'];
         
         data1 = load([fnameRoot 'thresh_1/' datasetName '_window_' num2str(win) '.mat']);
@@ -382,25 +392,5 @@ if (rocOn)
     ylim([0 1]);
     title('ROC Curve, Window size = 250');
     set(gca,'FontSize',20);
-    
-end
-%% Helpers
-function curHist = getBinCounts(data,bins)
-
-curHist = [];
-for bin=bins
-    
-    curMin = bin;
-    curMax = bin + 0.1;
-    
-    binInds = find((data(:,1) < curMax) & (data(:,1) >= curMin));
-    
-    zeroes = find(data(binInds,2) == 0);
-    ones = find(data(binInds,2) == 1);
-    
-    curHist(1,end+1) = length(zeroes);
-    curHist(2,end) = length(ones);
-    
-end
-
+    savefig('roc_full.fig') 
 end
