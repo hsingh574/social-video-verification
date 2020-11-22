@@ -23,7 +23,7 @@ if(angle)
     
     for p=1:length(people)
         
-        fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
+        fnameRoot = ['OutputSHCoords/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
         % load the data-- the data was saved s.t. angle 1 was 65 degrees, 2
         % was 52, etc. We reverse it here for ease in plotting.
