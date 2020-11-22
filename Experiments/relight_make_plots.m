@@ -9,7 +9,7 @@ clearvars; close all;
 histogramOn = false;
 accOn = true;
 prOn = false;
-rocOn = true;
+rocOn = false;
 angle = false;
 
 datasetName = 'onlyPCA';
@@ -27,13 +27,13 @@ if(angle)
         
         % load the data-- the data was saved s.t. angle 1 was 65 degrees, 2
         % was 52, etc. We reverse it here for ease in plotting.
-        ang_1 = load([fnameRoot datasetName '_5_window_250.mat']);
+        ang_1 = load([fnameRoot datasetName '_window_250.mat']);
         ang_2 = load([fnameRoot datasetName '_4_window_250.mat']);
         ang_3 = load([fnameRoot datasetName '_3_window_250.mat']);
         ang_4 = load([fnameRoot datasetName '_2_window_250.mat']);
         ang_5 = load([fnameRoot datasetName '_1_window_250.mat']);
         
-        dataset = {ang_1,ang_2,ang_3,ang_4,ang_5};
+        dataset = {ang_1};
   
         
         numAng = length(dataset);
@@ -81,7 +81,7 @@ if (histogramOn)
     
     for p=1:length(people)
         
-        fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
+        fnameRoot = ['OutputSHCoords/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
         % load the data
         win50 = load([fnameRoot datasetName '_window_50.mat']);
@@ -185,7 +185,7 @@ if (accOn)
 		continue	
 	end
 
-        fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
+        fnameRoot = ['OutputSHCoords/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
         % load the data
         win50 = load([fnameRoot datasetName '_window_50.mat']);
@@ -255,7 +255,7 @@ if(prOn)
 		continue
 	end
 
-        fnameRoot = ['Output/ID' num2str(p) '/'];
+        fnameRoot = ['OutputSHCoords/ID' num2str(p) '/'];
         
         data1 = load([fnameRoot 'thresh_1/' datasetName '_window_' num2str(win) '.mat']);
         data2 = load([fnameRoot 'thresh_2/' datasetName '_window_' num2str(win) '.mat']);
@@ -346,7 +346,7 @@ if (rocOn)
 		continue
 	end
 		    
-        fnameRoot = ['Output/ID' num2str(p) '/'];
+        fnameRoot = ['OutputSHCoords/ID' num2str(p) '/'];
         
         data1 = load([fnameRoot 'thresh_1/' datasetName '_window_' num2str(win) '.mat']);
         data2 = load([fnameRoot 'thresh_2/' datasetName '_window_' num2str(win) '.mat']);
