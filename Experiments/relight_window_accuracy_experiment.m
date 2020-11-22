@@ -40,13 +40,13 @@ for p=1:length(people)
     threshes = [1.1 1.3 1.5 1.7 1.9 2.1];
 
 
-    mkdir(['Output/ID' person])
-    mkdir(['Output/ID' person '/thresh_1/'])
-    mkdir(['Output/ID' person '/thresh_2/'])
-    mkdir(['Output/ID' person '/thresh_3/'])
-    mkdir(['Output/ID' person '/thresh_4/'])
-    mkdir(['Output/ID' person '/thresh_5/'])
-    mkdir(['Output/ID' person '/thresh_6/'])
+    mkdir(['OutputSHCoords/ID' person])
+    mkdir(['OutputSHCoords/ID' person '/thresh_1/'])
+    mkdir(['OutputSHCoords/ID' person '/thresh_2/'])
+    mkdir(['OutputSHCoords/ID' person '/thresh_3/'])
+    mkdir(['OutputSHCoords/ID' person '/thresh_4/'])
+    mkdir(['OutputSHCoords/ID' person '/thresh_5/'])
+    mkdir(['OutputSHCoords/ID' person '/thresh_6/'])
     
     parfor t=1:length(threshes) %parfor on/off for this line
         thresh = threshes(t);
@@ -281,7 +281,7 @@ for p=1:length(people)
             end
             
             % Save data for this window size
-            parsave(['Output/ID' person '/thresh_' num2str(t) '/' method '_window_' num2str(i) '.mat'], acc0, acc1, acc2, acc3, base, thresh, person);
+            parsave(['OutputSHCoords/ID' person '/thresh_' num2str(t) '/' method '_window_' num2str(i) '.mat'], acc0, acc1, acc2, acc3, base, thresh, person);
         end
         
     end
