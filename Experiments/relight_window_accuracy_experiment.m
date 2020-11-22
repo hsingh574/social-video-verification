@@ -87,8 +87,8 @@ for p=1:length(people)
                     cam4Out = cpca(cam4(curRange,:),'k',k);
                     cam5Out = cpca(cam5(curRange,:),'k',k);
                     cam6Out = cpca(cam6(curRange,:),'k',k);
-                    // camFake1 = cpca(fake2(curRange,:),'k',k);
-                    // camFake2 = cpca(fake3(curRange,:),'k',k);
+                    % camFake1 = cpca(fake2(curRange,:),'k',k);
+                    % camFake2 = cpca(fake3(curRange,:),'k',k);
                     camFake3 = cpca(fake4(curRange,:),'k',k);
                     
                     % X0 is no fakes, X1 one fake, etc.
