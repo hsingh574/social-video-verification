@@ -7,10 +7,10 @@
 clearvars; close all;
 fprintf('Stress Test: Interleaved Baselines \n');
 
-method = 'stats'; %options: 'onlyPCA', 'simpleMouth', 'noPCA', 'stats'
+method = 'onlyPCA'; %options: 'onlyPCA', 'simpleMouth', 'noPCA', 'stats'
 
 % Iterate over people
-people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','18','19','20','21','22','23','24','25'};
+people = {'1'};
 for p=1:length(people)
     
     person = people{p};
@@ -18,9 +18,9 @@ for p=1:length(people)
     
     % eg: fake3 indicates that the fake in the struct is the lipgan output  
     % of camera 3
-    data3 = load(['DataShort/mouth-data-fake3-ID' person '.mat']);
-    data2 = load(['DataShort/mouth-data-fake2-ID' person '.mat']);
-    data4 = load(['DataShort/mouth-data-fake4-ID' person '.mat']);
+    data3 = load(['DataIdentity/fake3-ID' person '.mat']);
+    data2 = load(['DataIdentity/fake2-ID' person '.mat']);
+    data4 = load(['DataIdentity/fake4-ID' person '.mat']);
     
     fullLen = min([length(data3.cam1) length(data4.cam1) length(data2.cam1)]);
     
@@ -43,13 +43,13 @@ for p=1:length(people)
     % Iterate over thresholds too
     threshes = [1.1 1.3 1.5 1.7 1.9 2.1];
     
-    mkdir(['OutputStat/ID' person])
-    mkdir(['OutputStat/ID' person '/thresh_1/'])
-    mkdir(['OutputStat/ID' person '/thresh_2/'])
-    mkdir(['OutputStat/ID' person '/thresh_3/'])
-    mkdir(['OutputStat/ID' person '/thresh_4/'])
-    mkdir(['OutputStat/ID' person '/thresh_5/'])
-    mkdir(['OutputStat/ID' person '/thresh_6/'])
+    mkdir(['OutputIdentity/ID' person])
+    mkdir(['OutputIdentity/ID' person '/thresh_1/'])
+    mkdir(['OutputIdentity/ID' person '/thresh_2/'])
+    mkdir(['OutputIdentity/ID' person '/thresh_3/'])
+    mkdir(['OutputIdentity/ID' person '/thresh_4/'])
+    mkdir(['OutputIdentity/ID' person '/thresh_5/'])
+    mkdir(['OutputIdentity/ID' person '/thresh_6/'])
     
     parfor t=1:length(threshes) %parfor on/off for this line
         thresh = threshes(t);
@@ -79,44 +79,6 @@ for p=1:length(people)
 
 		if (strcmp(method, 'stats'))
 		    
-
-
-		    k = 5;
-                    cam1Out = robpca(cam1(curRange,:),'k',k);
-                    cam2Out = robpca(cam2(curRange,:),'k',k);
-                    cam3Out = robpca(cam3(curRange,:),'k',k);
-                    cam4Out = robpca(cam4(curRange,:),'k',k);
-                    cam5Out = robpca(cam5(curRange,:),'k',k);
-                    cam6Out = robpca(cam6(curRange,:),'k',k);
-                    camFake1 = robpca(fake2(curRange,:),'k',k);
-                    camFake2 = robpca(fake3(curRange,:),'k',k);
-                    camFake3 = robpca(fake4(curRange,:),'k',k);
-
-                    % X0 is no fakes, X1 one fake, etc.
-                    X0 = [cam1Out.sd  cam2Out.sd cam3Out.sd cam4Out.sd cam5Out.sd cam6Out.sd]';
-                    X1 = [cam1Out.sd  cam2Out.sd cam3Out.sd camFake3.sd cam5Out.sd cam6Out.sd]';
-                    X2 = [cam1Out.sd  cam2Out.sd camFake2.sd camFake3.sd cam5Out.sd cam6Out.sd]';
-                    X3 = [cam1Out.sd  camFake1.sd camFake2.sd camFake3.sd cam5Out.sd cam6Out.sd]';
-
-                    % Test for tracking failures & remove
-                    badInds = find((max(X1,[],1) < 10) == 0);
-                    X0(:,badInds) = [];
-                    X1(:,badInds) = [];
-                    X2(:,badInds) = [];
-                    X3(:,badInds) = [];
-
-                    [~,tree0] = clusterdata(X0,4);
-                    [~,tree1] = clusterdata(X1,4);
-                    [~,tree2] = clusterdata(X2,4);
-                    [~,tree3] = clusterdata(X3,4);
-
-                    [numFakes0,~] = detectFakesTree(tree0,thresh);
-                    [numFakes1,o1] = detectFakesTree(tree1,thresh);
-                    [numFakes2,o2] = detectFakesTree(tree2,thresh);
-                    [numFakes3,o3] = detectFakesTree(tree3,thresh);
-		    
-		    
-		    %{
 		    cam1Out = cam1(curRange, :);
 		    cam2Out = cam2(curRange, :);
 		    cam3Out = cam3(curRange, :);
@@ -132,12 +94,7 @@ for p=1:length(people)
 		    X1 = cat(3, cam1Out, cam2Out, cam3Out, camFake3, cam5Out, cam6Out);
 		    X2 = cat(3, cam1Out, cam2Out, camFake2, camFake3, cam5Out, cam6Out);
 		    X3 = cat(3, cam1Out, camFake1, camFake2, camFake3, cam5Out, cam6Out);
-		    X0 = permute(X0, [3,2,1]);
-		    X1 = permute(X1, [3,2,1]);
-		    X2 = permute(X2, [3,2,1]);
-		    X3 = permute(X3, [3,2,1]);
 
-		    disp(size(X0))
    		    %computing mean and variance of each landmark across time
 		    %each shape is (40,6)
 
@@ -149,25 +106,26 @@ for p=1:length(people)
 		    X1_var = squeeze(var(X1, 0, 1));
 		    X2_var = squeeze(var(X2, 0, 1)); 
 		    X3_var = squeeze(var(X3, 0, 1));
+		    
+		    
+		    
 		    X0_max = squeeze(max(X0, [],1));
 		    X1_max = squeeze(max(X1, [],1)); 
 		    X2_max = squeeze(max(X2, [],1));
 		    X3_max = squeeze(max(X3, [],1));
 		   
-		    %disp(X1_var) 
+		    disp(X1_var) 
 		    
 		    %need to output numFakes0, numFakes1,2,3
 		    %also o1,o2,o3 which are all length 6 lists of 1 and 2s
-		    %}
 
-		    
-			
+
                 
                 % Use one of three methods to detect fakes
 		elseif (strcmp(method,'onlyPCA'))
                     % hierarchical clustering directly on mahalanobis
                     % distances
-                    %disp(size(cam1(curRange,:))) 
+                    disp(size(cam1(curRange,:))) 
                     k = 5;
                     cam1Out = cpca(cam1(curRange,:),'k',k);
                     cam2Out = cpca(cam2(curRange,:),'k',k);
@@ -185,9 +143,6 @@ for p=1:length(people)
                     X2 = [cam1Out.sd  cam2Out.sd camFake2.sd camFake3.sd cam5Out.sd cam6Out.sd]';
                     X3 = [cam1Out.sd  camFake1.sd camFake2.sd camFake3.sd cam5Out.sd cam6Out.sd]';
                     
-
-
-		    %disp(size(X0)) 
                     % Test for tracking failures & remove
                     badInds = find((max(X1,[],1) < 10) == 0);
                     X0(:,badInds) = [];
@@ -372,7 +327,7 @@ for p=1:length(people)
             end
             
             % Save data for this window size
-            parsave(['OutputStat/ID' person '/thresh_' num2str(t) '/' method '_window_' num2str(i) '.mat'], acc0, acc1, acc2, acc3, base, thresh, person);
+            parsave(['OutputIdentity/ID' person '/thresh_' num2str(t) '/' method '_window_' num2str(i) '.mat'], acc0, acc1, acc2, acc3, base, thresh, person);
         end
         
     end
