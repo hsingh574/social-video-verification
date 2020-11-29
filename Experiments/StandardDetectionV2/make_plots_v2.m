@@ -6,163 +6,9 @@
 %% Make the plots
 clearvars; close all;
 
-histogramOn = false;
 accOn = true;
 prOn = false;
-rocOn = true;
-angle = false;
-
-datasetName = 'onlyPCA';
-
-%% angles
-if(angle)
-    people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'};
-    accResults = zeros(1,5,length(people)); % # angles, # people
-    thresh = 2; % ind in [1.1 1.3 1.5]
-    
-    for p=1:length(people)
-        
-        fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
-        
-        % load the data-- the data was saved s.t. angle 1 was 65 degrees, 2
-        % was 52, etc. We reverse it here for ease in plotting.
-        ang_1 = load([fnameRoot datasetName '_5_window_250.mat']);
-        ang_2 = load([fnameRoot datasetName '_4_window_250.mat']);
-        ang_3 = load([fnameRoot datasetName '_3_window_250.mat']);
-        ang_4 = load([fnameRoot datasetName '_2_window_250.mat']);
-        ang_5 = load([fnameRoot datasetName '_1_window_250.mat']);
-        
-        dataset = {ang_1,ang_2,ang_3,ang_4,ang_5};
-  
-        
-        numAng = length(dataset);
-        accs = zeros(1,numAng);
-        
-        for i=1:numAng
-            
-            data = dataset{i};
-            accs(1,i) = (sum(data.acc1(1,:)) + sum(data.acc1(2,:))) / (sum(data.acc1(1,:)) + sum(data.acc1(2,:)) + sum(data.acc1(3,:)) + sum(data.acc1(4,:)));
-            
-        end
-        
-        accResults(:,:,p) = accs;
-        
-    end
-    
-    
-    % Plot average result per window + one stdev
-    meanRes = mean(accResults,3);
-    stdRes = std(accResults,0,3);
-    
-    accXData = [13 26 39 52 65];
-    
-    figure;
-    errorbar(accXData,meanRes,stdRes,'LineWidth',1.0); hold on;
-    ylim([0 1]);
-    set(gca,'FontSize',20);
-    xlabel('Pairwise Angular Distance (Degrees)','FontSize',20);
-    ylabel('Accuracy','FontSize',20);
-    title('Detection Accuracy vs Pairwise Angular Distance','FontSize',20);    
-end
-
-%% make histograms
-if (histogramOn)
-    
-    people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'};
-    thresh = 2; % ind in [1.1 1.3 1.5 1.7 1.9 2.1]
-    bins = 0.1:0.1:20;
-    
-    hist50 = zeros(2,length(bins),length(people));
-    hist150 = zeros(2,length(bins),length(people));
-    hist250 = zeros(2,length(bins),length(people));
-    hist350 = zeros(2,length(bins),length(people));
-    
-    for p=1:length(people)
-        
-        fnameRoot = ['Output/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
-        
-        % load the data
-        win50 = load([fnameRoot datasetName '_window_50.mat']);
-        win150 = load([fnameRoot datasetName '_window_150.mat']);
-        win250 = load([fnameRoot datasetName '_window_250.mat']);
-        win350 = load([fnameRoot datasetName '_window_350.mat']);
-        
-        % Want to take fake sect1ions, TP row. TP - row 2, base - row 1
-        interval = floor(length(win50.acc1) / 3);
-        
-        data50 =  [win50.base(2,1:interval) win50.base(2,2*interval + 1:end); ...
-            win50.acc1(1,1:interval) win50.acc1(1,2*interval + 1:end)];
-        data150 = [win150.base(2,1:interval) win150.base(2,2*interval + 1:end); ...
-            win150.acc1(1,1:interval) win150.acc1(1,2*interval + 1:end)];
-        data250 = [win250.base(2,1:interval) win250.base(2,2*interval + 1:end); ...
-            win250.acc1(1,1:interval) win250.acc1(1,2*interval + 1:end)];
-        data350 = [win350.base(2,1:interval) win350.base(2,2*interval + 1:end); ...
-            win350.acc1(1,1:interval) win350.acc1(1,2*interval + 1:end)];
-        
-        % Sort by base
-        sorted50 = sortrows(data50');
-        sorted150 = sortrows(data150');
-        sorted250 = sortrows(data250');
-        sorted350 = sortrows(data350');
-        
-        % Iterate through pre-set bins
-        hist50(:,:,p) = getBinCounts(sorted50,bins);
-        hist150(:,:,p) = getBinCounts(sorted150,bins);
-        hist250(:,:,p) = getBinCounts(sorted250,bins);
-        hist350(:,:,p) = getBinCounts(sorted350,bins);
-        
-    end
-    
-    % Take avg and std
-    mean50 = mean(hist50,3)';
-    std50 = std(hist50,0,3)';
-    mean150 = mean(hist150,3)';
-    std150 = std(hist150,0,3)';
-    mean250 = mean(hist250,3)';
-    std250 = std(hist250,0,3)';
-    mean350 = mean(hist350,3)';
-    std350 = std(hist350,0,3)';
-    
-    figure('Position', [10 10 1500 500]);
-    set(gca,'FontSize',20);
-    subplot(1,4,1);
-    bar(bins,mean50); hold on;
-    legend('Undetected Fake in Window','Fake Detected in Window');
-    ylabel('Count');
-    xlabel('L2 Difference Between Real and Fake Mouth');
-    title('One Fake, Thresh = 1.3, Window Size = 50');
-    xlim([0 20]); ylim([0 25]);
-    set(gca,'FontSize',20);
-    
-    subplot(1,4,2);
-    bar(bins,mean150); hold on;
-    legend('Undetected Fake in Window','Fake Detected in Window');
-    ylabel('Count');
-    xlabel('L2 Difference Between Real and Fake Mouth');
-    title('One Fake, Thresh = 1.3, Window Size = 150');
-    xlim([0 20]); ylim([0 25]);
-    set(gca,'FontSize',20);
-    
-    subplot(1,4,3);
-    bar(bins,mean250); hold on;
-    legend('Undetected Fake in Window','Fake Detected in Window');
-    ylabel('Count'); ylim([0 25]);
-    xlabel('L2 Difference Between Real and Fake Mouth');
-    title('One Fake, Thresh = 1.3, Window Size = 250');
-    xlim([0 20]); ylim([0 25]);
-    set(gca,'FontSize',20);
-    
-    subplot(1,4,4);
-    bar(bins,mean350); hold on;
-    legend('Undetected Fake in Window','Fake Detected in Window');
-    ylabel('Count');
-    xlabel('L2 Difference Between Real and Fake Mouth');
-    title('One Fake, Thresh = 1.3, Window Size = 350');
-    xlim([0 20]); ylim([0 25]);
-    set(gca,'FontSize',20);
-    
-    
-end
+rocOn = false;
 
 %% make accuracy plots
 % (1) TP if window contains a faked frame & fake is detected
@@ -174,7 +20,7 @@ if (accOn)
     
     people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'};
     accResults = zeros(4,4,length(people));
-    thresh = 2; % ind in [1.1 1.3 1.5 1.7 1.9 2.1]
+    thresh = 0; % ind in [1.1 1.3 1.5 1.7 1.9 2.1]
     
     for p=1:length(people)
         
@@ -182,13 +28,13 @@ if (accOn)
 		continue	
 	end
 
-        fnameRoot = ['OutputPCA/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
+        fnameRoot = ['results_v2/ID' num2str(p) '/thresh_' num2str(thresh) '/'];
         
         % load the data
-        win50 = load([fnameRoot datasetName '_window_50.mat']);
-        win150 = load([fnameRoot datasetName '_window_150.mat']);
-        win250 = load([fnameRoot datasetName '_window_250.mat']);
-        win350 = load([fnameRoot datasetName '_window_350.mat']);
+        win50 = load([fnameRoot 'window_50.mat']);
+        win150 = load([fnameRoot 'window_150.mat']);
+        win250 = load([fnameRoot 'window_250.mat']);
+        win350 = load([fnameRoot 'window_350.mat']);
         
         dataset = {win50,win150,win250,win350};
         accXData = [50 150 250 350];
