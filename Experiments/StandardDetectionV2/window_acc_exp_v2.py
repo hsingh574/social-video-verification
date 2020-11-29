@@ -113,7 +113,7 @@ def parse_args():
                     help='Number of participants')
     parser.add_argument('--save-dir', type=str, default='results_v2',
                     help='Directory to save results')
-    parser.add_argument("--thresholds", nargs="+", default=[1.3])
+    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
     
     
