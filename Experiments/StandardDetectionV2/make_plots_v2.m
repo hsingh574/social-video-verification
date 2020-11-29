@@ -1,7 +1,7 @@
 % This script was used to generate most of the plots in the paper. 
 %
 % Written by Eleanor Tursman
-% Last updated 7/2020
+% Last updated 11/2020 (Harman Suri)
 
 %% Make the plots
 clearvars; close all;
@@ -20,7 +20,7 @@ if (accOn)
     
     people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'};
     accResults = zeros(4,4,length(people));
-    thresh = 0; % ind in [1.1 1.3 1.5 1.7 1.9 2.1]
+    thresh = 1; % ind in [1.3 1.5 1.7 1.9 2.1], Note 0-indexing here 
     
     for p=1:length(people)
         
