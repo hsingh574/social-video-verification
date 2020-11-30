@@ -85,9 +85,9 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
 
     #reformat & order by recall values
     #sort rows by first column
-    oneFake = np.hstack([meanR[:,0], meanP[:,0]])
-    twoFake = np.hstack([meanR[:,1], meanP[:,1]])
-    thrFake = np.hstack([meanR[:,2], meanP[:,2]])
+    oneFake = np.column_stack([meanR[:,0], meanP[:,0]])
+    twoFake = np.column_stack([meanR[:,1], meanP[:,1]])
+    thrFake = np.column_stack([meanR[:,2], meanP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
@@ -204,9 +204,9 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     #sort rows by first column
     print(meanFP[:,0].shape)
     
-    oneFake = np.hstack([meanFP[:,0], meanTP[:,0]])
-    twoFake = np.hstack([meanFP[:,1], meanTP[:,1]])
-    thrFake = np.hstack([meanFP[:,2], meanTP[:,2]])
+    oneFake = np.column_stack([meanFP[:,0], meanTP[:,0]])
+    twoFake = np.column_stack([meanFP[:,1], meanTP[:,1]])
+    thrFake = np.column_stack([meanFP[:,2], meanTP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
