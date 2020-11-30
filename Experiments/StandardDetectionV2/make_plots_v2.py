@@ -149,7 +149,7 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     plt.errorbar(window_sizes, meanRes[3,:], yerr = stdRes[3,:], label = 'Three Fakes')
     
     plt.xlim([0, 400])
-    plt.ylim([0, 1])
+    plt.ylim([0, 1.1])
     plt.ylabel('Accuracy')
     plt.xlabel('Window Size')
     plt.legend(loc = 'lower right')
