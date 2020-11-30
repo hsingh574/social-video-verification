@@ -95,8 +95,8 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
 
 
     plt.errorbar(oneFake[:,0], oneFake[:,1], stdP[:,0], stdR[:,0], label = 'One Fake')
-    plt.errorbar(twoFake[:,1], twoFake[:,1], stdP[:,1], stdR[:,1], label = 'Two Fakes')
-    plt.errorbar(thrFake[:,2], thrFake[:,2], stdP[:,2], stdR[:,2], label = 'Three Fakes')
+    plt.errorbar(twoFake[:,0], twoFake[:,1], stdP[:,1], stdR[:,1], label = 'Two Fakes')
+    plt.errorbar(thrFake[:,0], thrFake[:,1], stdP[:,2], stdR[:,2], label = 'Three Fakes')
     
     plt.xlim([0, 1])
     plt.ylim([0, 1])
@@ -214,8 +214,8 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
 
 
     plt.errorbar(oneFake[:,0], oneFake[:,1], stdTP[:,0], stdFP[:,0], label = 'One Fake')
-    plt.errorbar(twoFake[:,1], twoFake[:,1], stdTP[:,1], stdFP[:,1], label = 'Two Fakes')
-    plt.errorbar(thrFake[:,2], thrFake[:,2], stdTP[:,2], stdFP[:,2], label = 'Three Fakes')
+    plt.errorbar(twoFake[:,0], twoFake[:,1], stdTP[:,1], stdFP[:,1], label = 'Two Fakes')
+    plt.errorbar(thrFake[:,0], thrFake[:,1], stdTP[:,2], stdFP[:,2], label = 'Three Fakes')
     
     plt.xlim([0, 1])
     plt.ylim([0, 1])
