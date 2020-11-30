@@ -104,7 +104,7 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
     plt.xlabel('Recall')
     plt.legend(loc = 'lower right')
     plt.title('Precision v Recall, Window size = {}'.format(window_size))
-    plt.savefig(os.path.join(save_dir, 'pr_plot_window_size_{}'.format(window_size)))
+    plt.savefig(os.path.join(save_dir, 'pr_plot_window_size_{}.png'.format(window_size)))
 
                    
 def acc_helper(results):
@@ -150,7 +150,7 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     plt.xlabel('Window Size')
     plt.legend(loc = 'lower right')
     plt.title('Detection Accuracy v Window Size. Threshold = {}'.format(threshold))
-    plt.savefig(os.path.join(save_dir, 'acc_plot_thresh_{}'.format(threshold)))
+    plt.savefig(os.path.join(save_dir, 'acc_plot_thresh_{}.png'.format(threshold)))
         
             
 
@@ -224,7 +224,7 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     plt.xlabel('False Positive Rate')
     plt.legend(loc = 'lower right')
     plt.title('ROC Curve, Window size = {}'.format(window_size))
-    plt.savefig(os.path.join(save_dir, 'roc_plot_window_size_{}'.format(window_size)))
+    plt.savefig(os.path.join(save_dir, 'roc_plot_window_size_{}.png'.format(window_size)))
 
 
 
