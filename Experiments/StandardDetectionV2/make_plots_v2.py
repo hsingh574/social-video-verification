@@ -186,7 +186,10 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
             fpResults[j,2,i] = (np.sum(results['acc3'][3,:]) / (np.sum(results['acc3'][3,:]) + 
                                                                  np.sum(results['acc3'][2,:])))
             
-            fpZeroFake[j,0,i] = (np.sum(results['acc0'][3,:]) / (np.sum(results['acc0'][3,:]) + 
+            if (np.sum(results['acc0'][3,:]) + np.sum(results['acc0'][2,:])==0):
+                fpZeroFake[j,0,i] = 0
+            else:
+                fpZeroFake[j,0,i] = (np.sum(results['acc0'][3,:]) / (np.sum(results['acc0'][3,:]) + 
                                                                  np.sum(results['acc0'][2,:])))
     
     meanTP = np.mean(tpResults,axis = 2)
@@ -199,6 +202,8 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
 
     #reformat & order by recall values
     #sort rows by first column
+    print(meanFP[:,0].shape)
+    
     oneFake = np.hstack([meanFP[:,0], meanTP[:,0]])
     twoFake = np.hstack([meanFP[:,1], meanTP[:,1]])
     thrFake = np.hstack([meanFP[:,2], meanTP[:,2]])
