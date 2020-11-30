@@ -85,18 +85,18 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
 
     #reformat & order by recall values
     #sort rows by first column
-    oneFake = np.vstack([meanR[:,0], meanP[:,0]])
-    twoFake = np.vstack([meanR[:,1], meanP[:,1]])
-    thrFake = np.vstack([meanR[:,2], meanP[:,2]])
+    oneFake = np.column_stack([meanR[:,0], meanP[:,0]])
+    twoFake = np.column_stack([meanR[:,1], meanP[:,1]])
+    thrFake = np.column_stack([meanR[:,2], meanP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
     thrFake = thrFake[np.argsort(thrFake[:, 0])]
 
 
-    plt.errorbar(oneFake[:,0], oneFake[:,1], stdP[:,0], stdR[:,0], label = 'One Fake')
-    plt.errorbar(twoFake[:,0], twoFake[:,1], stdP[:,1], stdR[:,1], label = 'Two Fakes')
-    plt.errorbar(thrFake[:,0], thrFake[:,1], stdP[:,2], stdR[:,2], label = 'Three Fakes')
+    plt.errorbar(oneFake[:,0], oneFake[:,1], yerr = stdP[:,0], xerr = stdR[:,0], label = 'One Fake')
+    plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdP[:,1], xerr = stdR[:,1], label = 'Two Fakes')
+    plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdP[:,2], xerr = stdR[:,2], label = 'Three Fakes')
     
     plt.xlim([0, 1])
     plt.ylim([0, 1])
@@ -179,20 +179,20 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
             tpResults[j,2,i] = (np.sum(results['acc3'][0,:]) / (np.sum(results['acc3'][0,:]) + 
                                                                  np.sum(results['acc3'][3,:])))
             
-            fpResults[j,0,i] = (np.sum(results['acc1'][3,:]) / (np.sum(results['acc1'][3,:]) + 
-                                                                 np.sum(results['acc1'][2,:])))
+            fpResults[j,0,i] = (np.sum(results['acc1'][2,:]) / (np.sum(results['acc1'][2,:]) + 
+                                                                 np.sum(results['acc1'][1,:])))
             
-            fpResults[j,1,i] = (np.sum(results['acc2'][3,:]) / (np.sum(results['acc2'][3,:]) + 
-                                                                 np.sum(results['acc2'][2,:])))
+            fpResults[j,1,i] = (np.sum(results['acc2'][2,:]) / (np.sum(results['acc2'][2,:]) + 
+                                                                 np.sum(results['acc2'][1,:])))
             
-            fpResults[j,2,i] = (np.sum(results['acc3'][3,:]) / (np.sum(results['acc3'][3,:]) + 
-                                                                 np.sum(results['acc3'][2,:])))
+            fpResults[j,2,i] = (np.sum(results['acc3'][2,:]) / (np.sum(results['acc3'][2,:]) + 
+                                                                 np.sum(results['acc3'][1,:])))
             
-            if (np.sum(results['acc0'][3,:]) + np.sum(results['acc0'][2,:])==0):
+            if (np.sum(results['acc0'][2,:]) + np.sum(results['acc0'][1,:])==0):
                 fpZeroFake[j,0,i] = 0
             else:
-                fpZeroFake[j,0,i] = (np.sum(results['acc0'][3,:]) / (np.sum(results['acc0'][3,:]) + 
-                                                                 np.sum(results['acc0'][2,:])))
+                fpZeroFake[j,0,i] = (np.sum(results['acc0'][2,:]) / (np.sum(results['acc0'][2,:]) + 
+                                                                 np.sum(results['acc0'][1,:])))
     
     meanTP = np.mean(tpResults,axis = 2)
     meanFP = np.mean(fpResults,axis = 2)
@@ -204,20 +204,19 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
 
     #reformat & order by recall values
     #sort rows by first column
-    print(meanFP[:,0].shape)
     
-    oneFake = np.vstack([meanFP[:,0], meanTP[:,0]])
-    twoFake = np.vstack([meanFP[:,1], meanTP[:,1]])
-    thrFake = np.vstack([meanFP[:,2], meanTP[:,2]])
+    oneFake = np.column_stack([meanFP[:,0], meanTP[:,0]])
+    twoFake = np.column_stack([meanFP[:,1], meanTP[:,1]])
+    thrFake = np.column_stack([meanFP[:,2], meanTP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
     thrFake = thrFake[np.argsort(thrFake[:, 0])]
 
 
-    plt.errorbar(oneFake[:,0], oneFake[:,1], stdTP[:,0], stdFP[:,0], label = 'One Fake')
-    plt.errorbar(twoFake[:,0], twoFake[:,1], stdTP[:,1], stdFP[:,1], label = 'Two Fakes')
-    plt.errorbar(thrFake[:,0], thrFake[:,1], stdTP[:,2], stdFP[:,2], label = 'Three Fakes')
+    plt.errorbar(oneFake[:,0], oneFake[:,1],yerr = stdTP[:,0], xerr = stdFP[:,0], label = 'One Fake')
+    plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = 'Two Fakes')
+    plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdTP[:,2], xerr = stdFP[:,2], label = 'Three Fakes')
     
     plt.xlim([0, 1])
     plt.ylim([0, 1])
