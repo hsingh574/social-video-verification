@@ -6,9 +6,9 @@
 %% Make the plots
 clearvars; close all;
 
-accOn = true;
+accOn = false;
 prOn = false;
-rocOn = false;
+rocOn = true;
 
 %% make accuracy plots
 % (1) TP if window contains a faked frame & fake is detected
@@ -175,7 +175,7 @@ end
 if (rocOn)
     
     people = {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25'};
-    threshNum = 6; % length of [1.1 1.3 1.5 1.7 1.9 2.1]
+    threshNum = 5; % length of [1.3 1.5 1.7 1.9 2.1]
     win = 250; % [50 150 250 350]
     tpResults = zeros(threshNum,3,length(people));
     fpResults = zeros(threshNum,3,length(people));
@@ -187,16 +187,15 @@ if (rocOn)
 		continue
 	end
 		    
-        fnameRoot = ['OutputPCA/ID' num2str(p) '/'];
+        fnameRoot = ['results_v2/ID' num2str(p) '/'];
         
-        data1 = load([fnameRoot 'thresh_1/' datasetName '_window_' num2str(win) '.mat']);
-        data2 = load([fnameRoot 'thresh_2/' datasetName '_window_' num2str(win) '.mat']);
-        data3 = load([fnameRoot 'thresh_3/' datasetName '_window_' num2str(win) '.mat']);
-        data4 = load([fnameRoot 'thresh_4/' datasetName '_window_' num2str(win) '.mat']);
-        data5 = load([fnameRoot 'thresh_5/' datasetName '_window_' num2str(win) '.mat']);
-        data6 = load([fnameRoot 'thresh_6/' datasetName '_window_' num2str(win) '.mat']);
+        data1 = load([fnameRoot 'thresh_0/' 'window_' num2str(win) '.mat']);
+        data2 = load([fnameRoot 'thresh_1/' 'window_' num2str(win) '.mat']);
+        data3 = load([fnameRoot 'thresh_2/' 'window_' num2str(win) '.mat']);
+        data4 = load([fnameRoot 'thresh_3/' 'window_' num2str(win) '.mat']);
+        data5 = load([fnameRoot 'thresh_4/' 'window_' num2str(win) '.mat']);
         
-        dataset = {data1,data2,data3,data4,data5,data6};
+        dataset = {data1,data2,data3,data4,data5};
         
         for i=1:threshNum
             
@@ -227,6 +226,9 @@ if (rocOn)
     twoFake = sortrows([meanFP(:,2) meanTP(:,2)]);
     thrFake = sortrows([meanFP(:,3) meanTP(:,3)]);
     
+    disp(size(meanFP(:,1)))
+    disp(size(oneFake))
+
     figure;
     errorbar(oneFake(:,1),oneFake(:,2),stdTP(:,1),stdTP(:,1),stdFP(:,1),stdFP(:,1)); hold on;
     errorbar(twoFake(:,1),twoFake(:,2),stdTP(:,2),stdTP(:,2),stdFP(:,2),stdFP(:,2)); hold on;
