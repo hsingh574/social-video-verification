@@ -85,9 +85,9 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
 
     #reformat & order by recall values
     #sort rows by first column
-    oneFake = np.column_stack([meanR[:,0], meanP[:,0]])
-    twoFake = np.column_stack([meanR[:,1], meanP[:,1]])
-    thrFake = np.column_stack([meanR[:,2], meanP[:,2]])
+    oneFake = np.vstack([meanR[:,0], meanP[:,0]])
+    twoFake = np.vstack([meanR[:,1], meanP[:,1]])
+    thrFake = np.vstack([meanR[:,2], meanP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
@@ -118,7 +118,7 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     numPeople = len(ids)
     numWin = len(window_sizes)
     
-    accResults = np.zeros((4,4,numPeople))
+    accResults = np.zeros((4,numWin,numPeople))
     
     for i,ID in enumerate(ids):
         accs = np.zeros((4,numWin))
@@ -134,8 +134,10 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
             accs[3,j] = acc_helper(results['acc3'])
         accResults[:,:,i] = accs
     
-    meanRes = np.mean(accResults, axis = 3)
-    stdRes = np.std(accResults, axis = 3)
+    print(accResults.shape)
+    
+    meanRes = np.mean(accResults, axis = 2)
+    stdRes = np.std(accResults, axis = 2)
     
     plt.errorbar(window_sizes, meanRes[0,:], stdRes[0,:], label = 'Zero Fakes')
     plt.errorbar(window_sizes, meanRes[1,:], stdRes[1,:], label = 'One Fake')
@@ -204,9 +206,9 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     #sort rows by first column
     print(meanFP[:,0].shape)
     
-    oneFake = np.column_stack([meanFP[:,0], meanTP[:,0]])
-    twoFake = np.column_stack([meanFP[:,1], meanTP[:,1]])
-    thrFake = np.column_stack([meanFP[:,2], meanTP[:,2]])
+    oneFake = np.vstack([meanFP[:,0], meanTP[:,0]])
+    twoFake = np.vstack([meanFP[:,1], meanTP[:,1]])
+    thrFake = np.vstack([meanFP[:,2], meanTP[:,2]])
     
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
