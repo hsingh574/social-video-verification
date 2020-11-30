@@ -12,10 +12,10 @@ from scipy.io import loadmat
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
 
-    parser.add_argument('--rocOn', action='store_true',
+    parser.add_argument('--rocOn', action='store_false',
                     help='Whether to plot ROC curve')
     
-    parser.add_argument('--accOn', action='store_true',
+    parser.add_argument('--accOn', action='store_false',
                     help='Whether to plot Accuracy curve')
     
     parser.add_argument('--prOn', action='store_true',
@@ -135,8 +135,11 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
             accs[3,j] = acc_helper(results['acc3'])
         accResults[:,:,i] = accs
     
+    
     meanRes = np.mean(accResults, axis = 2)
     stdRes = np.std(accResults, axis = 2)
+    
+    print(meanRes)
     
     plt.figure(2)
     
