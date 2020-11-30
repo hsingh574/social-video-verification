@@ -135,17 +135,15 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
             accs[3,j] = acc_helper(results['acc3'])
         accResults[:,:,i] = accs
     
-    print(accResults.shape)
-    
     meanRes = np.mean(accResults, axis = 2)
     stdRes = np.std(accResults, axis = 2)
     
     plt.figure(2)
     
-    plt.errorbar(window_sizes, meanRes[0,:], stdRes[0,:], label = 'Zero Fakes')
-    plt.errorbar(window_sizes, meanRes[1,:], stdRes[1,:], label = 'One Fake')
-    plt.errorbar(window_sizes, meanRes[2,:], stdRes[2,:], label = 'Two Fakes')
-    plt.errorbar(window_sizes, meanRes[3,:], stdRes[3,:], label = 'Three Fakes')
+    plt.errorbar(window_sizes, meanRes[0,:], yerr = stdRes[0,:], label = 'Zero Fakes')
+    plt.errorbar(window_sizes, meanRes[1,:], yerr = stdRes[1,:], label = 'One Fake')
+    plt.errorbar(window_sizes, meanRes[2,:], yerr = stdRes[2,:], label = 'Two Fakes')
+    plt.errorbar(window_sizes, meanRes[3,:], yerr = stdRes[3,:], label = 'Three Fakes')
     
     plt.xlim([0, 400])
     plt.ylim([0, 1])
