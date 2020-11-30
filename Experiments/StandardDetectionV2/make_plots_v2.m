@@ -6,9 +6,9 @@
 %% Make the plots
 clearvars; close all;
 
-accOn = false;
+accOn = true;
 prOn = false;
-rocOn = true;
+rocOn = false;
 
 %% make accuracy plots
 % (1) TP if window contains a faked frame & fake is detected
@@ -60,7 +60,9 @@ if (accOn)
     % Plot average result per window + one stdev
     meanRes = mean(accResults,3);
     stdRes = std(accResults,0,3);
-    
+   
+    disp(meanRes)
+
     figure;
     errorbar(accXData,meanRes(1,:),stdRes(1,:)); hold on;
     errorbar(accXData,meanRes(2,:),stdRes(2,:)); hold on;
