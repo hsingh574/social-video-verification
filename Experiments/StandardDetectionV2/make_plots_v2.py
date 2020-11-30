@@ -92,8 +92,9 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
     oneFake = oneFake[np.argsort(oneFake[:, 0])]
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
     thrFake = thrFake[np.argsort(thrFake[:, 0])]
-
-
+    
+    plt.figure(3)
+    
     plt.errorbar(oneFake[:,0], oneFake[:,1], yerr = stdP[:,0], xerr = stdR[:,0], label = 'One Fake')
     plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdP[:,1], xerr = stdR[:,1], label = 'Two Fakes')
     plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdP[:,2], xerr = stdR[:,2], label = 'Three Fakes')
@@ -138,6 +139,8 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     
     meanRes = np.mean(accResults, axis = 2)
     stdRes = np.std(accResults, axis = 2)
+    
+    plt.figure(2)
     
     plt.errorbar(window_sizes, meanRes[0,:], stdRes[0,:], label = 'Zero Fakes')
     plt.errorbar(window_sizes, meanRes[1,:], stdRes[1,:], label = 'One Fake')
@@ -213,6 +216,7 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
     thrFake = thrFake[np.argsort(thrFake[:, 0])]
 
+    plt.figure(1)
 
     plt.errorbar(oneFake[:,0], oneFake[:,1],yerr = stdTP[:,0], xerr = stdFP[:,0], label = 'One Fake')
     plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = 'Two Fakes')
