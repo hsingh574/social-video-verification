@@ -51,7 +51,7 @@ for p=1:length(people)
     mkdir(['OutputSHCoords/ID' person '/thresh_5/'])
     mkdir(['OutputSHCoords/ID' person '/thresh_6/'])
     
-    parfor t=1:length(threshes) %parfor on/off for this line
+    for t=1:length(threshes) %parfor on/off for this line
         thresh = threshes(t);
         
         for i=[50 150 250 350]
