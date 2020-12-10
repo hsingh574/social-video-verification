@@ -33,9 +33,12 @@ for p=1:length(people)
     
     % Split into thirds: [fake | real | fake]
     intervalWin = floor(fullLen / 3);
-    fake3 = [data3.fake(1:intervalWin,:); cam3((intervalWin + 1):(2*intervalWin),:); data3.fake((2*intervalWin + 1):fullLen,:)];
-    fake4 = [data4.fake(1:intervalWin,:); cam4((intervalWin + 1):(2*intervalWin),:); data4.fake((2*intervalWin + 1):fullLen,:)];
-    fake2 = [data2.fake(1:intervalWin,:); cam2((intervalWin + 1):(2*intervalWin),:); data2.fake((2*intervalWin + 1):fullLen,:)];
+    %fake3 = [data3.fake(1:intervalWin,:); cam3((intervalWin + 1):(2*intervalWin),:); data3.fake((2*intervalWin + 1):fullLen,:)];
+    %fake4 = [data4.fake(1:intervalWin,:); cam4((intervalWin + 1):(2*intervalWin),:); data4.fake((2*intervalWin + 1):fullLen,:)];
+    %fake2 = [data2.fake(1:intervalWin,:); cam2((intervalWin + 1):(2*intervalWin),:); data2.fake((2*intervalWin + 1):fullLen,:)];
+    fake3 = randi([0, 1], [1500,9]);
+    fake4 = randi([0, 1], [1500,9]);
+    fake2 = randi([0, 1], [1500,9]);
     
     % calculate L2 between real/fake mouth landmarks for all frames
     baseline = vecnorm(cam4 - fake4, 2, 2);
