@@ -31,10 +31,10 @@ for p=1:length(people)
     
     % Split into thirds: [fake | real | fake]
     intervalWin = floor(fullLen / 3);
-    fake4 = [data4.fake(1:intervalWin,:); cam1((intervalWin + 1):(2*intervalWin),:); data4.fake((2*intervalWin + 1):fullLen,:)];
+    fake4 = [data4.fake(1:intervalWin,:); cam4((intervalWin + 1):(2*intervalWin),:); data4.fake((2*intervalWin + 1):fullLen,:)];
     
     % calculate L2 between real/fake mouth landmarks for all frames
-    baseline = vecnorm(cam1 - fake4, 2, 2);
+    baseline = vecnorm(cam4 - fake4, 2, 2);
     
     % Iterate over thresholds too
     threshes = [1.1 1.3 1.5 1.7 1.9 2.1];
