@@ -18,7 +18,7 @@ for p=1:length(people)
     
     % eg: fake3 indicates that the fake in the struct is the lipgan output  
     % of camera 3
-    data4 = load(['DataSHCoords/wav2lip-fake1-ID' person '.mat']);
+    data4 = load(['DataSHCoords/fake4-ID' person '.mat']);
     
     fullLen = length(data4.cam1);
     

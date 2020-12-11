@@ -27,7 +27,7 @@ if(angle)
         
         % load the data-- the data was saved s.t. angle 1 was 65 degrees, 2
         % was 52, etc. We reverse it here for ease in plotting.
-        ang_1 = load([fnameRoot datasetName '_window_250.mat']);
+        ang_1 = load([fnameRoot datasetName '_5_window_250.mat']);
         ang_2 = load([fnameRoot datasetName '_4_window_250.mat']);
         ang_3 = load([fnameRoot datasetName '_3_window_250.mat']);
         ang_4 = load([fnameRoot datasetName '_2_window_250.mat']);
