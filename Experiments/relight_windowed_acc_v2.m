@@ -22,8 +22,7 @@ for p=1:length(people)
     data2 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']);
     data4 = load(['DataSHCoords/fake4-ID' person '-300frames.mat']);
     
-    %fullLen = min([length(data3.cam1) length(data4.cam1) length(data2.cam1)]);
-    fullLen = min([length(data3.cam1) length(data4.cam1)]);
+    fullLen = min([length(data3.cam1) length(data4.cam1) length(data2.cam1)]);
     
     cam1 = data3.cam1(1:fullLen,:);
     cam2 = data3.cam2(1:fullLen,:);
