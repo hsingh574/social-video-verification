@@ -113,6 +113,7 @@ for p=1:length(people)
                     [numFakes1,o1] = detectFakesTree(tree1,thresh);
                     [numFakes2,o2] = detectFakesTree(tree2,thresh);
                     [numFakes3,o3] = detectFakesTree(tree3,thresh);
+                    display('set num fakes');
                     
                 elseif (strcmp(method,'simpleMouth'))
                     % simple vertical mouth using landmarks in the top
@@ -275,10 +276,14 @@ for p=1:length(people)
                         acc3(4,startF) = 1; %FN
                     end
                 end
+
+                display('end iteration');
                 
                 base(startF) = mean(baseline(curRange));
                 
             end
+
+            display('saving');
             
             % Save data for this window size
             parsave(['OutputSHCoords/ID' person '/thresh_' num2str(t) '/' method '_window_' num2str(i) '.mat'], acc0, acc1, acc2, acc3, base, thresh, person);
