@@ -19,7 +19,7 @@ for p=1:length(people)
     % eg: fake3 indicates that the fake in the struct is the lipgan output  
     % of camera 3
     data3 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']);
-    data2 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']);
+    data2 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']); %TODO change back to fake2
     data4 = load(['DataSHCoords/fake4-ID' person '-300frames.mat']);
     
     fullLen = min([length(data3.cam1) length(data4.cam1) length(data2.cam1)]);
@@ -35,7 +35,7 @@ for p=1:length(people)
     intervalWin = floor(fullLen / 3);
     fake3 = [data3.fake(1:intervalWin,:); cam3((intervalWin + 1):(2*intervalWin),:); data3.fake((2*intervalWin + 1):fullLen,:)];
     fake4 = [data4.fake(1:intervalWin,:); cam4((intervalWin + 1):(2*intervalWin),:); data4.fake((2*intervalWin + 1):fullLen,:)];
-    %fake2 = [data2.fake(1:intervalWin,:); cam2((intervalWin + 1):(2*intervalWin),:); data2.fake((2*intervalWin + 1):fullLen,:)];
+    fake2 = [data2.fake(1:intervalWin,:); cam2((intervalWin + 1):(2*intervalWin),:); data2.fake((2*intervalWin + 1):fullLen,:)];
     %fake3 = randi([0, 1], [1500,9]);
     %fake4 = randi([0, 1], [1500,9]);
     %fake2 = randi([0, 1], [1500,9]);
