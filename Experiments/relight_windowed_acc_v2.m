@@ -19,7 +19,7 @@ for p=1:length(people)
     % eg: fake3 indicates that the fake in the struct is the lipgan output  
     % of camera 3
     data3 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']);
-    data2 = load(['DataSHCoords/fake3-ID' person '-300frames.mat']); %TODO change back to fake2
+    data2 = load(['DataSHCoords/fake2-ID' person '-300frames.mat']);
     data4 = load(['DataSHCoords/fake4-ID' person '-300frames.mat']);
     
     fullLen = min([length(data3.cam1) length(data4.cam1) length(data2.cam1)]);
