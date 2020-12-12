@@ -54,7 +54,7 @@ for p=1:length(people)
 
 
 
-	for i=[50 150 250 350]
+	for i=[250]
             fprintf('Window size: %d\n',i);
             numWin = fullLen - i;
             
