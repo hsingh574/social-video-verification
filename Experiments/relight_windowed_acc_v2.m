@@ -40,8 +40,11 @@ for p=1:length(people)
     %fake4 = randi([0, 1], [1500,9]);
     %fake2 = randi([0, 1], [1500,9]);
 
-    differences = [sum(mean(cam1 - fake4)), sum(mean(cam2 - fake4))];
+    differences = [sum(mean(cam1 - fake4)), sum(mean(cam2 - fake4)), sum(mean(cam3 - fake4)), sum(mean(cam4 - fake4)), sum(mean(cam5 - fake4)), sum(mean(cam6 - fake4))];
     plot(differences);
+    title('Cam 1-6 vs. Fake4');
+    xlabel('Camera');
+    ylabel('Sum of mean difference of SH Coords');
     
     % calculate L2 between real/fake mouth landmarks for all frames
     baseline = vecnorm(cam4 - fake4, 2, 2);
