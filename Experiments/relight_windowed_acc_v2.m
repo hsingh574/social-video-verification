@@ -337,11 +337,6 @@ for p=1:length(people)
 
 end
 
-%% Helpers
-function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
-save(fname, 'acc0', 'acc1','acc2','acc3','base','thresh','person');
-end
-
 %% plotting
 
 cams = [cam1, cam2, cam3, cam4, cam5, cam6];
@@ -353,3 +348,8 @@ for i = 1:6
 end
 plot(differences);
 title('Each camera vs. fake4');
+
+%% Helpers
+function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
+save(fname, 'acc0', 'acc1','acc2','acc3','base','thresh','person');
+end
