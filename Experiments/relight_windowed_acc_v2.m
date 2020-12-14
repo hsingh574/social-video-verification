@@ -39,6 +39,9 @@ for p=1:length(people)
     %fake3 = randi([0, 1], [1500,9]);
     %fake4 = randi([0, 1], [1500,9]);
     %fake2 = randi([0, 1], [1500,9]);
+
+    differences = [sum(mean(cam1 - fake4)), sum(mean(cam2 - fake4))];
+    plot(differences);
     
     % calculate L2 between real/fake mouth landmarks for all frames
     baseline = vecnorm(cam4 - fake4, 2, 2);
@@ -336,18 +339,6 @@ for p=1:length(people)
     end
 
 end
-
-%% plotting
-
-cams = [cam1, cam2, cam3, cam4, cam5, cam6];
-differences = [];
-
-for i = 1:6
-    cam = cams(i);
-    differences(end + 1) = sum(mean(cam - fake4));
-end
-plot(differences);
-title('Each camera vs. fake4');
 
 %% Helpers
 function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
