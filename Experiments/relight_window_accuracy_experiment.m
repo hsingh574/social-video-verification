@@ -297,3 +297,12 @@ end
 function parsave(fname,acc0,acc1,acc2,acc3,base,thresh,person)
 save(fname, 'acc0', 'acc1','acc2','acc3','base','thresh','person');
 end
+
+%% plotting
+
+cams = [cam1, cam2, cam3, cam4, cam5, cam6];
+differences = [];
+
+for i = 1:6
+    cam = cams(i);
+    differences(end + 1) = sum(mean(cam - fake4))
