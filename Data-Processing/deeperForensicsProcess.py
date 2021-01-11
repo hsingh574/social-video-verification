@@ -27,7 +27,7 @@ def main():
     id_count = 1
     
     for i in range(args.num_parts):
-        source_video_dir = os.path.join(args.data_dir, 'souce_videos' + str(i))
+        source_video_dir = os.path.join(args.data_dir, 'source_videos' + str(i))
         for name in os.listdir(source_video_dir):
             name_video_dir = os.path.join(source_video_dir, name)
             for dir_type in os.listdir(name_video_dir):
