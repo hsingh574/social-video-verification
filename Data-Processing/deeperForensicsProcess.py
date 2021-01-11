@@ -49,7 +49,7 @@ def main():
                     for cam_num, angle in enumerate(os.listdir(type_name_video_dir)):
                         temp = os.path.join(type_name_video_dir, angle)
                         file = os.path.join(temp, list(os.listdir(temp))[0])
-                        os.rename(file, os.path.join(ID_dir, 'camera' + str(cam_num)+'.mp4'))
+                        copy2(file, os.path.join(ID_dir, 'camera' + str(cam_num)+'.mp4'))
                 else:
                     #Iterate over emotions in lighting conditions
                     for emotion in os.listdir(type_name_video_dir):
