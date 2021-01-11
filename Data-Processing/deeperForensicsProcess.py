@@ -8,6 +8,7 @@ Created on Mon Jan 11 09:22:02 2021
 
 import os
 import argparse
+from shutil import copy2
 
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
@@ -46,7 +47,8 @@ def main():
                     os.makedirs(ID_dir)
                     id_count += 1
                     for cam_num, angle in enumerate(os.listdir(type_name_video_dir)):
-                        file = os.path.join(type_name_video_dir, angle)
+                        temp = os.path.join(type_name_video_dir, angle)
+                        file = os.path.join(temp, list(os.listdir(temp))[0])
                         os.rename(file, os.path.join(ID_dir, 'camera' + str(cam_num)+'.mp4'))
                 else:
                     #Iterate over emotions in lighting conditions
@@ -58,8 +60,9 @@ def main():
                         
                         #iterate over camer angles and tranfer files
                         for cam_num, angle in enumerate(os.listdir(emotion_video_dir)):
-                            file = os.path.join(emotion_video_dir, angle)
-                            os.rename(file, os.path.join(ID_dir, 'camera' + str(cam_num)+'.mp4'))
+                            temp = os.path.join(emotion_video_dir, angle)
+                            file = os.path.join(temp, list(os.listdir(temp))[0])
+                            copy2(file, os.path.join(ID_dir, 'camera' + str(cam_num)+'.mp4'))
           
                 
             
