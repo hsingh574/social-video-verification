@@ -42,7 +42,7 @@ do
     
     mkdir -p "${1}/cam${i}-frames"
     echo "Getting frames for cam $i at ${1}"
-    ffmpeg -i "${1}/camera{i}.mp4" -loglevel quiet -q:v 2 "${1}/cam${i}-frames/frames%04d.jpg" 
+    ffmpeg -i "${1}/camera${i}.mp4" -loglevel quiet -q:v 2 "${1}/cam${i}-frames/frames%04d.jpg" 
     
 
     ### Get face bounding boxes for each real video ####
