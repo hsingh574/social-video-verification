@@ -34,3 +34,7 @@ with open(save_path, 'w+') as out:
                                                     d.rect.right(), 
                                                    d.rect.bottom()))
         
+        
+
+
+#try the different face detectors here and see what happens

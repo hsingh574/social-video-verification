@@ -47,7 +47,6 @@ do
 
     ### Get face bounding boxes for each real video ####
     echo "Getting bounding boxes for cam $i at ${1}"
-    
     "${4}/wav2lip/bin/python3" "${7}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-frames" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
@@ -75,7 +74,7 @@ do
     ### Create the deepfake ###
     echo "Creating deepfake for video $i  at ${1} with Wav2Lip..."
     
-    "${4}/wav2lip/bin/python3" inference.py --checkpoint_path "${5}" --face "${1}/camera{i}.mp4" --audio "${4}/audio/${6}.wav" --pads 20 10 13 13  --nosmooth
+    "${4}/wav2lip/bin/python3" inference.py --checkpoint_path "${5}" --face "${1}/camera{i}.mp4" --audio "${4}/audio/${6}.wav" --pads 20 10 13 13  --nosmooth --bboxFile "${1}/bounding-boxes/cam${i}-bounding-boxes.txt" 
     mv "${4}/results/result_voice.mp4" "${2}/cam${i}-wav2lip.mp4"
     
     
@@ -102,9 +101,9 @@ done
 
 
 if [[ ${SINGLE_ID} =~ ID([1-9]|[1-9]{1}[0-9]{1}|[1-9]{1}[0-9]{2}|[1-9]{1}[0-9]{3})$ ]]; then
-    mkdir -p "${DEEPFAKE_LOCATION_BASE}/${SINGLE_ID}/"
-    DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${SINGLE_ID}/"
-    VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${SINGLE_ID}/"
+    mkdir -p "${DEEPFAKE_LOCATION_BASE}/${SINGLE_ID}"
+    DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${SINGLE_ID}"
+    VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${SINGLE_ID}"
     
     singleID ${VIDEO_LOCATION} ${DEEPFAKE_LOCATION} ${SCRIPT_LOCATION} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${AUDIO_FILENAME} ${NUM_CAMS} ${NUM_FAKES}
         
