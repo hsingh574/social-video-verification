@@ -74,7 +74,7 @@ do
     ### Create the deepfake ###
     echo "Creating deepfake for video $i  at ${1} with Wav2Lip..."
     
-    "${4}/wav2lip/bin/python3" "${4}/inference.py" --checkpoint_path "${5}" --face "${1}/camera{i}.mp4" --audio "${4}/audio/${6}.wav" --pads 40 10 15 15 --bboxFile "${1}/bounding-boxes/cam${i}-bounding-boxes.txt" 
+    "${4}/wav2lip/bin/python3" "${4}/inference.py" --checkpoint_path "${5}" --face "${1}/camera${i}.mp4" --audio "${4}/audio/${6}.wav" --pads 40 10 15 15 --bboxFile "${1}/bounding-boxes/cam${i}-bounding-boxes.txt" 
     mv "${4}/results/result_voice.mp4" "${2}/cam${i}-wav2lip.mp4"
     
     
