@@ -22,6 +22,8 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
         means = np.zeros((numLip*2,numF))
 
         # Get feature location per frame in image space
+        # can start from a specific frame number in order to make this faster
+        
         for f in range(1,numF+1):
             # Load data
             # format: x1,y1, x2,y2, ... xn,yn, for lip points 1,...,n
