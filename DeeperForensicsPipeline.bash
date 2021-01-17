@@ -47,7 +47,7 @@ do
 
     ### Get face bounding boxes for each real video ####
     echo "Getting bounding boxes for cam $i at ${1}"
-    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-frames" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${3}/mmod_human_face_detector.dat" "${1}/cam${i}-frames" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
     ### Get face bounding boxes for each real video ####
@@ -86,7 +86,7 @@ do
     
 
     echo "Getting bounding boxes for cam $i at ${2}"
-    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${2}/cam${i}-frames" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${3}/mmod_human_face_detector.dat" "${2}/cam${i}-frames" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
     echo "Getting 2d landmarks for cam $i at ${1}"
