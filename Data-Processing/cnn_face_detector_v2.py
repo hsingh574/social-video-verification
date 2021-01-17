@@ -3,7 +3,6 @@
 
 import dlib
 import sys
-import cv2
 import os
 
 print("Dlib using cuda?")
@@ -20,10 +19,9 @@ cnn_face_detector = dlib.cnn_face_detection_model_v1(face_detector_path)
 print('Reading video frames...')
 
 with open(save_path, 'w+') as out:
-    for f in os.listdir(frames_path):
-        frame = cv2.imread(os.path.join(frames_path, f))
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        dets = cnn_face_detector(frame, 1)
+    for f in os.listdir(frames_path):        
+        img = dlib.load_rgb_image(os.path.join(frames_path, f))
+        dets = cnn_face_detector(img, 1)
         sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
         if(len(dets) == 0):
             print('No faces detected. Using last detection result.')
