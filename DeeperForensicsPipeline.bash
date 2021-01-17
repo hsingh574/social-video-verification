@@ -65,8 +65,7 @@ done
 
 mkdir -p "${2}/bounding-boxes"
 
-#fakes=($(shuf -i 0-6 -n $8))
-fakes=(0)
+fakes=($(shuf -i 0-6 -n $8))
 
 for i in "${fakes[@]}"; 
 do
