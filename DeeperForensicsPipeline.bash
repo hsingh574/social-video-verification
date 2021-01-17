@@ -47,7 +47,7 @@ do
 
     ### Get face bounding boxes for each real video ####
     echo "Getting bounding boxes for cam $i at ${1}"
-    "${4}/wav2lip/bin/python3" "${7}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-frames" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${1}/cam${i}-frames" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
     ### Get face bounding boxes for each real video ####
@@ -55,7 +55,7 @@ do
     
     mkdir -p "${1}/cam${i}-landmarks"
     
-    "${4}/wav2lip/bin/python3" "${7}/detectFeatures_v2.py" "${1}/cam${i}-frames" "${1}/cam${i}-landmarks" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/detectFeatures_v2.py" "${1}/cam${i}-frames" "${1}/cam${i}-landmarks" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     ### Delete frame directory as we don't need it anymore ###
     
@@ -86,12 +86,12 @@ do
     
 
     echo "Getting bounding boxes for cam $i at ${2}"
-    "${4}/wav2lip/bin/python3" "${7}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${2}/cam${i}-frames" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/cnn_face_detector_v2.py" "${7}/mmod_human_face_detector.dat" "${2}/cam${i}-frames" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
     echo "Getting 2d landmarks for cam $i at ${1}"
     mkdir -p "${2}/cam${i}-landmarks"
-    "${4}/wav2lip/bin/python3" "${7}/detectFeatures_v2.py" "${2}/cam${i}-frames" "${2}/cam${i}-landmarks" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
+    "${4}/wav2lip/bin/python3" "${3}/detectFeatures_v2.py" "${2}/cam${i}-frames" "${2}/cam${i}-landmarks" "${2}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
     
     rm -rf "${2}/cam${i}-frames"
