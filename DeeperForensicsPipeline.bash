@@ -27,7 +27,7 @@ SINGLE_ID=${9:-""}
 
 
 # Exit the moment a command fails
-set -euo pipefail
+#set -euo pipefail
 
 
 function singleID {
