@@ -94,7 +94,28 @@ do
     
     
     rm -rf "${2}/cam${i}-frames"
+    
+    echo "Converting from landmark npy files to mat with cam $i faked"
+    
+    "${4}/wav2lip/bin/python3" "${3}/landmark_npy_to_mat_v2.py" "${1}" "${2}/cam${i}-landmarks" "${1}/mouth-data-fake${i}-${9}.mat"
+    
+    rm -rf "${2}/cam${i}-landmarks"
+    
+    
 done
+
+### Cleanup ###
+
+for ((i=0; i< $7; i++));
+do
+
+rm -rf "${1}/cam${i}-landmarks"
+
+done
+
+rm -rf "${1}/bounding-boxes"
+rm -rf "${2}/bounding-boxes"
+
 
 }
 
@@ -120,7 +141,7 @@ else
         mkdir -p "${DEEPFAKE_LOCATION_BASE}/${dir%?}"
         DEEPFAKE_LOCATION="${DEEPFAKE_LOCATION_BASE}/${dir%?}"
         VIDEO_LOCATION="${VIDEO_LOCATION_BASE}/${dir%?}"
-        singleID ${VIDEO_LOCATION} ${DEEPFAKE_LOCATION} ${SCRIPT_LOCATION} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${AUDIO_FILENAME} ${NUM_CAMS} ${NUM_FAKES}
+        singleID ${VIDEO_LOCATION} ${DEEPFAKE_LOCATION} ${SCRIPT_LOCATION} ${WAV2LIP_LOCATION} ${WAV2LIP_CHECKPOINT} ${AUDIO_FILENAME} ${NUM_CAMS} ${NUM_FAKES} ${dir%?}
             
     done
 
