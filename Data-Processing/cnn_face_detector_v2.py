@@ -44,11 +44,11 @@ with open(save_path, 'w+') as out:
         else:
             d = sortedDets[0]
         if from_first:
-            out.write('%d, %d, %d, %d\n' % (d[0]), d[1],d[2], d[3])
-            out.write('%d, %d, %d, %d\n' % (d[0]), d[1],d[2], d[3])
+            out.write('%d, %d, %d, %d\n' % (d[0], d[1],d[2], d[3]))
+            out.write('%d, %d, %d, %d\n' % (d[0], d[1],d[2], d[3]))
             
         else:
-            out.write('%d, %d, %d, %d\n' % (d[0]), d[1],d[2], d[3])
+            out.write('%d, %d, %d, %d\n' % (d[0], d[1],d[2], d[3]))
         from_first = False
         
         
