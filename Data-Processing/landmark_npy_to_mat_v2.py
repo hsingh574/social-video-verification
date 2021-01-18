@@ -6,7 +6,7 @@ import numpy as np
 import scipy.io as sio
 import sys
 
-def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
+def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,shift):
 # Prep landmark data for analysis in Matlab
 # Lip points are: 49-68
 
@@ -50,7 +50,6 @@ def landmark2mat(inPathReal, inPathFake,numCams,outPath,numF,fakeCam,shift):
 inPathReal = sys.argv[1]
 inPathFake = sys.argv[2]
 outPath = sys.argv[3]
-fakeCam = sys.argv[4]
 
 shift = 0
 numCams = 7
@@ -58,5 +57,5 @@ numCams = 7
 lengthLst = [(len(os.listdir(os.path.join(inPathReal, f'cam{i}-landmarks'))) - shift) for i in range(0,numCams)]
 lengthLst.append(len(os.listdir(inPathFake)))
 numF = min(lengthLst)
-landmark2mat(inPathReal, inPathFake, numCams,outPath,numF,fakeCam, shift)
+landmark2mat(inPathReal, inPathFake, numCams,outPath,numF, shift)
 print(f"Done! Saved output to: {outPath}")
