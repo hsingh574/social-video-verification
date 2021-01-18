@@ -136,6 +136,14 @@ else
         echo "Working on directory ${dir%?}"
         
         
+        fnum=$(ls ${VIDEO_LOCATION_BASE}/${dir%?}/mouth-data* | wc -l)
+        
+        if [[ $fnum -eq 3 ]]; then
+            echo "Skipping this directory because 3 mat files have already been generated"
+            continue
+        fi
+        
+        
         ### Make the fake directory if it does not exist
         
         mkdir -p "${DEEPFAKE_LOCATION_BASE}/${dir%?}"
