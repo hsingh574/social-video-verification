@@ -21,7 +21,7 @@ print('Reading video frames...')
 
 numImg = len([name for name in os.listdir(frames_path) if 
                   os.path.isfile(os.path.join(frames_path, name))])
-
+from_first= True
 
 with open(save_path, 'w+') as out:
     for f in range(1,numImg+1):
@@ -32,12 +32,28 @@ with open(save_path, 'w+') as out:
         sortedDets = sorted(dets, key=lambda a: a.confidence, reverse=True)
         if(len(dets) == 0):
             print('No faces detected. Using last detection result.')
+            if from_first:
+                print('Not detected on first frame, second frame will be used twice')
+                continue
         else:
             d = sortedDets[0]
-        out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
+        if from_first:
+            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
                                                     d.rect.top(), 
                                                     d.rect.right(), 
                                                    d.rect.bottom()))
+            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
+                                                    d.rect.top(), 
+                                                    d.rect.right(), 
+                                                   d.rect.bottom()))
+            
+        else:
+            out.write('%d, %d, %d, %d\n' % (d.rect.left(), 
+                                                    d.rect.top(), 
+                                                    d.rect.right(), 
+                                                   d.rect.bottom()))
+        from_first = False
+        
         
         
 
