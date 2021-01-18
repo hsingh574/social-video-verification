@@ -34,7 +34,6 @@ function singleID {
 
 mkdir -p "${1}/bounding-boxes"
 
-
 for ((i=0; i< $7; i++));
 do
 
@@ -57,11 +56,12 @@ do
     
     "${4}/wav2lip/bin/python3" "${3}/detectFeatures_v2.py" "${1}/cam${i}-frames" "${1}/cam${i}-landmarks" "${1}/bounding-boxes/cam${i}-bounding-boxes.txt"
     
-    ### Delete frame directory as we don't need it anymore ###
+    ### Delete frame directory as we dont need it anymore ###
     
     rm -rf "${1}/cam${i}-frames"
 
 done
+
 
 mkdir -p "${2}/bounding-boxes"
 
@@ -74,8 +74,7 @@ do
     ### Create the deepfake ###
     echo "Creating deepfake for video $i  at ${1} with Wav2Lip..."
     
-    "${4}/wav2lip/bin/python3" "${4}/inference.py" --checkpoint_path "${5}" --face "${1}/camera${i}.mp4" --audio "${4}/audio/${6}.wav" --pads 40 10 15 15 --bboxFile "${1}/bounding-boxes/cam${i}-bounding-boxes.txt" 
-    mv "${4}/results/result_voice.mp4" "${2}/cam${i}-wav2lip.mp4"
+    "${4}/wav2lip/bin/python3" "${4}/inference.py" --checkpoint_path "${5}" --face "${1}/camera${i}.mp4" --audio "${4}/audio/${6}.wav" --pads 40 10 15 15 --bboxFile "${1}/bounding-boxes/cam${i}-bounding-boxes.txt" --outfile "${2}/cam${i}-wav2lip.mp4" 
     
     
     ### Process deepfake in identical manner to real video ###
