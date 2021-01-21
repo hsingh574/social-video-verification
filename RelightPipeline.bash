@@ -27,9 +27,13 @@ function relight_id {
 
     cd image-relighting
 
-    echo 'Creating deep fake'
-    "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_04.txt" "--input_path" "/home/socialvv/Dataset/ID1/camera3.MP4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID1/bashScriptTest.avi"
+    # echo 'Creating deep fake'
+    # "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_04.txt" "--input_path" "/home/socialvv/Dataset/ID1/camera3.MP4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID1/bashScriptTest.avi"
 
 }
 
-relight_id 3
+ids = (1 2 3)
+
+for id in ids;
+do
+    relight_id id
