@@ -7,7 +7,7 @@
 #   create relit fakes (how many? different lighting conditions or angles?)
 # then run accuracy experiment
 
-IMAGE_RELIGHT_DIR = ${1:-"~/social-video-verification-v2/image-relighting"}
+IMAGE_RELIGHT_DIR=${1:-"~/social-video-verification-v2/image-relighting"}
 
 # cd ${IMAGE_RELIGHT_DIR}
 
