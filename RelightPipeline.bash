@@ -15,6 +15,8 @@ echo ${IMAGE_RELIGHT_DIR}
 
 cd ..
 
+cd image-relighting
+
 pwd
 
 
