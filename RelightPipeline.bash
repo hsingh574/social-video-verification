@@ -36,6 +36,6 @@ ids=(1 2 3)
 
 for id in ${ids[@]};
 do
-    # relight_id ${id}
-    echo ${id}
+    relight_id ${id}
+    # echo ${id}
 done
