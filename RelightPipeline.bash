@@ -19,7 +19,7 @@ source lighting-env/bin/activate
 
 cd image-relighting
 
-"python" "live_lighting_transfer.py --light_text /home/socialvv/social-video-verification-v2/image-relighting/data/test/light/rotate_light_04.txt" 
+"python" "live_lighting_transfer.py" "--light_text /home/socialvv/social-video-verification-v2/image-relighting/data/test/light/rotate_light_04.txt" 
 
 #"--light_text /home/socialvv/social-video-verification-v2/image-relighting/data/test/light/rotate_light_04.txt"
 
