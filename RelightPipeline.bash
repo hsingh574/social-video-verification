@@ -19,16 +19,14 @@ IMAGE_RELIGHT_OUTPUT=${3:-"/media/eleanor/New-Volume/socialvv/social-video-verif
 
 function relight_id {
 
-    echo 'relighting id'${1}
-
     cd ..
 
     source lighting-env/bin/activate
 
     cd image-relighting
 
-    # echo 'Creating deep fake'
-    # "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_04.txt" "--input_path" "/home/socialvv/Dataset/ID1/camera3.MP4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID1/bashScriptTest.avi"
+    echo 'Creating deep fake for id '${1}
+    "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_04.txt" "--input_path" "/home/socialvv/Dataset/ID${1}/camera3.MP4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/bashScriptTest.avi"
 
 }
 
