@@ -32,7 +32,7 @@ function relight_id {
 
 }
 
-ids = (1 2 3)
+ids=(1 2 3)
 
 for id in ids;
 do
