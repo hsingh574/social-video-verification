@@ -34,7 +34,7 @@ function relight_id {
 
 ids=(1 2 3)
 
-for id in ids;
+for id in ${ids};
 do
     relight_id ${id}
 done
