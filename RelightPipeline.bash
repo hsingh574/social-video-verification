@@ -25,6 +25,8 @@ function relight_id {
 
     cd image-relighting
 
+    mkdir -p "/${IMAGE_RELIGHT_OUTPUT}/ID${1}"
+
     echo 'Creating deep fake for id '${1}
     "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_04.txt" "--input_path" "/home/socialvv/Dataset/ID${1}/camera3.MP4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/bashScriptTest.avi"
 
