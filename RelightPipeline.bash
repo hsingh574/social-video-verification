@@ -9,7 +9,9 @@
 
 IMAGE_RELIGHT_DIR=${1:-"~/social-video-verification-v2/image-relighting"}
 
-# cd ${IMAGE_RELIGHT_DIR}
+cd ${IMAGE_RELIGHT_DIR}
+
+echo pwd
 
 echo 'in relight dir'
 
