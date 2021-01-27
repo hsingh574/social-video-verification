@@ -46,5 +46,17 @@ do
     relight_id ${id} 2
     relight_id ${id} 3
     relight_id ${id} 4
-    # echo ${id}
 done
+
+cd ..
+
+echo 'finished relighting and analysis'
+
+echo pwd
+
+cd social-video-verification
+cd Experiments
+
+matlab -nosplash -nodesktop -r "relight_windowed_acc_v2"
+
+matlab -nosplash -nodesktop -r "relight_make_plots"
