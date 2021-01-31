@@ -18,9 +18,7 @@ def mahalanobis(T, eigenval):
     return np.sqrt(np.sum(np.multiply(np.matmul(T, cov), T), axis=1)) #T @ cov, T), axis = 1))
 
 
-
 def mahalanobis_calculate(data, num_pcs):
-
     pca = PCA(num_pcs)
     T = pca.fit_transform(data)
     eigenval = pca.explained_variance_
@@ -55,6 +53,7 @@ def detectFakesTree(link, thresh):
 
 def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
             fake3, fake4, start, end, num_pcs, thresh):
+    
     
     cam1Out = mahalanobis_calculate(cam1[start:end,:], num_pcs)
     cam2Out = mahalanobis_calculate(cam2[start:end,:], num_pcs)
@@ -259,6 +258,12 @@ def main():
     
     #whether or not to use alternative procedure for fakes#
     alternative = False
+    
+# =============================================================================
+#     for i in ids:
+#         gen_results(i, args.data_dir, alternative, threshes, window_sizes, args.num_pcs, args.save_dir)
+# =============================================================================
+        
     
     
     Parallel(n_jobs=-1)(delayed(gen_results)(i, args.data_dir, 
