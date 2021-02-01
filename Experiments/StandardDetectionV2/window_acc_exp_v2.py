@@ -113,7 +113,7 @@ def parse_args():
                     help='Directory to save results')
     parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
-    parser.add_argument("--num-jobs", nargs=int, default=-1)
+    parser.add_argument("--num-jobs", type=int, default=-1)
     
     
     
