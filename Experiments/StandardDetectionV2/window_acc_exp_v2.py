@@ -3,10 +3,12 @@
 # -*- coding: utf-8 -*-
 import argparse
 import os
+import re
 import numpy as np
 from sklearn.decomposition import PCA
 from scipy.io import loadmat, savemat
 from scipy.cluster.hierarchy import linkage, fcluster
+from collections import defaultdict
 
 from joblib import Parallel, delayed
 
@@ -51,33 +53,31 @@ def detectFakesTree(link, thresh):
     return numFakes, c
 
 
-def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
-            fake3, fake4, start, end, num_pcs, thresh):
+def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
+    camsOut = []
+    for c in cams:
+        camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
     
-    cam1Out = mahalanobis_calculate(cam1[start:end,:], num_pcs)
-    cam2Out = mahalanobis_calculate(cam2[start:end,:], num_pcs)
-    cam3Out = mahalanobis_calculate(cam3[start:end,:], num_pcs)
-    cam4Out = mahalanobis_calculate(cam4[start:end,:], num_pcs)
-    cam5Out = mahalanobis_calculate(cam5[start:end,:], num_pcs)
-    cam6Out = mahalanobis_calculate(cam6[start:end,:], num_pcs)
-    
-    camFake1 = mahalanobis_calculate(fake2[start:end,:], num_pcs)
-    camFake2 = mahalanobis_calculate(fake3[start:end,:], num_pcs)
-    camFake3 = mahalanobis_calculate(fake4[start:end,:], num_pcs)
+    fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+    fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
+    fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
     
     #X0 is no fakes, X1 is 1 fake, etc.
-    X0 = np.array([cam1Out, cam2Out, cam3Out, cam4Out, cam5Out, cam6Out])
-    X1 = np.array([cam1Out, cam2Out, cam3Out, camFake3, cam5Out, cam6Out])
-    X2 = np.array([cam1Out, cam2Out, camFake2, camFake3, cam5Out, cam6Out])
-    X3 = np.array([cam1Out, camFake1, camFake2, camFake3, cam5Out, cam6Out])
+    X0 = np.array(camsOut)
+    temp = X0.copy()
+    temp[3] = fake0Out
+    X1 = temp
+    temp = X1.copy()
+    temp[2] = fake1Out
+    X2 = temp
+    temp = X2.copy()
+    temp[1] = fake2Out
+    X3 = temp
     
     #Test for tracking failures and remove
-    
     #delete the columns which have an element greater than 10
-    
     badInds = []
-    
     for i, row in enumerate(X0.T):
         if np.max(row) >= 10:
             badInds.append(i)
@@ -99,7 +99,6 @@ def onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2,
     
     return numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3
 
-
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
 
@@ -107,10 +106,11 @@ def parse_args():
                     help='Directory where processed landmark files live')
     parser.add_argument('--num_pcs', type=int, default=5,
                     help='Number of principal components to use')
-    parser.add_argument('--num_participants', type=int, default=25,
-                    help='Number of participants')
     parser.add_argument('--save-dir', type=str, default='results_v2',
                     help='Directory to save results')
+    parser.add_argument('--zero-start', action='store_true',
+                    help='Whether or not there is a cam0')
+    parser.add_argument("--num-cams", type=int, default=6)
     parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
     parser.add_argument("--num-jobs", type=int, default=-1)
@@ -143,47 +143,84 @@ def calculate_acc_helper(option1, option2, numFakes, c, correctAnswer, isFake):
 
 
 
-
-def gen_results(i, data_dir, alternative, threshes, window_sizes, num_pcs, save_dir):
-    #print("Processing ID", str(i))
-        
-    data2 = loadmat(os.path.join(data_dir, "mouth-data-fake2-ID{}.mat".format(i)))
-    data3 = loadmat(os.path.join(data_dir, "mouth-data-fake3-ID{}.mat".format(i)))
-    data4 = loadmat(os.path.join(data_dir, "mouth-data-fake4-ID{}.mat".format(i)))
-    
-    fullLen = min(data2['cam1'].shape[0], data3['cam1'].shape[0], data4['cam1'].shape[0])
-    
-    #print("Total number of frames to work over: {}".format(fullLen))
-    
-    #arbitrarily pick data3 because the non-faked views should be the same across all 
-    #files for a given ID
-    cam1 = data3['cam1'][:fullLen,:]
-    cam2 = data3['cam2'][:fullLen,:]
-    cam3 = data3['cam3'][:fullLen,:]
-    cam4 = data3['cam4'][:fullLen,:]
-    cam5 = data3['cam5'][:fullLen,:]
-    cam6 = data3['cam6'][:fullLen,:]
+def split_procedure(data0, data1, data2, real_cam0, real_cam1, 
+                    real_cam2, alternative, fullLen, intervalWin):
     
     #split into two thirds (fake, real, fake)
     if not alternative:
         
-        intervalWin = fullLen // 3
+        
+        fake0 = np.vstack([data0['fake'][:intervalWin,:], 
+                           real_cam0[intervalWin:(2*intervalWin),:], 
+                           data0['fake'][(2*intervalWin):fullLen,:]])
+    
+        fake1 = np.vstack([data1['fake'][:intervalWin,:], 
+                           real_cam1[intervalWin:(2*intervalWin),:], 
+                           data1['fake'][(2*intervalWin):fullLen,:]])
+    
         fake2 = np.vstack([data2['fake'][:intervalWin,:], 
-                           cam2[intervalWin:(2*intervalWin),:], 
+                           real_cam2[intervalWin:(2*intervalWin),:], 
                            data2['fake'][(2*intervalWin):fullLen,:]])
-    
-        fake3 = np.vstack([data3['fake'][:intervalWin,:], 
-                           cam3[intervalWin:(2*intervalWin),:], 
-                           data3['fake'][(2*intervalWin):fullLen,:]])
-    
-        fake4 = np.vstack([data4['fake'][:intervalWin,:], 
-                           cam4[intervalWin:(2*intervalWin),:], 
-                           data4['fake'][(2*intervalWin):fullLen,:]])
     else:
         #alternative procedure: keep the fake as a fake throughout all frames
+        fake0 = data0['fake'][:fullLen,:]
+        fake1 = data1['fake'][:fullLen,:]
         fake2 = data2['fake'][:fullLen,:]
-        fake3 = data3['fake'][:fullLen,:]
-        fake4 = data4['fake'][:fullLen,:]
+        
+    return fake0, fake1, fake2
+    
+    
+#Note: zero_start is whether or not there is a cam0    
+
+def get_cams(data, num_cams, zero_start, fullLen):
+    
+    cams_list = []
+    if zero_start:
+        for i in range(num_cams):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    else:
+        for i in range(1, num_cams+1):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    
+    return cams_list
+
+
+
+#Note: fake_cams is 0-indexed
+
+#Note: first fake at index 3, second at index 2, third at index 1
+
+
+def gen_results(i, fake_cams, num_cams, zero_start, data_dir, 
+                alternative, threshes, window_sizes, num_pcs, save_dir):
+    #print("Processing ID", str(i))
+    
+    
+    data0 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[0], i)))
+    data1 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[1], i)))
+    data2 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[2], i)))
+    
+    fullLen = min(data0['cam1'].shape[0], data1['cam1'].shape[0], data2['cam1'].shape[0])
+    intervalWin = fullLen // 3
+    
+    #print("Total number of frames to work over: {}".format(fullLen))
+    
+    #Get the non-faked camera views. Arbitrarily pick data1
+    #because the non-faked views should be the same across all 
+    #files for a given ID    
+    cams = get_cams(data1, num_cams, zero_start, fullLen)
+    
+    
+    #Get the real camera to weave in with the fake camera
+    real_cam0 = cams[fake_cams[0]]
+    real_cam1 = cams[fake_cams[1]]
+    real_cam2 = cams[fake_cams[2]]
+    
+    
+    #Generate the fakes, using a standard or alternative procedure
+    fake0, fake1, fake2 = split_procedure(data0, data1, data2, real_cam0, 
+                                          real_cam1, real_cam2, alternative, fullLen, intervalWin)
+    
     
     
 # =============================================================================
@@ -206,11 +243,8 @@ def gen_results(i, data_dir, alternative, threshes, window_sizes, num_pcs, save_
                 end = start + j
                 if end > fullLen-1:
                     continue
-                #print('Start: ', str(start))
-                #print('End: ', str(end))
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cam1, cam2, cam3, cam4, cam5, cam6, fake2, 
-        fake3, fake4, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 
                 if not alternative:
                     isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
@@ -222,16 +256,37 @@ def gen_results(i, data_dir, alternative, threshes, window_sizes, num_pcs, save_
                     acc0[1][start] = 1 #TN
                 else:
                     acc0[2][start] = 1 #FP
-
-                acc1[:, start] = calculate_acc_helper(np.array([1,1,1,2,1,1]), 
-                    np.array([2,2,2,1,2,2]), numFakes1, c1, 1, isFake)
+                    
+                if zero_start:    
+                    all_ones = np.ones((num_cams+1,))
+                    all_twos = 2*np.ones((num_cams+1,))
+                else:
+                    all_ones = np.ones((num_cams,))
+                    all_twos = 2*np.ones((num_cams,))
+                    
+                single_fake_ones = all_ones.copy()
+                single_fake_ones[3] = 2
+                single_fake_twos = all_twos.copy()
+                single_fake_twos[3] = 1
+                double_fake_ones = single_fake_ones.copy()
+                double_fake_ones[2] = 2
+                double_fake_twos = single_fake_twos.copy()
+                double_fake_twos[2] = 1
+                triple_fake_ones = double_fake_ones.copy()
+                triple_fake_ones[1] = 2
+                triple_fake_twos = double_fake_twos.copy()
+                triple_fake_twos[1] = 1
                 
-                acc2[:,start] = calculate_acc_helper(np.array([1,1,2,2,1,1]), 
-                    np.array([2,2,1,1,2,2]), numFakes2, c2, 2, isFake)
+ 
+                acc1[:, start] = calculate_acc_helper(single_fake_ones, 
+                    single_fake_twos, numFakes1, c1, 1, isFake)
+                
+                acc2[:,start] = calculate_acc_helper(double_fake_ones, 
+                    double_fake_twos, numFakes2, c2, 2, isFake)
                 
                 
-                acc3[:,start] = calculate_acc_helper(np.array([1,2,2,2,1,1]), 
-                    np.array([2,1,1,1,2,2]), numFakes3, c3, 3, isFake)
+                acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
+                    triple_fake_twos, numFakes3, c3, 3, isFake)
                 
                 
             #save the results to do more statistics with later
@@ -248,15 +303,23 @@ def main():
     
     args = parse_args()
     
+    ids = set()
+    fake_cams_dict = defaultdict(list)
+    
+    for f in os.listdir(args.data_dir):
+        try:
+            x = re.search(r"mouth-data-fake([1-9][0-9]*)-ID([1-9][0-9]*).mat", f)
+            ID = int(x.group(2))
+            fake_cam = int(x.group(1))
+            fake_cams_dict[ID].append(fake_cam)
+            ids.add(ID)
+        except AttributeError:
+            continue
+        
     exclude_list  = [17]
-    ids = [i for i in range(1, args.num_participants+1) if i not in exclude_list] 
+    ids = [i for i in ids if i not in exclude_list] 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
-
-    #Iterate over diffrent thresholds and window sizes
-    threshes = args.thresholds
-    window_sizes = args.window_sizes
-    
     
     #whether or not to use alternative procedure for fakes#
     alternative = False
@@ -265,11 +328,10 @@ def main():
 #     for i in ids:
 #         gen_results(i, args.data_dir, alternative, threshes, window_sizes, args.num_pcs, args.save_dir)
 # =============================================================================
-        
     
-    
-    Parallel(n_jobs=args.num_jobs)(delayed(gen_results)(i, args.data_dir, 
-             alternative, threshes, window_sizes, args.num_pcs, args.save_dir) for i in ids)    
+    Parallel(n_jobs=args.num_jobs)(delayed(gen_results)(i, fake_cams_dict[i], 
+             args.num_cams, args.zero_start, args.data_dir, alternative, args.threshes, 
+             args.window_sizes, args.num_pcs, args.save_dir) for i in ids)    
              
 
 if __name__ == "__main__":
