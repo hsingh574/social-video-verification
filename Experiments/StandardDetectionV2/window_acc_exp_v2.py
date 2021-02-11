@@ -330,7 +330,7 @@ def main():
 # =============================================================================
     
     Parallel(n_jobs=args.num_jobs)(delayed(gen_results)(i, fake_cams_dict[i], 
-             args.num_cams, args.zero_start, args.data_dir, alternative, args.threshes, 
+             args.num_cams, args.zero_start, args.data_dir, alternative, args.thresholds, 
              args.window_sizes, args.num_pcs, args.save_dir) for i in ids)    
              
 
