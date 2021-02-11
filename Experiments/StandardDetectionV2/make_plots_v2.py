@@ -6,6 +6,7 @@ import argparse
 import os
 import numpy as np
 from scipy.io import loadmat
+import re
 
 
 
@@ -21,8 +22,8 @@ def parse_args():
     parser.add_argument('--prOn', action='store_true',
                     help='Whether to plot Precision Recall curve')
     
-    parser.add_argument('--num_participants', type=int, default=25,
-                    help='Number of participants')
+    parser.add_argument('--data-dir', type=str, default='data_v2',
+                    help='Directory where data has been saved')
     
     parser.add_argument('--results-dir', type=str, default='results_v2',
                     help='Directory where results have been saved')
@@ -237,8 +238,19 @@ def main():
     
     args = parse_args()
     
+    
+    ids = set()
+    for f in os.listdir(args.data_dir):
+        try:
+            x = re.search(r"mouth-data-fake([0-9]*)-ID([0-9]*).mat", f)
+            ID = int(x.group(2))
+            ids.add(ID)
+        except AttributeError:
+            continue
+        
     exclude_list  = [17]
-    ids = [i for i in range(1, args.num_participants+1) if i not in exclude_list] 
+    ids = [i for i in ids if i not in exclude_list] 
+    
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
         
