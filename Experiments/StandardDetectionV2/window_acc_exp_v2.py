@@ -308,7 +308,7 @@ def main():
     
     for f in os.listdir(args.data_dir):
         try:
-            x = re.search(r"mouth-data-fake([1-9][0-9]*)-ID([1-9][0-9]*).mat", f)
+            x = re.search(r"mouth-data-fake([0-9]*)-ID([0-9]*).mat", f)
             ID = int(x.group(2))
             fake_cam = int(x.group(1))
             fake_cams_dict[ID].append(fake_cam)
