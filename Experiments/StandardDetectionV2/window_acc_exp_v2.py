@@ -235,6 +235,9 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
         for ind2, j in enumerate(window_sizes):
             #print('Processing window size ', str(j))
             numWin = fullLen - j
+            if numWin <= 0:
+                print("Skipping  window size " + str(j) + " for ID " + str(i) + " , as it is larger than the total number of available frames")
+                continue
             acc0 = np.zeros((4, numWin))
             acc1 = np.zeros((4, numWin))
             acc2 = np.zeros((4, numWin))
