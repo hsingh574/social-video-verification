@@ -176,7 +176,7 @@ def get_cams(data, num_cams, zero_start, fullLen):
     
     cams_list = []
     if zero_start:
-        for i in range(num_cams):
+        for i in range(num_cams+1):
             cams_list.append(data['cam{}'.format(i)][:fullLen,:])
     else:
         for i in range(1, num_cams+1):
@@ -218,9 +218,9 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
         real_cam2 = cams[fake_cams[2]]
     except IndexError:
         print("Number of cams",len(cams))
-        print('Fake cam 0',fake_cams[0])
-        print('Fake cam 1',fake_cams[1])
-        print('Fake cam 2',fake_cams[2])
+        print('First Fake cam: ',fake_cams[0])
+        print('Second Fake cam: ',fake_cams[1])
+        print('Third Fake cam: ',fake_cams[2])
         
     
     
