@@ -112,7 +112,7 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
+    parser.add_argument("--window-sizes", nargs="+", default=[10,20,30,40,50,60])
     parser.add_argument("--num-jobs", type=int, default=-1)
     
     
@@ -212,9 +212,16 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     
     
     #Get the real camera to weave in with the fake camera
-    real_cam0 = cams[fake_cams[0]]
-    real_cam1 = cams[fake_cams[1]]
-    real_cam2 = cams[fake_cams[2]]
+    try:
+        real_cam0 = cams[fake_cams[0]]
+        real_cam1 = cams[fake_cams[1]]
+        real_cam2 = cams[fake_cams[2]]
+    except IndexError:
+        print("Number of cams",len(cams))
+        print('Fake cam 0',fake_cams[0])
+        print('Fake cam 1',fake_cams[1])
+        print('Fake cam 2',fake_cams[2])
+        
     
     
     #Generate the fakes, using a standard or alternative procedure
