@@ -33,7 +33,7 @@ def parse_args():
     
     
     parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
+    parser.add_argument("--window-sizes", nargs="+", default=[10,20,30,40,50])
     
     
     args = parser.parse_args()
@@ -45,13 +45,20 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
     
     pResults = np.zeros((threshNum,3,numPeople))
     rResults = np.zeros((threshNum,3,numPeople))
-    
+   
+    skipID = False
     for i,ID in enumerate(ids):
+        if skipID:
+            continue
         for j, t in enumerate(threshes):
-            results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
+            try:
+                results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
                                            'thresh_{}'.format(j), 
                                            "window_{}.mat".format(window_size)))
-
+                skipID = False
+            except FileNotFoundError:
+                skipID = True
+                break
             if (np.sum(results['acc1'][0,:]) == 0 and np.sum(results['acc1'][2,:]) == 0):
                 pResults[j,0,i] = 1
             else:
@@ -78,7 +85,6 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
             
             rResults[j,2,i] = (np.sum(results['acc3'][0,:]) / 
                             (np.sum(results['acc3'][0,:]) + np.sum(results['acc3'][3,:])))
-            
     meanP = np.mean(pResults,axis = 2)
     meanR = np.mean(rResults,axis = 2)
     stdP = np.std(pResults,axis = 2)
@@ -119,17 +125,24 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     
     numPeople = len(ids)
     numWin = len(window_sizes)
-    
+    skipID = False 
     accResults = np.zeros((4,numWin,numPeople))
     
     for i,ID in enumerate(ids):
+        if skipID:
+            continue
         accs = np.zeros((4,numWin))
         
         for j, w in enumerate(window_sizes):
-            results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
+            try:  
+                results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
                                            'thresh_{}'.format(threshold_idx), 
                                            "window_{}.mat".format(w)))
-            
+                skipID = False
+            except FileNotFoundError:
+                skipID = True
+                break
+
             accs[0,j] = acc_helper(results['acc0'])
             accs[1,j] = acc_helper(results['acc1'])
             accs[2,j] = acc_helper(results['acc2'])
@@ -149,7 +162,7 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     plt.errorbar(window_sizes, meanRes[2,:], yerr = stdRes[2,:], label = 'Two Fakes')
     plt.errorbar(window_sizes, meanRes[3,:], yerr = stdRes[3,:], label = 'Three Fakes')
     
-    plt.xlim([0, 400])
+    plt.xlim([0, max(window_sizes)+10])
     plt.ylim([0, 1.1])
     plt.ylabel('Accuracy')
     plt.xlabel('Window Size')
@@ -163,17 +176,23 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     
     threshNum = len(threshes)
     numPeople = len(ids)
-    
+    skipID = False
     tpResults = np.zeros((threshNum,3,numPeople))
     fpResults = np.zeros((threshNum,3,numPeople))
     fpZeroFake = np.zeros((threshNum,1,numPeople))
     
     for i,ID in enumerate(ids):
+        if skipID:
+            continue
         for j, t in enumerate(threshes):
-            results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
+            try:
+                results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
                                            'thresh_{}'.format(j), 
                                            "window_{}.mat".format(window_size)))
-    
+                skipID = False
+            except FileNotFoundError:
+                skipID = True
+                break
             
             tpResults[j,0,i] = (np.sum(results['acc1'][0,:]) / (np.sum(results['acc1'][0,:]) + 
                                                                  np.sum(results['acc1'][3,:])))
@@ -259,7 +278,7 @@ def main():
     
     
     
-    window_size = 250
+    window_size = 30
     threshold = 1.5
     threshold_idx = 1
     
