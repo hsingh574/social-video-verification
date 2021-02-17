@@ -8,7 +8,7 @@ clearvars; close all;
 
 accOn = true;
 prOn = false;
-rocOn = false;
+rocOn = true;
 
 %% make accuracy plots
 % (1) TP if window contains a faked frame & fake is detected
@@ -75,7 +75,7 @@ if (accOn)
     title('Detection Accuracy vs Window Size');
     set(gca,'FontSize',20);
     legend('No Fakes','One Fake','Two Fakes','Three Fakes','Location','SouthEast');
-    savefig('acc_full.fig')
+    savefig('acc_full_check.fig')
 end
 
 %% precision recall
@@ -242,5 +242,5 @@ if (rocOn)
     ylim([0 1]);
     title('ROC Curve, Window size = 250');
     set(gca,'FontSize',20);
-    savefig('roc_full.fig') 
+    savefig('roc_full_check.fig') 
 end
