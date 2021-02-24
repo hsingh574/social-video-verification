@@ -42,7 +42,8 @@ def mahalanobis_calculate(data, num_pcs):
 
 #determine L2 difference between clusters
 def linkage_L2(linkage_matrix):
-    print("Linkage matrix: ", linkage_matrix)
+    print("Linkage matrix: ")
+    print(linkage_matrix)
 
 #previous version: This takes longer and 
 #returns a different value from the matlab version   
