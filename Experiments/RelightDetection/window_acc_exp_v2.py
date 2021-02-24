@@ -8,10 +8,24 @@ import numpy as np
 from sklearn.decomposition import PCA
 from scipy.io import loadmat, savemat
 from scipy.cluster.hierarchy import linkage, fcluster
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 from joblib import Parallel, delayed
 
+
+
+
+        
+def l2_calculate(data, upper_lip_start, lower_lip_start, num_points):
+    
+    length = len(data)
+    upper_lip = data[:, upper_lip_start:(upper_lip_start+num_points)]
+    lower_lip = data[:, lower_lip_start:(lower_lip_start+num_points)]
+    
+    #upper_lip = np.reshape(upper_lip, (length, -1, 2))
+    #lower_lip = np.reshape(lower_lip, (length, -1, 2))
+    
+    return np.linalg.norm(upper_lip - lower_lip, axis = -1)
 
 
 def mahalanobis(T, eigenval):
@@ -53,27 +67,8 @@ def detectFakesTree(link, thresh):
     return numFakes, c
 
 
-def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
-    
-    camsOut = []
-    for c in cams:
-        camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-    
-    fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
-    fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
-    fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
-    
-    #X0 is no fakes, X1 is 1 fake, etc.
-    X0 = np.array(camsOut)
-    temp = X0.copy()
-    temp[3] = fake0Out
-    X1 = temp
-    temp = X1.copy()
-    temp[2] = fake1Out
-    X2 = temp
-    temp = X2.copy()
-    temp[1] = fake2Out
-    X3 = temp
+
+def cluster_helper(X0, X1, X2, X3, thresh):
     
     #Test for tracking failures and remove
     #delete the columns which have an element greater than 10
@@ -86,8 +81,6 @@ def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     X1 = np.delete(X1, badInds, axis = 1)
     X2 = np.delete(X2, badInds, axis = 1)
     X3 = np.delete(X3, badInds, axis = 1)
-
-    #shape of Xi is 6 x window_sz
     
     link0 = linkage(X0)
     link1 = linkage(X1)
@@ -100,6 +93,62 @@ def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     numFakes3, c3 = detectFakesTree(link3, thresh)
     
     return numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3
+
+def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
+    #X0 is no fakes, X1 is 1 fake, etc.
+    X0 = np.array(camsOut)
+    temp = X0.copy()
+    temp[3] = fake0Out
+    X1 = temp
+    temp = X1.copy()
+    temp[2] = fake1Out
+    X2 = temp
+    temp = X2.copy()
+    temp[1] = fake2Out
+    X3 = temp
+    
+    return X0, X1, X2, X3
+    
+    
+# =============================================================================
+# Take the l2 distance between the
+# upper and lower lip for each frame of each camera 
+# and cluster (as described in Tursman et al. 2020)
+# =============================================================================
+def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+    
+    #Can tweak these later to check performance on other facial landmarks
+    upper_lip_start = 0
+    lower_lip_start = 14
+    num_points = 4
+    
+    camsOut = []
+    for c in cams:
+        camsOut.append(l2_calculate(c[start:end,:], upper_lip_start, lower_lip_start, num_points))
+    
+    fake0Out = l2_calculate(fake0[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    fake1Out = l2_calculate(fake1[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    fake2Out = l2_calculate(fake2[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    
+    return cluster_helper(X0, X1, X2, X3, thresh)
+    
+    
+
+def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+    
+    camsOut = []
+    for c in cams:
+        camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+    
+    fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+    fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
+    fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
+    
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    
+    return cluster_helper(X0, X1, X2, X3, thresh)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
