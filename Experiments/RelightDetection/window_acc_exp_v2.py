@@ -40,6 +40,10 @@ def mahalanobis_calculate(data, num_pcs):
     eigenval = pca.explained_variance_
     return mahalanobis(T, eigenval)
 
+#determine L2 difference between clusters
+def linkage_L2(linkage_matrix):
+    print("Linkage matrix: ", linkage_matrix)
+
 #previous version: This takes longer and 
 #returns a different value from the matlab version   
 # =============================================================================
@@ -86,6 +90,8 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     link1 = linkage(X1)
     link2 = linkage(X2)
     link3 = linkage(X3)
+
+    linkage_L2(link1)
     
     numFakes0, _ = detectFakesTree(link0, thresh)
     numFakes1, c1 = detectFakesTree(link1, thresh)
