@@ -86,6 +86,8 @@ def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     X1 = np.delete(X1, badInds, axis = 1)
     X2 = np.delete(X2, badInds, axis = 1)
     X3 = np.delete(X3, badInds, axis = 1)
+
+    print("x1 shape: ", X1.shape)
     
     link0 = linkage(X0)
     link1 = linkage(X1)
