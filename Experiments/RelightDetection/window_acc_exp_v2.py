@@ -145,22 +145,29 @@ def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     camsOut = []
+    camsOutPCA = []
+
     for c in cams:
         camsOut.append(c[start:end,0])
         # camsOut.append(c[start:end,:])
-    #     camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+        camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
     
     fake0OutPCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
     # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
-    print("PCA dims: ", fake0OutPCA.shape)
 
     fake0Out = fake0[start:end,0]
     fake1Out = fake1[start:end,0]
     fake2Out = fake2[start:end,0]
 
+    print("PCA dims: ", fake0OutPCA.shape)
     print("landmark dims: ", fake0Out.shape)
+
+    print("cam0pca dims: ", camsOutPCA.shape)
+    print("cam0 dims: ", camsOut.shape)
+
+
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
