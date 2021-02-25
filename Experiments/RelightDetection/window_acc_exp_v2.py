@@ -94,6 +94,11 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     link2 = linkage(X2)
     link3 = linkage(X3)
 
+    print("0:", link0[-1, 2])
+    print("1:", link1[-1, 2])
+    print("2:", link2[-1, 2])
+    print("3:", link3[-1, 2])
+
     # linkage_L2(link1)
     
     numFakes0, _ = detectFakesTree(link0, thresh)
