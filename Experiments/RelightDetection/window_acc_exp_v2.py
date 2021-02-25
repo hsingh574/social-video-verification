@@ -92,7 +92,7 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     link2 = linkage(X2)
     link3 = linkage(X3)
 
-    linkage_L2(link1)
+    # linkage_L2(link1)
     
     numFakes0, _ = detectFakesTree(link0, thresh)
     numFakes1, c1 = detectFakesTree(link1, thresh)
@@ -142,6 +142,24 @@ def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     return cluster_helper(X0, X1, X2, X3, thresh)
     
     
+def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+    
+    camsOut = []
+    for c in cams:
+        camsOut.append(c[start:end,:])
+    #     camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+    
+    # fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+    # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
+    # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
+
+    fake0Out = fake0[start:end,:]
+    fake1Out = fake1[start:end,:]
+    fake2Out = fake2[start:end,:]
+    
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    
+    return cluster_helper(X0, X1, X2, X3, thresh)
 
 def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
@@ -312,7 +330,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 if end > fullLen-1:
                     continue
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 
                 if not alternative:
                     isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
