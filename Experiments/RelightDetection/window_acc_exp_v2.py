@@ -153,7 +153,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
-    print("PCA dims: ", fake0OutPCA.shape)
+    print("PCA dims: ", fake0OutPCA[:,0].shape)
 
     fake0Out = fake0[start:end,:]
     fake1Out = fake1[start:end,:]
