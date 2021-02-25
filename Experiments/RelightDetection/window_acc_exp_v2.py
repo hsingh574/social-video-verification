@@ -155,9 +155,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
     print("PCA dims: ", fake0OutPCA.shape)
 
-    fake0Out = fake0[start:end,:,0]
-    fake1Out = fake1[start:end,:,0]
-    fake2Out = fake2[start:end,:,0]
+    fake0Out = fake0[start:end,0]
+    fake1Out = fake1[start:end,0]
+    fake2Out = fake2[start:end,0]
 
     print("landmark dims: ", fake0Out.shape)
     
