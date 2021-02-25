@@ -86,6 +86,8 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     X1 = np.delete(X1, badInds, axis = 1)
     X2 = np.delete(X2, badInds, axis = 1)
     X3 = np.delete(X3, badInds, axis = 1)
+
+    print("dims X0: ", X0.shape)
     
     link0 = linkage(X0)
     link1 = linkage(X1)
