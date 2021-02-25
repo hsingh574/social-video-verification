@@ -153,13 +153,13 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
-    print("PCA dims: ", fake0OutPCA[:,0].shape)
+    print("PCA dims: ", fake0OutPCA.shape)
 
     fake0Out = fake0[start:end,:]
     fake1Out = fake1[start:end,:]
     fake2Out = fake2[start:end,:]
 
-    print("landmark dims: ", fake0Out.shape)
+    print("landmark dims: ", fake0Out[:,0].shape)
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
