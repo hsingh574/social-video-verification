@@ -152,14 +152,14 @@ def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     camsOut = []
-    camsOutPCA = []
+    # camsOutPCA = []
 
     for c in cams:
-        camsOut.append(c[start:end])
+        camsOut.append(np.sum(c[start:end], axis = 2))
         # camsOut.append(c[start:end,:])
-        camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+        # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
     
-    fake0OutPCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+    # fake0OutPCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
     # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
@@ -169,11 +169,11 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake2Out = fake2[start:end,0]
 
     fake0Out = np.sum(fake0[start:end], axis = 2)
-    fake1Out = fake1[start:end]
-    fake2Out = fake2[start:end]
+    fake1Out = np.sum(fake1[start:end], axis = 2)
+    fake2Out = np.sum(fake2[start:end], axis = 2)
 
     # print("PCA dims: ", fake0OutPCA.shape)
-    print("landmark dims: ", fake0Out.shape)
+    # print("landmark dims: ", fake0Out.shape)
 
     # print("cam0pca dims: ", camsOutPCA[0].shape)
     # print("cam0 dims: ", camsOut[0].shape)
