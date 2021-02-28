@@ -87,7 +87,7 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     X2 = np.delete(X2, badInds, axis = 1)
     X3 = np.delete(X3, badInds, axis = 1)
 
-    # print("dims X0: ", X0.shape)
+    print("dims X0: ", X0.shape)
     
     link0 = linkage(X0)
     link1 = linkage(X1)
@@ -170,9 +170,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = fake1[start:end,0]
     # fake2Out = fake2[start:end,0]
 
-    fake0Out = np.sum(fake0[start:end], axis = 2)
-    fake1Out = np.sum(fake1[start:end], axis = 2)
-    fake2Out = np.sum(fake2[start:end], axis = 2)
+    fake0Out = np.sum(fake0[start:end], axis = 1)
+    fake1Out = np.sum(fake1[start:end], axis = 1)
+    fake2Out = np.sum(fake2[start:end], axis = 1)
 
     # print("PCA dims: ", fake0OutPCA.shape)
     # print("landmark dims: ", fake0Out.shape)
