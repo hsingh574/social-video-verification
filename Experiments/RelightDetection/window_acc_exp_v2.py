@@ -150,7 +150,7 @@ def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
 def weighted_SH_coords_sum(coords):
     weights = np.array([9,8,7,6,5,4,3,2,1])
-    return coords * np.power(10, weights)
+    return np.sum(coords * np.power(10, weights), axis = 1)
 
 ## for debugging lighting results: don't use PCA/mahalanobis for clustering. Trying difference methods such as summing SH coords
 def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
@@ -180,6 +180,8 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake0Out = weighted_SH_coords_sum(fake0)
     fake1Out = weighted_SH_coords_sum(fake1)
     fake2Out = weighted_SH_coords_sum(fake2)
+
+    # print("weighed dims", fake2Out)
 
     # print("PCA dims: ", fake0OutPCA.shape)
     # print("landmark dims: ", fake0Out.shape)
