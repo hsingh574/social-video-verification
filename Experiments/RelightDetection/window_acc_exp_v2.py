@@ -353,7 +353,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 if end > fullLen-1:
                     continue
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 
                 if not alternative:
                     isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
