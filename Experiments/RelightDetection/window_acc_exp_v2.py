@@ -412,6 +412,10 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
                     triple_fake_twos, numFakes3, c3, 3, isFake)
                 
+            print("acc0", acc0)
+            print("acc1", acc1)
+            print("acc2", acc2)
+            print("acc3", acc3)
                 
             #save the results to do more statistics with later
             saveDir = os.path.join(save_dir,"ID{}".format(i),"thresh_{}".format(ind))
