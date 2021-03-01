@@ -14,6 +14,9 @@ from joblib import Parallel, delayed
 
 
 zerodist = []
+onedist = []
+twodist = []
+threedist = []
 
         
 def l2_calculate(data, upper_lip_start, lower_lip_start, num_points):
@@ -98,6 +101,9 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     # print("0 one elt:", link0[-1, 2])
 
     zerodist.append(link0[-1, 2])
+    onedist.append(link1[-1, 2])
+    twodist.append(link2[-1, 2])
+    threedist.append(link3[-1, 2])
 
     # print("1:", link1[-1, 2])
     # print("2:", link2[-1, 2])
@@ -430,7 +436,10 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
 
-    print(np.mean(np.array(zerodist)))    
+    print(np.mean(np.array(zerodist)))
+    print(np.mean(np.array(onedist)))
+    print(np.mean(np.array(twodist)))
+    print(np.mean(np.array(threedist)))    
 
 
 
