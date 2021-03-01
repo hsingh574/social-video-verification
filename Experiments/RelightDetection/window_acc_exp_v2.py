@@ -13,7 +13,7 @@ from collections import defaultdict, Counter
 from joblib import Parallel, delayed
 
 
-
+zerodist = []
 
         
 def l2_calculate(data, upper_lip_start, lower_lip_start, num_points):
@@ -94,8 +94,11 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     link2 = linkage(X2)
     link3 = linkage(X3)
 
-    print("0:", link0)
-    print("0 one elt:", link0[-1, 2])
+    # print("0:", link0)
+    # print("0 one elt:", link0[-1, 2])
+
+    zerodist.append(link0[-1, 2])
+
     # print("1:", link1[-1, 2])
     # print("2:", link2[-1, 2])
     # print("3:", link3[-1, 2])
@@ -413,7 +416,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
                     triple_fake_twos, numFakes3, c3, 3, isFake)
                 
-            print("acc0 dims", acc0.shape)
+            # print("acc0 dims", acc0.shape)
             # print("acc1", acc1)
             # print("acc2", acc2)
             # print("acc3", acc3)
@@ -426,6 +429,8 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         'acc2':acc2, 'acc3': acc3, 
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
+
+    print(np.mean(np.array(zerodist))
 
 
 def main():  
