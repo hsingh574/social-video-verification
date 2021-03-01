@@ -171,7 +171,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     for c in cams:
         # camsOut.append(weighted_SH_coords_sum(c))
         # camsOut.append(c[start:end, 0])
-        camsOut.append(np.linalg.norm(c[start:end], :))
+        camsOut.append(np.linalg.norm(c[start:end, :]))
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
@@ -191,9 +191,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake0Out = weighted_SH_coords_sum(fake0)
     # fake1Out = weighted_SH_coords_sum(fake1)
     # fake2Out = weighted_SH_coords_sum(fake2)
-    fake0Out = np.linalg.norm(fake0[start:end], :)
-    fake1Out = np.linalg.norm(fake1[start:end], :)
-    fake2Out = np.linalg.norm(fake2[start:end], :)
+    fake0Out = np.linalg.norm(fake0[start:end, :])
+    fake1Out = np.linalg.norm(fake1[start:end, :])
+    fake2Out = np.linalg.norm(fake2[start:end, :])
 
     # print("weighed dims", fake2Out)
 
