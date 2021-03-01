@@ -169,8 +169,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # camsOutPCA = []
 
     for c in cams:
-        camsOut.append(weighted_SH_coords_sum(c))
+        # camsOut.append(weighted_SH_coords_sum(c))
         # camsOut.append(c[start:end, 0])
+        camsOut.append(np.linalg.norm(c[start:end], :))
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
@@ -187,9 +188,12 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake0Out = np.sum(fake0[start:end], axis = 1)
     # fake1Out = np.sum(fake1[start:end], axis = 1)
     # fake2Out = np.sum(fake2[start:end], axis = 1)
-    fake0Out = weighted_SH_coords_sum(fake0)
-    fake1Out = weighted_SH_coords_sum(fake1)
-    fake2Out = weighted_SH_coords_sum(fake2)
+    # fake0Out = weighted_SH_coords_sum(fake0)
+    # fake1Out = weighted_SH_coords_sum(fake1)
+    # fake2Out = weighted_SH_coords_sum(fake2)
+    fake0Out = np.linalg.norm(fake0[start:end], :)
+    fake1Out = np.linalg.norm(fake1[start:end], :)
+    fake2Out = np.linalg.norm(fake2[start:end], :)
 
     # print("weighed dims", fake2Out)
 
@@ -374,7 +378,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 if end > fullLen-1:
                     continue
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 # print("numFake0", numFakes0)
                 # print("numFake1", numFakes1)
                 # print("numFake2", numFakes2)
@@ -436,10 +440,10 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
 
-    print("zerodist: ", np.mean(np.array(zerodist)))
-    print("onedist: ", np.mean(np.array(onedist)))
-    print("twodist: ", np.mean(np.array(twodist)))
-    print("threedist: ", np.mean(np.array(threedist)))    
+    # print("zerodist: ", np.mean(np.array(zerodist)))
+    # print("onedist: ", np.mean(np.array(onedist)))
+    # print("twodist: ", np.mean(np.array(twodist)))
+    # print("threedist: ", np.mean(np.array(threedist)))    
 
 
 
