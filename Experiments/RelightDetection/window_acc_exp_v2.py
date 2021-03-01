@@ -430,7 +430,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
 
-            print(np.mean(np.array(zerodist))    
+    print(np.mean(np.array(zerodist)))    
 
 
 
