@@ -430,7 +430,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
 
-    print(np.mean(np.array(zerodist))
+
 
 
 def main():  
@@ -465,7 +465,9 @@ def main():
     
     Parallel(n_jobs=args.num_jobs)(delayed(gen_results)(i, fake_cams_dict[i], 
              args.num_cams, args.zero_start, args.data_dir, alternative, args.thresholds, 
-             args.window_sizes, args.num_pcs, args.save_dir) for i in ids)    
+             args.window_sizes, args.num_pcs, args.save_dir) for i in ids)
+
+    print(np.mean(np.array(zerodist))    
              
 
 if __name__ == "__main__":
