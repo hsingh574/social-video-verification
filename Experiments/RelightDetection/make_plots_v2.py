@@ -19,7 +19,7 @@ def parse_args():
     parser.add_argument('--accOn', action='store_false',
                     help='Whether to plot Accuracy curve')
     
-    parser.add_argument('--prOn', action='store_true',
+    parser.add_argument('--prOn', action='store_false',
                     help='Whether to plot Precision Recall curve')
     
     parser.add_argument('--data-dir', type=str, default='data_v2',
@@ -289,8 +289,7 @@ def main():
     threshold_idx = 0
     
     if args.rocOn:
-        # plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
-        plot_ROC(ids, [1.9, 2.1], window_size, args.results_dir, args.save_dir)
+        plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
 
         
     if args.accOn:
