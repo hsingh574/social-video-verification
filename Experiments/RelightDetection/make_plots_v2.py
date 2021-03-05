@@ -290,7 +290,7 @@ def main():
     
     if args.rocOn:
         # plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
-    plot_ROC(ids, [1.3], window_size, args.results_dir, args.save_dir)
+        plot_ROC(ids, [1.3], window_size, args.results_dir, args.save_dir)
         
     if args.accOn:
         plot_acc(ids, window_sizes, threshold, threshold_idx, args.results_dir, args.save_dir)
