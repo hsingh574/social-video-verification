@@ -33,7 +33,9 @@ def parse_args():
     
     
     # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
+    # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
+    parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
+
 
     parser.add_argument("--window-sizes", nargs="+", default=[50, 100, 150, 200, 250, 300])
     
@@ -287,8 +289,8 @@ def main():
     
     
     window_size = 250
-    threshold = 0.5
-    threshold_idx = 0#TODO fix
+    threshold = 2.7
+    threshold_idx = 3#TODO fix
     
     if args.rocOn:
         plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
