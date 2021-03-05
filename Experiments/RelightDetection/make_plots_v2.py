@@ -287,7 +287,7 @@ def main():
     
     
     window_size = 250
-    threshold = 1.3
+    threshold = 0.5
     threshold_idx = 0#TODO fix
     
     if args.rocOn:
