@@ -235,7 +235,7 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_true',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
+    parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
     # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
 
@@ -388,7 +388,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 if end > fullLen-1:
                     continue
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 # print("numFake0", numFakes0)
                 # print("numFake1", numFakes1)
                 # print("numFake2", numFakes2)
