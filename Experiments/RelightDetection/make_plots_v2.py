@@ -227,6 +227,9 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     stdTP = np.std(tpResults,axis = 2)
     stdFP = np.std(fpResults, axis = 2)
 
+    print("mean tp:", meanTP)
+    print("mean fp:", meanFP)
+
     #zeroFakeMean = np.mean(fpZeroFake,axis = 2)
     #zeroFakeStd = np.std(fpZeroFake,axis = 2)
 
