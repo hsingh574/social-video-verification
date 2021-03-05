@@ -284,13 +284,13 @@ def main():
     
     
     
-    window_size = 250
+    window_size = 50
     threshold = 1.3
     threshold_idx = 0
     
     if args.rocOn:
         # plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
-        plot_ROC(ids, [1.9, 2.1], window_size, args.results_dir, args.save_dir)
+        # plot_ROC(ids, [1.9, 2.1], window_size, args.results_dir, args.save_dir)
 
         
     if args.accOn:
