@@ -356,7 +356,8 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     #files for a given ID    
     cams = get_cams(data1, num_cams, zero_start, fullLen)
 
-    print("cams shape: ", cams.shape)
+    print("cams lens: ", len(cams))
+    print("cams shape: ", (cams[0].shape))
     
     
     #Get the real camera to weave in with the fake camera
