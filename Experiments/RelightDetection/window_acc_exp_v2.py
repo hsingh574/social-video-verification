@@ -444,7 +444,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     plt.plot(cams[3][:,5], 'tab:purple')
     plt.plot(cams[4][:,5], 'tab:brown')
     plt.plot(cams[5][:,5], 'tab:pink')
-    plt.plot(fake1[:,5], 'tab:red')
+    plt.plot(fake2[:,5], 'tab:red')
     plt.show()
     
     
