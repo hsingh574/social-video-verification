@@ -437,14 +437,14 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     fake0, fake1, fake2 = split_procedure(data0, data1, data2, real_cam0, 
                                           real_cam1, real_cam2, alternative, fullLen, intervalWin)
     
-    plt.title("cams plotted in gen results, only SH coord 6, red is fake")
-    plt.plot(cams[0][:,6], 'tab:blue')
-    plt.plot(cams[1][:,6], 'tab:orange')
-    plt.plot(cams[2][:,6], 'tab:green')
-    plt.plot(cams[3][:,6], 'tab:purple')
-    plt.plot(cams[4][:,6], 'tab:brown')
-    plt.plot(cams[5][:,6], 'tab:pink')
-    plt.plot(fake0[:,6], 'tab:red')
+    plt.title("cams plotted in gen results, only SH coord 7, red is fake")
+    plt.plot(cams[0][:,7], 'tab:blue')
+    plt.plot(cams[1][:,7], 'tab:orange')
+    plt.plot(cams[2][:,7], 'tab:green')
+    plt.plot(cams[3][:,7], 'tab:purple')
+    plt.plot(cams[4][:,7], 'tab:brown')
+    plt.plot(cams[5][:,7], 'tab:pink')
+    plt.plot(fake0[:,7], 'tab:red')
     plt.show()
     
     
