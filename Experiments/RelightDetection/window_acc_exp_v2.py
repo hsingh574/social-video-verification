@@ -194,7 +194,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = weighted_SH_coords_sum(fake1)
     # fake2Out = weighted_SH_coords_sum(fake2)
 
-    plt.title("cams plotted in no PCA, L2 norm, red is fake")
+    plt.title("cams plotted in no PCA, window cropped, red is fake")
     plt.plot(cams[0][start:end, :], 'tab:blue')
     plt.plot(cams[1][start:end, :], 'tab:orange')
     plt.plot(cams[2][start:end, :], 'tab:green')
