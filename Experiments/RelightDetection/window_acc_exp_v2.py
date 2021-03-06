@@ -363,7 +363,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
 
     plt.title("test plot")
     plt.plot(cams[0])
-    plt.show()
+    plt.show(block=False)
     
     
     #Get the real camera to weave in with the fake camera
