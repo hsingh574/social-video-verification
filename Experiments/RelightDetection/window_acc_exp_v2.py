@@ -363,6 +363,11 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
 
     plt.title("test plot")
     plt.plot(cams[0], 'tab:blue')
+    plt.plot(cams[1], 'tab:orange')
+    plt.plot(cams[2], 'tab:green')
+    plt.plot(cams[3], 'tab:purple')
+    plt.plot(cams[4], 'tab:brown')
+    plt.plot(cams[5], 'tab:pink')
     plt.show()
     
     
