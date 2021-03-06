@@ -12,6 +12,8 @@ from collections import defaultdict, Counter
 
 from joblib import Parallel, delayed
 
+from matplotlib import pyplot as plt
+
 
 zerodist = []
 onedist = []
@@ -358,6 +360,10 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
 
     print("cams lens: ", len(cams))
     print("cams shape: ", (cams[0].shape))
+
+    plt.title("test plot")
+    plt.plot(cams)
+    plt.show()
     
     
     #Get the real camera to weave in with the fake camera
