@@ -248,7 +248,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     plt.plot(cams[3][start:end, 5], 'tab:purple')
     plt.plot(cams[4][start:end, 5], 'tab:brown')
     plt.plot(cams[5][start:end, 5], 'tab:pink')
-    plt.plot(fake0[start:end, 5], 'tab:red')
+    plt.plot(fake1[start:end, 5], 'tab:red')
     plt.show()
 
 
