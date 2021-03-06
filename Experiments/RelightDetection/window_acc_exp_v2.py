@@ -199,7 +199,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("fake0 vs. cam diff", np.mean(camsOut[0] - fake0Out))
     # print("fake1 vs. cam diff", np.mean(camsOut[0] - fake1Out))
 
-    # print("weighed dims", fake2Out)
+    print("fake dims", fake2Out)
 
     # print("PCA dims: ", fake0OutPCA.shape)
     # print("landmark dims: ", fake0Out.shape)
@@ -394,9 +394,9 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 # print("cams0 dims", cams[0].shape)
                 # print("fake dims", fake0.shape)
 
-                print("cams diff pre norm", np.mean(cams[0] - cams[1]))
-                print("cam vs fake0 diff pre norm", np.mean(cams[0] - fake0))
-                print("cam vs fake0 diff pre norm", np.mean(cams[1] - fake1))
+                # print("cams diff pre norm", np.mean(cams[0] - cams[1]))
+                # print("cam vs fake0 diff pre norm", np.mean(cams[0] - fake0))
+                # print("cam vs fake0 diff pre norm", np.mean(cams[1] - fake1))
 
                 numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 # print("numFake0", numFakes0)
