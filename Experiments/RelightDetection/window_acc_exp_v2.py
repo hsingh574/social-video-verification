@@ -362,7 +362,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     print("cams shape: ", (cams[0].shape))
 
     plt.title("test plot")
-    plt.plot(cams)
+    plt.plot(cams[0])
     plt.show()
     
     
