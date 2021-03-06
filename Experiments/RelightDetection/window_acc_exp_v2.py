@@ -178,7 +178,14 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
     
-    # fake0OutPCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+
+    cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
+    cam1PCA = mahalanobis_calculate(cams[1][start:end,:], num_pcs)
+    cam2PCA = mahalanobis_calculate(cams[2][start:end,:], num_pcs)
+    cam3PCA = mahalanobis_calculate(cams[3][start:end,:], num_pcs)
+    cam4PCA = mahalanobis_calculate(cams[4][start:end,:], num_pcs)
+    cam5PCA = mahalanobis_calculate(cams[5][start:end,:], num_pcs)
+    fake0PCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
     # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
@@ -194,14 +201,14 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = weighted_SH_coords_sum(fake1)
     # fake2Out = weighted_SH_coords_sum(fake2)
 
-    plt.title("cams plotted in no PCA, window cropped, red is fake")
-    plt.plot(cams[0][start:end, :], 'tab:blue')
-    plt.plot(cams[1][start:end, :], 'tab:orange')
-    plt.plot(cams[2][start:end, :], 'tab:green')
-    plt.plot(cams[3][start:end, :], 'tab:purple')
-    plt.plot(cams[4][start:end, :], 'tab:brown')
-    plt.plot(cams[5][start:end, :], 'tab:pink')
-    plt.plot(fake0[start:end, :], 'tab:red')
+    plt.title("cams plotted with PCA mahalanobis distance, red is fake")
+    plt.plot(cam0PCA, 'tab:blue')
+    plt.plot(cam1PCA, 'tab:orange')
+    plt.plot(cam2PCA, 'tab:green')
+    plt.plot(cam3PCA, 'tab:purple')
+    plt.plot(cam4PCA, 'tab:brown')
+    plt.plot(cam5PCA, 'tab:pink')
+    plt.plot(fake0PCA, 'tab:red')
     plt.show()
 
     cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
