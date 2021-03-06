@@ -361,7 +361,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     print("cams lens: ", len(cams))
     print("cams shape: ", (cams[0].shape))
 
-    plt.title("test plot")
+    plt.title("cams plotted in gen results")
     plt.plot(cams[0], 'tab:blue')
     plt.plot(cams[1], 'tab:orange')
     plt.plot(cams[2], 'tab:green')
