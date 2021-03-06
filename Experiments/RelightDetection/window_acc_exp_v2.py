@@ -330,16 +330,16 @@ def calculate_acc_helper(option1, option2, numFakes, c, correctAnswer, isFake):
     if numFakes == correctAnswer:
         if isFake==0:
             acc[2] = 1  #FP, detected some number of fakes where there was none
-            print("FP!")
+            # print("FP!")
         else:
             if (np.all(c == option1) or np.all(c == option2)):
                 acc[0] = 1 #TP, detected some number of fakes where there was some
-                print("TP!")
+                # print("TP!")
             else:
                 acc[3] = 1 #FN, failed to detect some number of fakes where there was some
     elif not(numFakes == 0):
         acc[2] = 1 #FP deteected some number of fakes, but was wrong number of fakes
-        print("FP!")
+        # print("FP!")
     else:
         if isFake == 0:
             acc[1] = 1 #TN, correctly got no fakes 
