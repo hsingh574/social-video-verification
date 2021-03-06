@@ -203,8 +203,8 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("cam0 dims", cam0PreNorm.shape)
     # print("fake0 dims", fake0PreNorm.shape)
 
-    print("cams pre norm diff", np.mean(cam0PreNorm - cam1PreNorm))
-    print("fake0 vs. cam pre norm diff", np.mean(cam0PreNorm - fake0PreNorm))
+    # print("cams pre norm diff", np.mean(cam0PreNorm - cam1PreNorm))
+    # print("fake0 vs. cam pre norm diff", np.mean(cam0PreNorm - fake0PreNorm))
     # print("fake1 vs. cam diff", np.mean(camsOut[0] - fake1Out))
 
     # print("fake pre norm dims", fake2[start:end].shape)
@@ -355,6 +355,8 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     #because the non-faked views should be the same across all 
     #files for a given ID    
     cams = get_cams(data1, num_cams, zero_start, fullLen)
+
+    print("cams shape: ", cams.shape)
     
     
     #Get the real camera to weave in with the fake camera
