@@ -194,6 +194,16 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = weighted_SH_coords_sum(fake1)
     # fake2Out = weighted_SH_coords_sum(fake2)
 
+    plt.title("cams plotted in no PCA, L2 norm, red is fake")
+    plt.plot(cams[0][start:end, :], 'tab:blue')
+    plt.plot(cams[1][start:end, :], 'tab:orange')
+    plt.plot(cams[2][start:end, :], 'tab:green')
+    plt.plot(cams[3][start:end, :], 'tab:purple')
+    plt.plot(cams[4][start:end, :], 'tab:brown')
+    plt.plot(cams[5][start:end, :], 'tab:pink')
+    plt.plot(fake0[start:end, :], 'tab:red')
+    plt.show()
+
     cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
     cam1out = np.linalg.norm(cams[1][start:end, :], axis = 1)
     cam2out = np.linalg.norm(cams[2][start:end, :], axis = 1)
@@ -205,15 +215,15 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake1Out = np.linalg.norm(fake1[start:end, :], axis = 1)
     fake2Out = np.linalg.norm(fake2[start:end, :], axis = 1)
 
-    plt.title("cams plotted in no PCA, L2 norm, red is fake")
-    plt.plot(cam0out, 'tab:blue')
-    plt.plot(cam1out, 'tab:orange')
-    plt.plot(cam2out, 'tab:green')
-    plt.plot(cam3out, 'tab:purple')
-    plt.plot(cam4out, 'tab:brown')
-    plt.plot(cam5out, 'tab:pink')
-    plt.plot(fake0Out, 'tab:red')
-    plt.show()
+    # plt.title("cams plotted in no PCA, L2 norm, red is fake")
+    # plt.plot(cam0out, 'tab:blue')
+    # plt.plot(cam1out, 'tab:orange')
+    # plt.plot(cam2out, 'tab:green')
+    # plt.plot(cam3out, 'tab:purple')
+    # plt.plot(cam4out, 'tab:brown')
+    # plt.plot(cam5out, 'tab:pink')
+    # plt.plot(fake0Out, 'tab:red')
+    # plt.show()
 
 
     cam0PreNorm = cams[5][start:end, :]
