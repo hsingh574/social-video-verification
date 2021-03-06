@@ -193,6 +193,16 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake0Out = weighted_SH_coords_sum(fake0)
     # fake1Out = weighted_SH_coords_sum(fake1)
     # fake2Out = weighted_SH_coords_sum(fake2)
+
+    plt.title("cams plotted in no PCA, straight from input, red is fake")
+    plt.plot(cams[0], 'tab:blue')
+    plt.plot(cams[1], 'tab:orange')
+    plt.plot(cams[2], 'tab:green')
+    plt.plot(cams[3], 'tab:purple')
+    plt.plot(cams[4], 'tab:brown')
+    plt.plot(cams[5], 'tab:pink')
+    plt.plot(fake0, 'tab:red')
+
     fake0Out = np.linalg.norm(fake0[start:end, :], axis = 1)
     fake1Out = np.linalg.norm(fake1[start:end, :], axis = 1)
     fake2Out = np.linalg.norm(fake2[start:end, :], axis = 1)
@@ -381,15 +391,15 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     fake0, fake1, fake2 = split_procedure(data0, data1, data2, real_cam0, 
                                           real_cam1, real_cam2, alternative, fullLen, intervalWin)
     
-    plt.title("cams plotted in gen results, red is fake")
-    plt.plot(cams[0], 'tab:blue')
-    plt.plot(cams[1], 'tab:orange')
-    plt.plot(cams[2], 'tab:green')
-    plt.plot(cams[3], 'tab:purple')
-    plt.plot(cams[4], 'tab:brown')
-    plt.plot(cams[5], 'tab:pink')
-    plt.plot(fake0, 'tab:red')
-    plt.show()
+    # plt.title("cams plotted in gen results, red is fake")
+    # plt.plot(cams[0], 'tab:blue')
+    # plt.plot(cams[1], 'tab:orange')
+    # plt.plot(cams[2], 'tab:green')
+    # plt.plot(cams[3], 'tab:purple')
+    # plt.plot(cams[4], 'tab:brown')
+    # plt.plot(cams[5], 'tab:pink')
+    # plt.plot(fake0, 'tab:red')
+    # plt.show()
     
     
     
