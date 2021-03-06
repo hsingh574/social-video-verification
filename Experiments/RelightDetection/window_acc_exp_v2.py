@@ -196,15 +196,15 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake2Out = np.linalg.norm(fake2[start:end, :], axis = 1)
 
 
-    cam0PreNorm = cams[0][start:end, :]
+    cam0PreNorm = cams[5][start:end, :]
     cam1PreNorm = cams[1][start:end, :]
-    fake0PreNorm = fake0[start:end, :]
+    fake0PreNorm = fake2[start:end, :]
 
     # print("cam0 dims", cam0PreNorm.shape)
     # print("fake0 dims", fake0PreNorm.shape)
 
-    print("cams diff", np.mean(cam0PreNorm - cam1PreNorm))
-    print("fake0 vs. cam diff", np.mean(cam0PreNorm - fake0PreNorm))
+    print("cams pre norm diff", np.mean(cam0PreNorm - cam1PreNorm))
+    print("fake0 vs. cam pre norm diff", np.mean(cam0PreNorm - fake0PreNorm))
     # print("fake1 vs. cam diff", np.mean(camsOut[0] - fake1Out))
 
     # print("fake pre norm dims", fake2[start:end].shape)
