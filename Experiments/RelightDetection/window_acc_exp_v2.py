@@ -198,10 +198,10 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
     cam0PreNorm = cams[0][start:end, :]
     cam1PreNorm = cams[1][start:end, :]
-    fake0PreNorm = cams[0][start:end, :]
+    fake0PreNorm = fake0[start:end, :]
 
-    print("cam0 dims", cam0PreNorm.shape)
-    print("fake0 dims", fake0PreNorm.shape)
+    # print("cam0 dims", cam0PreNorm.shape)
+    # print("fake0 dims", fake0PreNorm.shape)
 
     print("cams diff", np.mean(cam0PreNorm - cam1PreNorm))
     print("fake0 vs. cam diff", np.mean(cam0PreNorm - fake0PreNorm))
