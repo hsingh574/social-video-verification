@@ -205,7 +205,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake1Out = np.linalg.norm(fake1[start:end, :], axis = 1)
     fake2Out = np.linalg.norm(fake2[start:end, :], axis = 1)
 
-    plt.title("cams plotted in no PCA, window cropped, red is fake")
+    plt.title("cams plotted in no PCA, L2 norm, red is fake")
     plt.plot(cam0out, 'tab:blue')
     plt.plot(cam1out, 'tab:orange')
     plt.plot(cam2out, 'tab:green')
