@@ -47,8 +47,6 @@ def mahalanobis_calculate(data, num_pcs):
 
 #for a cam, sum the L2 distances across all other cams in the list
 def L2_sum(cams, index):
-    print("len cams: ", len(cams))
-    print("index: ", index)
     curr_cam = cams[index]
     other_cams = cams.copy()
     other_cams.pop(index)
