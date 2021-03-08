@@ -334,7 +334,7 @@ def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
     fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
 
-    print("fake dims:", fake0Out)
+    print("fake dims:", fake0Out.shape)
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
