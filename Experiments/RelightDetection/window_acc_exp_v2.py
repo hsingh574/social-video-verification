@@ -194,8 +194,24 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     allCamsTrim.append(fake2[start:end, :])
 
     cam0_norm = L2_sum(allCamsTrim, 0)
+    cam1_norm = L2_sum(allCamsTrim, 1)
+    cam2_norm = L2_sum(allCamsTrim, 2)
+    cam3_norm = L2_sum(allCamsTrim, 3)
+    cam4_norm = L2_sum(allCamsTrim, 4)
+    cam5_norm = L2_sum(allCamsTrim, 5)
+    fake0_norm = L2_sum(allCamsTrim, 6)
 
     print("got norm!", cam0_norm)
+
+    plt.title("cams plotted with L2 distance to all others, red is fake")
+    plt.plot(cam0_norm, 'tab:blue')
+    plt.plot(cam1_norm, 'tab:orange')
+    plt.plot(cam2_norm, 'tab:green')
+    plt.plot(cam3_norm, 'tab:purple')
+    plt.plot(cam4_norm, 'tab:brown')
+    plt.plot(cam5_norm, 'tab:pink')
+    plt.plot(fake0_norm, 'tab:red')
+    plt.show()
     
 
     # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
