@@ -50,7 +50,7 @@ def L2_sum(cams, index):
     print("len cams: ", len(cams))
     print("index: ", index)
     curr_cam = cams[index]
-    other_cams = cams
+    other_cams = cams.copy()
     other_cams.pop(index)
     sum = 0
     for cam in cams:
