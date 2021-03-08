@@ -55,7 +55,7 @@ def L2_sum(cams, index):
     sum = 0
     for cam in cams:
         sum += np.linalg.norm(cam - curr_cam, axis = 1)
-    print("sum return: ", sum)
+    # print("sum return: ", sum)
     return sum
 
 #determine L2 difference between clusters
@@ -203,18 +203,22 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     cam4_norm = L2_sum(allCamsTrim, 4)
     cam5_norm = L2_sum(allCamsTrim, 5)
     fake0_norm = L2_sum(allCamsTrim, 6)
+    fake1_norm = L2_sum(allCamsTrim, 6)
+    fake2_norm = L2_sum(allCamsTrim, 6)
 
-    print("got norm!", cam0_norm)
+    camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
 
-    plt.title("cams plotted with L2 distance to all others, red is fake")
-    plt.plot(cam0_norm, 'tab:blue')
-    plt.plot(cam1_norm, 'tab:orange')
-    plt.plot(cam2_norm, 'tab:green')
-    plt.plot(cam3_norm, 'tab:purple')
-    plt.plot(cam4_norm, 'tab:brown')
-    plt.plot(cam5_norm, 'tab:pink')
-    plt.plot(fake0_norm, 'tab:red')
-    plt.show()
+    # print("got norm!", cam0_norm)
+
+    # plt.title("cams plotted with L2 distance to all others, red is fake")
+    # plt.plot(cam0_norm, 'tab:blue')
+    # plt.plot(cam1_norm, 'tab:orange')
+    # plt.plot(cam2_norm, 'tab:green')
+    # plt.plot(cam3_norm, 'tab:purple')
+    # plt.plot(cam4_norm, 'tab:brown')
+    # plt.plot(cam5_norm, 'tab:pink')
+    # plt.plot(fake0_norm, 'tab:red')
+    # plt.show()
     
 
     # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
@@ -313,6 +317,10 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake0Out = fake0[start:end, 5]
     # fake1Out = fake1[start:end, 5]
     # fake2Out = fake2[start:end, 5]
+
+    fake0Out = fake0_norm
+    fake1Out = fake1_norm
+    fake2Out = fake2_norm
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
