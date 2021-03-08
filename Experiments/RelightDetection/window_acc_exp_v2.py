@@ -188,12 +188,12 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        camsTrim.append(c[start:end, :])
-    camsTrim.append(fake0[start:end, :])
-    camsTrim.append(fake1[start:end, :])
-    camsTrim.append(fake2[start:end, :])
+        allCamsTrim.append(c[start:end, :])
+    allCamsTrim.append(fake0[start:end, :])
+    allCamsTrim.append(fake1[start:end, :])
+    allCamsTrim.append(fake2[start:end, :])
 
-    cam0_norm = L2_sum(camsTrim, 0)
+    cam0_norm = L2_sum(allCamsTrim, 0)
 
     print("got norm!", cam0_norm)
     
