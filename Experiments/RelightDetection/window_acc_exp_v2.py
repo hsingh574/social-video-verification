@@ -45,6 +45,16 @@ def mahalanobis_calculate(data, num_pcs):
     eigenval = pca.explained_variance_
     return mahalanobis(T, eigenval)
 
+#for a cam, sum the L2 distances across all other cams in the list
+def L2_sum(cams, index):
+    curr_cam = cams[index]
+    other_cams = cams
+    other_cams.pop(index)
+    sum = 0
+    for cam in cams:
+        sum += np.linalg.norm(cam - curr_cam)
+    return sum
+
 #determine L2 difference between clusters
 def linkage_L2(linkage_matrix):
     print("Linkage matrix: ")
@@ -169,14 +179,23 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     camsOut = []
     # camsOutPCA = []
+    allCamsTrim = []
 
     for c in cams:
         # camsOut.append(weighted_SH_coords_sum(c))
         # camsOut.append(c[start:end, 0])
-        camsOut.append(c[start:end, 5])
+        # camsOut.append(c[start:end, 5])
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+        camsTrim.append(c[start:end, :])
+    camsTrim.append(fake0[start:end, :])
+    camsTrim.append(fake1[start:end, :])
+    camsTrim.append(fake2[start:end, :])
+
+    cam0_norm = L2_sum(camsTrim, 0)
+
+    print("got norm!", cam0_norm)
     
 
     # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
@@ -272,9 +291,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("cam0pca dims: ", camsOutPCA[0].shape)
     # print("cam0 dims: ", camsOut[0].shape)
 
-    fake0Out = fake0[start:end, 5]
-    fake1Out = fake1[start:end, 5]
-    fake2Out = fake2[start:end, 5]
+    # fake0Out = fake0[start:end, 5]
+    # fake1Out = fake1[start:end, 5]
+    # fake2Out = fake2[start:end, 5]
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
