@@ -87,8 +87,8 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
                             (np.sum(results['acc3'][0,:]) + np.sum(results['acc3'][3,:])))
     meanP = np.mean(pResults,axis = 2)
     meanR = np.mean(rResults,axis = 2)
-    stdP = np.std(pResults,axis = 2)
-    stdR = np.std(rResults, axis = 2)
+    stdP = np.std(pResults,axis = 2, ddof = 1)
+    stdR = np.std(rResults, axis = 2, ddof = 1)
 
     #reformat & order by recall values
     #sort rows by first column
@@ -151,7 +151,7 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     
     
     meanRes = np.mean(accResults, axis = 2)
-    stdRes = np.std(accResults, axis = 2)
+    stdRes = np.std(accResults, axis = 2, ddof=1)
     
     print(meanRes)
     
@@ -220,8 +220,8 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     
     meanTP = np.mean(tpResults,axis = 2)
     meanFP = np.mean(fpResults,axis = 2)
-    stdTP = np.std(tpResults,axis = 2)
-    stdFP = np.std(fpResults, axis = 2)
+    stdTP = np.std(tpResults,axis = 2, ddof=1)
+    stdFP = np.std(fpResults, axis = 2, ddof=1)
 
     #zeroFakeMean = np.mean(fpZeroFake,axis = 2)
     #zeroFakeStd = np.std(fpZeroFake,axis = 2)
