@@ -55,6 +55,7 @@ def L2_sum(cams, index):
     sum = 0
     for cam in cams:
         sum += np.linalg.norm(cam - curr_cam)
+    print("sum return: ", sum)
     return sum
 
 #determine L2 difference between clusters
