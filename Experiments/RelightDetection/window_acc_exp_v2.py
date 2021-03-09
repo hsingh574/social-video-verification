@@ -192,7 +192,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
         # allCamsTrim.append(c[start:end, :])
         camsOut.append(np.mean(c, axis = 0))
     
-    print("dims: ", camsOut[0].shape)
+
+
+
     # allCamsTrim.append(fake0[start:end, :])
     # allCamsTrim.append(fake1[start:end, :])
     # allCamsTrim.append(fake2[start:end, :])
@@ -272,6 +274,16 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake0Out = np.mean(fake0, axis = 0)
     fake1Out = np.mean(fake1, axis = 0)
     fake2Out = np.mean(fake2, axis = 0)
+
+    plt.title("cams plotted with mean sh coords, red is fake")
+    plt.plot(camsOut[0], 'tab:blue')
+    plt.plot(camsOut[1], 'tab:orange')
+    plt.plot(camsOut[2], 'tab:green')
+    plt.plot(camsOut[3], 'tab:purple')
+    plt.plot(camsOut[4], 'tab:brown')
+    plt.plot(camsOut[5], 'tab:pink')
+    plt.plot(fake0Out, 'tab:red')
+    plt.show()
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
