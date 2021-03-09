@@ -93,15 +93,15 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     
     #Test for tracking failures and remove
     #delete the columns which have an element greater than 10
-    badInds = []
-    for i, row in enumerate(X0.T):
-        if np.max(row) >= 10:
-            badInds.append(i)
+    # badInds = []
+    # for i, row in enumerate(X0.T):
+    #     if np.max(row) >= 10:
+    #         badInds.append(i)
     
-    X0 = np.delete(X0, badInds, axis = 1)
-    X1 = np.delete(X1, badInds, axis = 1)
-    X2 = np.delete(X2, badInds, axis = 1)
-    X3 = np.delete(X3, badInds, axis = 1)
+    # X0 = np.delete(X0, badInds, axis = 1)
+    # X1 = np.delete(X1, badInds, axis = 1)
+    # X2 = np.delete(X2, badInds, axis = 1)
+    # X3 = np.delete(X3, badInds, axis = 1)
 
     # print("dims X0: ", X0.shape)
     
@@ -180,7 +180,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     camsOut = []
     # camsOutPCA = []
-    allCamsTrim = []
+    # allCamsTrim = []
 
     for c in cams:
         # camsOut.append(weighted_SH_coords_sum(c))
@@ -189,22 +189,25 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        allCamsTrim.append(c[start:end, :])
-    allCamsTrim.append(fake0[start:end, :])
-    allCamsTrim.append(fake1[start:end, :])
-    allCamsTrim.append(fake2[start:end, :])
+        # allCamsTrim.append(c[start:end, :])
+        camsOut.append(np.mean(c, axis = 1))
+    
+    print("dims: ", camsOut[0].shape)
+    # allCamsTrim.append(fake0[start:end, :])
+    # allCamsTrim.append(fake1[start:end, :])
+    # allCamsTrim.append(fake2[start:end, :])
 
-    cam0_norm = L2_sum(allCamsTrim, 0)
-    cam1_norm = L2_sum(allCamsTrim, 1)
-    cam2_norm = L2_sum(allCamsTrim, 2)
-    cam3_norm = L2_sum(allCamsTrim, 3)
-    cam4_norm = L2_sum(allCamsTrim, 4)
-    cam5_norm = L2_sum(allCamsTrim, 5)
-    fake0_norm = L2_sum(allCamsTrim, 6)
-    fake1_norm = L2_sum(allCamsTrim, 6)
-    fake2_norm = L2_sum(allCamsTrim, 6)
+    # cam0_norm = L2_sum(allCamsTrim, 0)
+    # cam1_norm = L2_sum(allCamsTrim, 1)
+    # cam2_norm = L2_sum(allCamsTrim, 2)
+    # cam3_norm = L2_sum(allCamsTrim, 3)
+    # cam4_norm = L2_sum(allCamsTrim, 4)
+    # cam5_norm = L2_sum(allCamsTrim, 5)
+    # fake0_norm = L2_sum(allCamsTrim, 6)
+    # fake1_norm = L2_sum(allCamsTrim, 6)
+    # fake2_norm = L2_sum(allCamsTrim, 6)
 
-    camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
+    # camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
 
     # print("got norm!", cam0_norm)
 
@@ -235,62 +238,12 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # cam5_weighted = weighted_SH_coords_sum(cams[5][start:end,:])
     # fake_weighted = weighted_SH_coords_sum(fake0[start:end,:])
 
-    # plt.title("cams plotted with weighted_sum distance, red is fake")
-    # plt.plot(cam0_weighted, 'tab:blue')
-    # plt.plot(cam1_weighted, 'tab:orange')
-    # plt.plot(cam2_weighted, 'tab:green')
-    # plt.plot(cam3_weighted, 'tab:purple')
-    # plt.plot(cam4_weighted, 'tab:brown')
-    # plt.plot(cam5_weighted, 'tab:pink')
-    # plt.plot(fake_weighted, 'tab:red')
-    # plt.show()
-
-    # fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
-    # fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
-
-
-    # fake0Out = fake0[start:end,0]
-    # fake1Out = fake1[start:end,0]
-    # fake2Out = fake2[start:end,0]
-
-    # fake0Out = np.sum(fake0[start:end], axis = 1)
-    # fake1Out = np.sum(fake1[start:end], axis = 1)
-    # fake2Out = np.sum(fake2[start:end], axis = 1)
-    # fake0Out = weighted_SH_coords_sum(fake0)
-    # fake1Out = weighted_SH_coords_sum(fake1)
-    # fake2Out = weighted_SH_coords_sum(fake2)
-
-    # plt.title("cams plotted with PCA mahalanobis distance, red is fake")
-    # plt.plot(cam0PCA, 'tab:blue')
-    # plt.plot(cam1PCA, 'tab:orange')
-    # plt.plot(cam2PCA, 'tab:green')
-    # plt.plot(cam3PCA, 'tab:purple')
-    # plt.plot(cam4PCA, 'tab:brown')
-    # plt.plot(cam5PCA, 'tab:pink')
-    # plt.plot(fake0PCA, 'tab:red')
-    # plt.show()
-
     # cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
     # cam1out = np.linalg.norm(cams[1][start:end, :], axis = 1)
     # cam2out = np.linalg.norm(cams[2][start:end, :], axis = 1)
     # cam3out = np.linalg.norm(cams[3][start:end, :], axis = 1)
     # cam4out = np.linalg.norm(cams[4][start:end, :], axis = 1)
     # cam5out = np.linalg.norm(cams[5][start:end, :], axis = 1)
-
-    # fake0Out = np.linalg.norm(fake0[start:end, :], axis = 1)
-    # fake1Out = np.linalg.norm(fake1[start:end, :], axis = 1)
-    # fake2Out = np.linalg.norm(fake2[start:end, :], axis = 1)
-
-    # plt.title("cams plotted in no PCA, only sh coord 5, red is fake")
-    # plt.plot(cams[0][start:end, 5], 'tab:blue')
-    # plt.plot(cams[1][start:end, 5], 'tab:orange')
-    # plt.plot(cams[2][start:end, 5], 'tab:green')
-    # plt.plot(cams[3][start:end, 5], 'tab:purple')
-    # plt.plot(cams[4][start:end, 5], 'tab:brown')
-    # plt.plot(cams[5][start:end, 5], 'tab:pink')
-    # plt.plot(fake1[start:end, 5], 'tab:red')
-    # plt.show()
-
 
     # cam0PreNorm = cams[5][start:end, :]
     # cam1PreNorm = cams[1][start:end, :]
