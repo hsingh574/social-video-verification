@@ -484,7 +484,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 # print("cam vs fake0 diff pre norm", np.mean(cams[0] - fake0))
                 # print("cam vs fake0 diff pre norm", np.mean(cams[1] - fake1))
 
-                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3 = noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                 # print("numFake0", numFakes0)
                 # print("numFake1", numFakes1)
                 # print("numFake2", numFakes2)
