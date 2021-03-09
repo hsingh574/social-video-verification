@@ -190,7 +190,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
         # allCamsTrim.append(c[start:end, :])
-        camsOut.append(np.mean(c, axis = 1))
+        camsOut.append(np.mean(c, axis = 0))
     
     print("dims: ", camsOut[0].shape)
     # allCamsTrim.append(fake0[start:end, :])
