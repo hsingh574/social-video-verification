@@ -74,6 +74,9 @@ def linkage_L2(linkage_matrix):
 
 def detectFakesTree(link, thresh):
     ratio = link[-1][-2] / link[-2][-2]
+
+    print("ratio: ", ratio)
+
     if ratio > thresh:
         c = fcluster(link, 2,criterion='maxclust')
         partition1 = len(np.argwhere(c==1))
