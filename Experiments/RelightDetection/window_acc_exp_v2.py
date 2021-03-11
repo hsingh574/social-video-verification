@@ -135,6 +135,11 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     numFakes1, c1 = detectFakesTree(link1, thresh)
     numFakes2, c2 = detectFakesTree(link2, thresh)
     numFakes3, c3 = detectFakesTree(link3, thresh)
+
+    print("Num fakes0: ", numFakes0)
+    print("Num fakes1: ", numFakes1)
+    print("Num fakes2: ", numFakes2)
+    print("Num fakes3: ", numFakes3)
     
     return numFakes0, numFakes1, numFakes2, numFakes3, c1, c2, c3
 
