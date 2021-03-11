@@ -119,10 +119,10 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     # print("0:", link0)
     # print("0 one elt:", link0[-1, 2])
 
-    zerodist.append(link0[-1, 2])
-    onedist.append(link1[-1, 2])
-    twodist.append(link2[-1, 2])
-    threedist.append(link3[-1, 2])
+    # zerodist.append(link0[-1, 2])
+    # onedist.append(link1[-1, 2])
+    # twodist.append(link2[-1, 2])
+    # threedist.append(link3[-1, 2])
 
     # print("0:", link0[-1, 2])
     # print("1:", link1[-1, 2])
@@ -336,7 +336,9 @@ def parse_args():
     # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
     # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
-    parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
+    # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
+    parser.add_argument("--thresholds", nargs="+", default=[0.5])
+
 
 
 
