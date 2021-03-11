@@ -106,9 +106,14 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     # print("dims X0: ", X0.shape)
     
     link0 = linkage(X0)
+    print("link0", link0)
     link1 = linkage(X1)
+    print("link1", link1)
     link2 = linkage(X2)
+    print("link2", link2)
     link3 = linkage(X3)
+    print("link3", link3)
+
 
     # print("0:", link0)
     # print("0 one elt:", link0[-1, 2])
@@ -118,10 +123,10 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     twodist.append(link2[-1, 2])
     threedist.append(link3[-1, 2])
 
-    print("0:", link0[-1, 2])
-    print("1:", link1[-1, 2])
-    print("2:", link2[-1, 2])
-    print("3:", link3[-1, 2])
+    # print("0:", link0[-1, 2])
+    # print("1:", link1[-1, 2])
+    # print("2:", link2[-1, 2])
+    # print("3:", link3[-1, 2])
 
     # linkage_L2(link1)
     
