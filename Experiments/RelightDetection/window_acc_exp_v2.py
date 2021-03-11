@@ -340,7 +340,7 @@ def parse_args():
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
     # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
     # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
-    parser.add_argument("--thresholds", nargs="+", default=[0.5])
+    parser.add_argument("--thresholds", nargs="+", default=[1.1])
 
 
 
