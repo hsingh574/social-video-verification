@@ -72,10 +72,10 @@ def linkage_L2(linkage_matrix):
 #     return m
 # =============================================================================
 
-def detectFakesTree(link, thresh):
+def detectFakesTree(link, thresh, fakesNum):
     ratio = link[-1][-2] / link[-2][-2]
 
-    print("ratio: ", ratio)
+    print("ratio: ", ratio, ", num fakes: ", fakesNum)
 
     if ratio > thresh:
         c = fcluster(link, 2,criterion='maxclust')
@@ -134,10 +134,10 @@ def cluster_helper(X0, X1, X2, X3, thresh):
 
     # linkage_L2(link1)
     
-    numFakes0, _ = detectFakesTree(link0, thresh)
-    numFakes1, c1 = detectFakesTree(link1, thresh)
-    numFakes2, c2 = detectFakesTree(link2, thresh)
-    numFakes3, c3 = detectFakesTree(link3, thresh)
+    numFakes0, _ = detectFakesTree(link0, thresh, 0)
+    numFakes1, c1 = detectFakesTree(link1, thresh, 1)
+    numFakes2, c2 = detectFakesTree(link2, thresh, 2)
+    numFakes3, c3 = detectFakesTree(link3, thresh, 3)
 
     print("Num fakes0: ", numFakes0)
     print("Num fakes1: ", numFakes1)
