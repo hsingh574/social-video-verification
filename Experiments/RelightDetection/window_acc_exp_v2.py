@@ -205,7 +205,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
         # allCamsTrim.append(c[start:end, :])
-        camsOut.append(np.mean(c[:,3:7], axis = 0))
+        camsOut.append(np.mean(c, axis = 0))
     
 
 
@@ -286,21 +286,21 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = fake1[start:end, 5]
     # fake2Out = fake2[start:end, 5]
 
-    fake0Out = np.mean(fake0[:,3:7], axis = 0)
-    fake1Out = np.mean(fake1[:,3:7], axis = 0)
-    fake2Out = np.mean(fake2[:,3:7], axis = 0)
+    fake0Out = np.mean(fake0, axis = 0)
+    fake1Out = np.mean(fake1, axis = 0)
+    fake2Out = np.mean(fake2, axis = 0)
 
-    plt.title("cams plotted with mean sh coords 3-7, red is fake")
-    plt.plot(camsOut[0], 'tab:blue')
-    plt.plot(camsOut[1], 'tab:orange')
-    plt.plot(camsOut[2], 'tab:green')
-    plt.plot(camsOut[3], 'tab:purple')
-    plt.plot(camsOut[4], 'tab:brown')
-    plt.plot(camsOut[5], 'tab:pink')
-    plt.plot(fake0Out, 'tab:red')
-    plt.plot(fake1Out, 'tab:red')
-    plt.plot(fake2Out, 'tab:red')
-    plt.show()
+    # plt.title("cams plotted with mean sh coords 3-7, red is fake")
+    # plt.plot(camsOut[0], 'tab:blue')
+    # plt.plot(camsOut[1], 'tab:orange')
+    # plt.plot(camsOut[2], 'tab:green')
+    # plt.plot(camsOut[3], 'tab:purple')
+    # plt.plot(camsOut[4], 'tab:brown')
+    # plt.plot(camsOut[5], 'tab:pink')
+    # plt.plot(fake0Out, 'tab:red')
+    # plt.plot(fake1Out, 'tab:red')
+    # plt.plot(fake2Out, 'tab:red')
+    # plt.show()
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
@@ -338,17 +338,16 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
     # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
     # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
-    parser.add_argument("--thresholds", nargs="+", default=[1.1])
 
 
 
 
-    # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
-    parser.add_argument("--window-sizes", nargs="+", default=[5])
+    parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    # parser.add_argument("--window-sizes", nargs="+", default=[5])
 
     # parser.add_argument("--window-sizes", nargs="+", default=[300])
 
