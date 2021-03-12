@@ -348,7 +348,7 @@ def parse_args():
 
 
     # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
-    parser.add_argument("--window-sizes", nargs="+", default=[300])
+    parser.add_argument("--window-sizes", nargs="+", default=[1000])
 
     # parser.add_argument("--window-sizes", nargs="+", default=[300])
 
