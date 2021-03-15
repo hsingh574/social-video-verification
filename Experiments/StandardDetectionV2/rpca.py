@@ -1,66 +1,146 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from __future__ import division, print_function
-
 import numpy as np
 
+def thres(x, mu):
+    y = np.maximum(x - mu, 0)
+    y = y + np.minimum(x + mu, 0)
+    return y
 
-class R_pca:
+def solve_proj2(m, U, lambda1, lambda2):
+    """
+    solve the problem:
+    min_{v, s} 0.5*|m-Uv-s|_2^2 + 0.5*lambda1*|v|^2 + lambda2*|s|_1
 
-    def __init__(self, D, mu=None, lmbda=None):
-        self.D = D
-        self.S = np.zeros(self.D.shape)
-        self.Y = np.zeros(self.D.shape)
+    solve the projection by APG
+    Parameters
+    ----------
+    m: nx1 numpy array, vector
+    U: nxp numpy array, matrix
+    lambda1, lambda2: tuning parameters
 
-        if mu:
-            self.mu = mu
-        else:
-            self.mu = np.prod(self.D.shape) / (4 * np.linalg.norm(self.D, ord=1))
+    Returns:
+    ----------
+    v: px1 numpy array, vector
+    s: nx1 numpy array, vector
+    """
+    # intialization
+    n, p = U.shape
+    v = np.zeros(p)
+    s = np.zeros(n)
+    I = np.identity(p)
+    converged = False
+    maxIter = np.inf
+    k = 0
+    # alternatively update
+    UUt = np.linalg.inv(U.transpose().dot(U) + lambda1*I).dot(U.transpose())
+    while not converged:
+        k += 1
+        vtemp = v
+        # v = (U'*U + lambda1*I)\(U'*(m-s))
+        v = UUt.dot(m - s)
+        stemp = s
+        s = thres(m - U.dot(v), lambda2)
+        stopc = max(np.linalg.norm(v - vtemp), np.linalg.norm(s - stemp))/n
+        if stopc < 1e-6 or k > maxIter:
+            converged = True
 
-        self.mu_inv = 1 / self.mu
+    return v, s
 
-        if lmbda:
-            self.lmbda = lmbda
-        else:
-            self.lmbda = 1 / np.sqrt(np.max(self.D.shape))
 
-    @staticmethod
-    def frobenius_norm(M):
-        return np.linalg.norm(M, ord='fro')
 
-    @staticmethod
-    def shrink(M, tau):
-        return np.sign(M) * np.maximum((np.abs(M) - tau), np.zeros(M.shape))
+def pcp(M, lam=np.nan, mu=np.nan, factor=1, tol=10**(-7), maxit=1000):
+    m, n = M.shape
+    unobserved = np.isnan(M)
+    M[unobserved] = 0
+    S = np.zeros((m,n))
+    L = np.zeros((m,n))
+    Lambda = np.zeros((m,n)) # the dual variable
 
-    def svd_threshold(self, M, tau):
-        U, S, V = np.linalg.svd(M, full_matrices=False)
-        return np.dot(U, np.dot(np.diag(self.shrink(S, tau)), V))
+    # parameter setting
+    if np.isnan(mu):
+        mu = 0.25/np.abs(M).mean()
+    if np.isnan(lam):
+        lam = 1/np.sqrt(max(m,n)) * float(factor)
 
-    def fit(self, tol=None, max_iter=1000):
-        iter = 0
-        err = np.Inf
-        Sk = self.S
-        Yk = self.Y
-        Lk = np.zeros(self.D.shape)
+    # main
+    for niter in range(maxit):
+        normLS = np.linalg.norm(np.concatenate((S,L), axis=1), 'fro')
+        # dS, dL record the change of S and L, only used for stopping criterion
 
-        if tol:
-            _tol = tol
-        else:
-            _tol = 1E-7 * self.frobenius_norm(self.D)
+        X = Lambda / mu + M
+        # L - subproblem
+        # L = argmin_L ||L||_* + <Lambda, M-L-S> + (mu/2) * ||M-L-S||.^2
+        # L has closed form solution (singular value thresholding)
+        Y = X - S;
+        dL = L;
+        U, sigmas, V = np.linalg.svd(Y, full_matrices=False);
+        rank = (sigmas > 1/mu).sum()
+        Sigma = np.diag(sigmas[0:rank] - 1/mu)
+        L = np.dot(np.dot(U[:,0:rank], Sigma), V[0:rank,:])
+        dL = L - dL
 
-        #this loop implements the principal component pursuit (PCP) algorithm
-        #located in the table on page 29 of https://arxiv.org/pdf/0912.3599.pdf
-        while (err > _tol) and iter < max_iter:
-            Lk = self.svd_threshold(
-                self.D - Sk + self.mu_inv * Yk, self.mu_inv)                            #step 3
-            Sk = self.shrink(
-                self.D - Lk + (self.mu_inv * Yk), self.mu_inv * self.lmbda)             #step 4 
-            Yk = Yk + self.mu * (self.D - Lk - Sk)                                      #step 5
-            err = self.frobenius_norm(self.D - Lk - Sk)
-            iter += 1
+        # S - subproblem
+        # S = argmin_S  lam*||S||_1 + <Lambda, M-L-S> + (mu/2) * ||M-L-S||.^2
+        # Define element wise softshinkage operator as
+        #     softshrink(z; gamma) = sign(z).* max(abs(z)-gamma, 0);
+        # S has closed form solution: S=softshrink(Lambda/mu + M - L; lam/mu)
+        Y = X - L
+        dS = S
+        S = thres(Y, lam/mu) # softshinkage operator
+        dS = S - dS
 
-        self.L = Lk
-        self.S = Sk
-        return Lk, Sk
+        # Update Lambda (dual variable)
+        Z = M - S - L
+        Z[unobserved] = 0
+        Lambda = Lambda + mu * Z;
 
+        # stopping criterion
+        RelChg = np.linalg.norm(np.concatenate((dS, dL), axis=1), 'fro') / (normLS + 1)
+        if RelChg < tol:
+            break
+
+    return L, S, niter, rank
+
+
+
+def stoc_rpca(M, burnin,  lambda1=np.nan, lambda2=np.nan):
+    m, n = M.shape
+    # calculate pcp on burnin samples and find rank r
+    Lhat, Shat, niter, r = pcp(M[:,:burnin])
+    Uhat, sigmas_hat, Vhat = np.linalg.svd(Lhat)
+    if np.isnan(lambda1):
+        lambda1 = 1.0/np.sqrt(m)/np.mean(sigmas_hat[:r])
+    if np.isnan(lambda2):
+        lambda2 = 1.0/np.sqrt(m)
+
+    # initialization
+    U = np.random.rand(m, r)
+#    Uhat, sigmas_hat, Vhat = np.linalg.svd(Lhat)
+#    U = Uhat[:,:r].dot(np.sqrt(np.diag(sigmas_hat[:r])))
+    A = np.zeros((r, r))
+    B = np.zeros((m, r))
+    for i in range(burnin, n):
+        mi = M[:, i]
+        vi, si = solve_proj2(mi, U, lambda1, lambda2)
+        Shat = np.hstack((Shat, si.reshape(m,1)))
+        A = A + np.outer(vi, vi)
+        B = B + np.outer(mi - si, vi)
+        U = update_col(U, A, B, lambda1)
+        Lhat = np.hstack((Lhat, U.dot(vi).reshape(m,1)))
+        #Lhat = np.hstack((Lhat, (mi - si).reshape(m,1)))
+
+    return Lhat, Shat, r, U
+
+def update_col(U, A, B, lambda1):
+    m, r = U.shape
+    A = A + lambda1*np.identity(r)
+    for j in range(r):
+        bj = B[:,j]
+        uj = U[:,j]
+        aj = A[:,j]
+        temp = (bj - U.dot(aj))/A[j,j] + uj
+        U[:,j] = temp/max(np.linalg.norm(temp), 1)
+
+    return U
