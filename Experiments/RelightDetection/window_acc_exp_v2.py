@@ -216,7 +216,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        # allCamsTrim.append(c[start:end, :])
+        allCamsTrim.append(c[start:end, :])
         camsOut.append(np.mean(c, axis = 0))
         # camsOut.append(c)
 
@@ -224,21 +224,21 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
 
 
-    # allCamsTrim.append(fake0[start:end, :])
-    # allCamsTrim.append(fake1[start:end, :])
-    # allCamsTrim.append(fake2[start:end, :])
+    allCamsTrim.append(fake0[start:end, :])
+    allCamsTrim.append(fake1[start:end, :])
+    allCamsTrim.append(fake2[start:end, :])
 
-    # cam0_norm = L2_sum(allCamsTrim, 0)
-    # cam1_norm = L2_sum(allCamsTrim, 1)
-    # cam2_norm = L2_sum(allCamsTrim, 2)
-    # cam3_norm = L2_sum(allCamsTrim, 3)
-    # cam4_norm = L2_sum(allCamsTrim, 4)
-    # cam5_norm = L2_sum(allCamsTrim, 5)
-    # fake0_norm = L2_sum(allCamsTrim, 6)
-    # fake1_norm = L2_sum(allCamsTrim, 7)
-    # fake2_norm = L2_sum(allCamsTrim, 8)
+    cam0_norm = L2_sum(allCamsTrim, 0)
+    cam1_norm = L2_sum(allCamsTrim, 1)
+    cam2_norm = L2_sum(allCamsTrim, 2)
+    cam3_norm = L2_sum(allCamsTrim, 3)
+    cam4_norm = L2_sum(allCamsTrim, 4)
+    cam5_norm = L2_sum(allCamsTrim, 5)
+    fake0_norm = L2_sum(allCamsTrim, 6)
+    fake1_norm = L2_sum(allCamsTrim, 7)
+    fake2_norm = L2_sum(allCamsTrim, 8)
 
-    # # camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
+    camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
 
     # # print("got norm!", cam0_norm)
 
@@ -317,25 +317,25 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("cam0pca dims: ", camsOutPCA[0].shape)
     # print("cam0 dims: ", camsOut[0].shape)
 
-    fake0Out = np.mean(fake0, axis = 0)
-    fake1Out = np.mean(fake1, axis = 0)
-    fake2Out = np.mean(fake2, axis = 0)
+    fake0Out = fake0_norm
+    fake1Out = fake1_norm
+    fake2Out = fake2_norm
 
     # fake0Out = np.mean(fake0)
     # fake1Out = np.mean(fake1)
     # fake2Out = np.mean(fake2)
 
-    plt.title("mean SH coords, red is fake")
-    plt.plot(camsOut[0], 'tab:blue')
-    plt.plot(camsOut[1], 'tab:orange')
-    plt.plot(camsOut[2], 'tab:green')
-    plt.plot(camsOut[3], 'tab:purple')
-    plt.plot(camsOut[4], 'tab:brown')
-    plt.plot(camsOut[5], 'tab:pink')
-    plt.plot(fake0Out, 'tab:red')
-    plt.plot(fake1Out, 'tab:red')
-    plt.plot(fake2Out, 'tab:red')
-    plt.show()
+    # plt.title("mean SH coords, red is fake")
+    # plt.plot(camsOut[0], 'tab:blue')
+    # plt.plot(camsOut[1], 'tab:orange')
+    # plt.plot(camsOut[2], 'tab:green')
+    # plt.plot(camsOut[3], 'tab:purple')
+    # plt.plot(camsOut[4], 'tab:brown')
+    # plt.plot(camsOut[5], 'tab:pink')
+    # plt.plot(fake0Out, 'tab:red')
+    # plt.plot(fake1Out, 'tab:red')
+    # plt.plot(fake2Out, 'tab:red')
+    # plt.show()
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
@@ -373,10 +373,10 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
+    # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[1.0])
 
-    # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
+    parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
     # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
     # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
 
@@ -642,8 +642,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    # ids = [i for i in ids if i not in exclude_list] 
-    ids = [3]
+    ids = [i for i in ids if i not in exclude_list] 
+    # ids = [3]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
