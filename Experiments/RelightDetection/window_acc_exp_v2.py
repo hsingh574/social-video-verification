@@ -79,7 +79,7 @@ def detectFakesTree(link, thresh, fakesNum):
     print("ratio: ", ratio, ", num fakes: ", fakesNum)
     print("last dist: ", link[-1][-2], ", num fakes: ", fakesNum)
 
-    if last_dist > thresh: #TODO
+    if ratio > thresh: #TODO
         c = fcluster(link, 2,criterion='maxclust')
         partition1 = len(np.argwhere(c==1))
         partition2 = len(np.argwhere(c==2))
@@ -609,8 +609,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    # ids = [i for i in ids if i not in exclude_list] 
-    ids = [2] 
+    ids = [i for i in ids if i not in exclude_list] 
+    # ids = [2] 
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
