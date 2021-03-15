@@ -217,7 +217,9 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
         # allCamsTrim.append(c[start:end, :])
-        camsOut.append(np.mean(c, axis = 0))
+        # camsOut.append(np.mean(c, axis = 0))
+        camsOut.append(c, axis = 0)
+
     
 
 
@@ -315,15 +317,15 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("cam0pca dims: ", camsOutPCA[0].shape)
     # print("cam0 dims: ", camsOut[0].shape)
 
-    # fake0Out = fake0[start:end, 5]
-    # fake1Out = fake1[start:end, 5]
-    # fake2Out = fake2[start:end, 5]
+    fake0Out = fake0
+    fake1Out = fake1
+    fake2Out = fake2
 
     fake0Out = np.mean(fake0, axis = 0)
     fake1Out = np.mean(fake1, axis = 0)
     fake2Out = np.mean(fake2, axis = 0)
 
-    plt.title("cams plotted with mean sh coords, red is fake")
+    plt.title("cams plotted all 9 coords, red is fake")
     plt.plot(camsOut[0], 'tab:blue')
     plt.plot(camsOut[1], 'tab:orange')
     plt.plot(camsOut[2], 'tab:green')
