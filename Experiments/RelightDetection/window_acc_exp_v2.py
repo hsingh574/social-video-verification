@@ -216,7 +216,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        # allCamsTrim.append(c[start:end, :])
+        allCamsTrim.append(c[start:end, :])
         # camsOut.append(np.mean(c, axis = 0))
         camsOut.append(c)
 
@@ -224,35 +224,35 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
 
 
-    # allCamsTrim.append(fake0[start:end, :])
-    # allCamsTrim.append(fake1[start:end, :])
-    # allCamsTrim.append(fake2[start:end, :])
+    allCamsTrim.append(fake0[start:end, :])
+    allCamsTrim.append(fake1[start:end, :])
+    allCamsTrim.append(fake2[start:end, :])
 
-    # cam0_norm = L2_sum(allCamsTrim, 0)
-    # cam1_norm = L2_sum(allCamsTrim, 1)
-    # cam2_norm = L2_sum(allCamsTrim, 2)
-    # cam3_norm = L2_sum(allCamsTrim, 3)
-    # cam4_norm = L2_sum(allCamsTrim, 4)
-    # cam5_norm = L2_sum(allCamsTrim, 5)
-    # fake0_norm = L2_sum(allCamsTrim, 6)
-    # fake1_norm = L2_sum(allCamsTrim, 7)
-    # fake2_norm = L2_sum(allCamsTrim, 8)
+    cam0_norm = L2_sum(allCamsTrim, 0)
+    cam1_norm = L2_sum(allCamsTrim, 1)
+    cam2_norm = L2_sum(allCamsTrim, 2)
+    cam3_norm = L2_sum(allCamsTrim, 3)
+    cam4_norm = L2_sum(allCamsTrim, 4)
+    cam5_norm = L2_sum(allCamsTrim, 5)
+    fake0_norm = L2_sum(allCamsTrim, 6)
+    fake1_norm = L2_sum(allCamsTrim, 7)
+    fake2_norm = L2_sum(allCamsTrim, 8)
 
     # # camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
 
     # # print("got norm!", cam0_norm)
 
-    # plt.title("cams plotted with L2 distance to all others, red is fake")
-    # plt.plot(cam0_norm, 'tab:blue')
-    # plt.plot(cam1_norm, 'tab:orange')
-    # plt.plot(cam2_norm, 'tab:green')
-    # plt.plot(cam3_norm, 'tab:purple')
-    # plt.plot(cam4_norm, 'tab:brown')
-    # plt.plot(cam5_norm, 'tab:pink')
-    # plt.plot(fake0_norm, 'tab:red')
-    # plt.plot(fake1_norm, 'tab:red')
-    # plt.plot(fake2_norm, 'tab:red')
-    # plt.show()
+    plt.title("cams plotted with L2 distance to all others, red is fake")
+    plt.plot(cam0_norm, 'tab:blue')
+    plt.plot(cam1_norm, 'tab:orange')
+    plt.plot(cam2_norm, 'tab:green')
+    plt.plot(cam3_norm, 'tab:purple')
+    plt.plot(cam4_norm, 'tab:brown')
+    plt.plot(cam5_norm, 'tab:pink')
+    plt.plot(fake0_norm, 'tab:red')
+    plt.plot(fake1_norm, 'tab:red')
+    plt.plot(fake2_norm, 'tab:red')
+    plt.show()
     
     # cam0_norm = L2_sum_mean(allCamsTrim, 0)
     # cam1_norm = L2_sum_mean(allCamsTrim, 1)
@@ -325,17 +325,17 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # fake1Out = np.mean(fake1)
     # fake2Out = np.mean(fake2)
 
-    plt.title("cams plotted all 9 coords, red is fake")
-    plt.plot(camsOut[0], 'tab:blue')
-    plt.plot(camsOut[1], 'tab:orange')
-    plt.plot(camsOut[2], 'tab:green')
-    plt.plot(camsOut[3], 'tab:purple')
-    plt.plot(camsOut[4], 'tab:brown')
-    plt.plot(camsOut[5], 'tab:pink')
-    plt.plot(fake0Out, 'tab:red')
-    plt.plot(fake1Out, 'tab:red')
-    plt.plot(fake2Out, 'tab:red')
-    plt.show()
+    # plt.title("cams plotted all 9 coords, red is fake")
+    # plt.plot(camsOut[0], 'tab:blue')
+    # plt.plot(camsOut[1], 'tab:orange')
+    # plt.plot(camsOut[2], 'tab:green')
+    # plt.plot(camsOut[3], 'tab:purple')
+    # plt.plot(camsOut[4], 'tab:brown')
+    # plt.plot(camsOut[5], 'tab:pink')
+    # plt.plot(fake0Out, 'tab:red')
+    # plt.plot(fake1Out, 'tab:red')
+    # plt.plot(fake2Out, 'tab:red')
+    # plt.show()
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
@@ -642,7 +642,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    ids = [i for i in ids if i not in exclude_list] 
+    # ids = [i for i in ids if i not in exclude_list] 
+    ids = [1]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
