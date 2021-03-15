@@ -122,13 +122,13 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     
 
     link0 = linkage(X0)
-    # print("link0", link0)
+    print("link0", link0)
     link1 = linkage(X1)
-    # print("link1", link1)
+    print("link1", link1)
     link2 = linkage(X2)
-    # print("link2", link2)
+    print("link2", link2)
     link3 = linkage(X3)
-    # print("link3", link3)
+    print("link3", link3)
 
 
     # print("0:", link0)
@@ -335,7 +335,7 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     plt.plot(fake0Out, 'tab:red')
     plt.plot(fake1Out, 'tab:red')
     plt.plot(fake2Out, 'tab:red')
-    plt.show()
+    # plt.show()
     
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     
