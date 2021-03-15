@@ -76,6 +76,7 @@ def detectFakesTree(link, thresh, fakesNum):
     ratio = link[-1][-2] / link[-2][-2]
 
     print("ratio: ", ratio, ", num fakes: ", fakesNum)
+    print("last dist: ", link[-1][-2], ", num fakes: ", fakesNum)
 
     if ratio > thresh:
         c = fcluster(link, 2,criterion='maxclust')
