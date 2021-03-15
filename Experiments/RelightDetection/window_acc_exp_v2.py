@@ -643,7 +643,7 @@ def main():
         
     exclude_list  = [17]
     # ids = [i for i in ids if i not in exclude_list] 
-    ids = [1]
+    ids = [2]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
