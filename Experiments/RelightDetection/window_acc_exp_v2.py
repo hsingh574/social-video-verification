@@ -112,13 +112,13 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     
 
     link0 = linkage(X0)
-    print("link0", link0)
+    # print("link0", link0)
     link1 = linkage(X1)
-    print("link1", link1)
+    # print("link1", link1)
     link2 = linkage(X2)
-    print("link2", link2)
+    # print("link2", link2)
     link3 = linkage(X3)
-    print("link3", link3)
+    # print("link3", link3)
 
 
     # print("0:", link0)
@@ -340,7 +340,7 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.00, 1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[1.0])
 
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
