@@ -51,7 +51,7 @@ def L2_sum(cams, index):
     other_cams = cams.copy()
     other_cams.pop(index)
     sum = 0
-    for cam in cams:
+    for cam in other_cams:
         sum += np.linalg.norm(cam - curr_cam, axis = 1)
     # print("sum return: ", sum)
     return sum
