@@ -214,38 +214,41 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
             except FileNotFoundError:
                 skipID = True
                 break
+           
+            denom = np.sum(results['acc1'][0,:]) + np.sum(results['acc1'][3,:]) 
+            tpResults[j,0,i] = (np.sum(results['acc1'][0,:]) / (1 if denom == 0 else denom))
+
+            denom = np.sum(results['acc2'][0,:]) + np.sum(results['acc2'][3,:]) 
+            tpResults[j,1,i] = (np.sum(results['acc2'][0,:]) / (1 if denom == 0 else denom))
             
-            tpResults[j,0,i] = (np.sum(results['acc1'][0,:]) / (np.sum(results['acc1'][0,:]) + 
-                                                                 np.sum(results['acc1'][3,:])))
+            denom = np.sum(results['acc3'][0,:]) + np.sum(results['acc3'][3,:]) 
+            tpResults[j,2,i] = (np.sum(results['acc3'][0,:]) / (1 if denom == 0 else denom))
             
-            tpResults[j,1,i] = (np.sum(results['acc2'][0,:]) / (np.sum(results['acc2'][0,:]) + 
-                                                                 np.sum(results['acc2'][3,:])))
+
+            denom = (np.sum(results['acc1'][2,:]) + np.sum(results['acc1'][1,:]))
+            fpResults[j,0,i] = np.sum(results['acc1'][2,:]) / (1 if denom == 0 else denom)
             
-            tpResults[j,2,i] = (np.sum(results['acc3'][0,:]) / (np.sum(results['acc3'][0,:]) + 
-                                                                 np.sum(results['acc3'][3,:])))
+            denom = (np.sum(results['acc2'][2,:]) + np.sum(results['acc2'][1,:]))
+            fpResults[j,1,i] = np.sum(results['acc2'][2,:]) / (1 if denom == 0 else denom)
             
-            fpResults[j,0,i] = (np.sum(results['acc1'][2,:]) / (np.sum(results['acc1'][2,:]) + 
-                                                                 np.sum(results['acc1'][1,:])))
+            denom = np.sum(results['acc3'][2,:]) + np.sum(results['acc3'][1,:])
+            fpResults[j,2,i] = (np.sum(results['acc3'][2,:]) / (1 if denom == 0 else denom))
             
-            fpResults[j,1,i] = (np.sum(results['acc2'][2,:]) / (np.sum(results['acc2'][2,:]) + 
-                                                                 np.sum(results['acc2'][1,:])))
-            
-            fpResults[j,2,i] = (np.sum(results['acc3'][2,:]) / (np.sum(results['acc3'][2,:]) + 
-                                                                 np.sum(results['acc3'][1,:])))
-            
+
             if (np.sum(results['acc0'][2,:]) + np.sum(results['acc0'][1,:])==0):
                 fpZeroFake[j,0,i] = 0
             else:
                 fpZeroFake[j,0,i] = (np.sum(results['acc0'][2,:]) / (np.sum(results['acc0'][2,:]) + 
                                                                  np.sum(results['acc0'][1,:])))
-    
+
     meanTP = np.mean(tpResults,axis = 2)
     meanFP = np.mean(fpResults,axis = 2)
-    stdTP = np.std(tpResults,axis = 2)
-    stdFP = np.std(fpResults, axis = 2)
-
-    print("mean tp:", meanTP)
-    print("mean fp:", meanFP)
+    stdTP = np.std(tpResults,axis = 2, ddof=1)
+    stdFP = np.std(fpResults, axis = 2, ddof=1)
+    
+    print('ROC False Positive Rates')
+    print(meanFP)
+    print(stdFP)
 
     #zeroFakeMean = np.mean(fpZeroFake,axis = 2)
     #zeroFakeStd = np.std(fpZeroFake,axis = 2)
@@ -261,14 +264,14 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     twoFake = twoFake[np.argsort(twoFake[:, 0])]
     thrFake = thrFake[np.argsort(thrFake[:, 0])]
 
-    plt.figure(1)
+    plt.figure()
 
-    plt.errorbar(oneFake[:,0], oneFake[:,1],yerr = stdTP[:,0], xerr = stdFP[:,0], label = 'One Fake')
-    plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = 'Two Fakes')
-    plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdTP[:,2], xerr = stdFP[:,2], label = 'Three Fakes')
+    plt.errorbar(oneFake[:,0], oneFake[:,1],yerr = stdTP[:,0], xerr = stdFP[:,0], label = 'One Fake', elinewidth=0.5, capsize=1)
+    plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = 'Two Fakes', elinewidth=0.5,  capsize=1)
+    plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdTP[:,2], xerr = stdFP[:,2], label = 'Three Fakes', elinewidth=0.5,  capsize=1)
     
     plt.xlim([0, 1])
-    plt.ylim([0, 1])
+    plt.ylim([0, 1.1])
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.legend(loc = 'lower right')
