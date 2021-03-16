@@ -19,38 +19,21 @@ def parse_args():
     parser.add_argument('--accOn', action='store_false',
                     help='Whether to plot Accuracy curve')
     
-    parser.add_argument('--prOn', action='store_false',
+    parser.add_argument('--prOn', action='store_true',
                     help='Whether to plot Precision Recall curve')
     
-    parser.add_argument('--data-dir', type=str, default='data_v2',
+    parser.add_argument('--data-dir', type=str, default='Data',
                     help='Directory where data has been saved')
     
-    parser.add_argument('--results-dir', type=str, default='results_v2',
+    parser.add_argument('--results-dir', type=str, default='Results',
                     help='Directory where results have been saved')
     
-    parser.add_argument('--save-dir', type=str, default='plots_v2',
+    parser.add_argument('--save-dir', type=str, default='Plots',
                     help='Directory to save results plots')
     
     
-    # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.00, 1.3, 1.5, 1.7, 1.9, 2.1])
-
-    # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.1])
-    parser.add_argument("--thresholds", nargs="+", default=[1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
-    # parser.add_argument("--thresholds", nargs="+", default=[2.1])
-
-
-
-    # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
-    # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
-
-
-    # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
-
-
-
-    parser.add_argument("--window-sizes", nargs="+", default=[50, 100, 150, 200, 250, 300])
+    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     
     
     args = parser.parse_args()
@@ -104,8 +87,8 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
                             (np.sum(results['acc3'][0,:]) + np.sum(results['acc3'][3,:])))
     meanP = np.mean(pResults,axis = 2)
     meanR = np.mean(rResults,axis = 2)
-    stdP = np.std(pResults,axis = 2)
-    stdR = np.std(rResults, axis = 2)
+    stdP = np.std(pResults,axis = 2, ddof = 1)
+    stdR = np.std(rResults, axis = 2, ddof = 1)
 
     #reformat & order by recall values
     #sort rows by first column
@@ -133,10 +116,10 @@ def plot_PR(ids, threshes, window_size, results_dir, save_dir):
 
                    
 def acc_helper(results):
-    
+    print("TP:", np.sum(results[0,:]), "    TN:", np.sum(results[1,:]))
     numerator = np.sum(results[0,:]) + np.sum(results[1,:])
     denominator = np.sum(results, axis = (0,1))
-    return numerator / denominator
+    return numerator / (1 if denominator == 0 else denominator)
             
 def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir):
     
@@ -144,10 +127,9 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     numWin = len(window_sizes)
     skipID = False 
     accResults = np.zeros((4,numWin,numPeople))
-    print("num win: ", numWin)
-    print("num people: ", numPeople)
     
     for i,ID in enumerate(ids):
+        print('Accuracy ID', str(ID))
         if skipID:
             continue
         accs = np.zeros((4,numWin))
@@ -168,20 +150,19 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
             accs[3,j] = acc_helper(results['acc3'])
         accResults[:,:,i] = accs
     
-#    print("acc results: ", accResults)    
+    
     meanRes = np.mean(accResults, axis = 2)
-    stdRes = np.std(accResults, axis = 2)
+    stdRes = np.std(accResults, axis = 2, ddof=1)
     
-    print("avg acc", meanRes)
+    print(meanRes)
+    print(stdRes)
     
-    plt.figure(2)
-
-    print("std res:", stdRes)
+    plt.figure()
     
-    plt.errorbar(window_sizes, meanRes[0,:], yerr = stdRes[0,:], label = 'Zero Fakes')
-    plt.errorbar(window_sizes, meanRes[1,:], yerr = stdRes[1,:], label = 'One Fake')
-    plt.errorbar(window_sizes, meanRes[2,:], yerr = stdRes[2,:], label = 'Two Fakes')
-    plt.errorbar(window_sizes, meanRes[3,:], yerr = stdRes[3,:], label = 'Three Fakes')
+    plt.errorbar(window_sizes, meanRes[0,:], yerr = stdRes[0,:], label = 'Zero Fakes', elinewidth=0.5, capsize=1)
+    plt.errorbar(window_sizes, meanRes[1,:], yerr = stdRes[1,:], label = 'One Fake', elinewidth=0.5, capsize=1)
+    plt.errorbar(window_sizes, meanRes[2,:], yerr = stdRes[2,:], label = 'Two Fakes', elinewidth=0.5, capsize=1)
+    plt.errorbar(window_sizes, meanRes[3,:], yerr = stdRes[3,:], label = 'Three Fakes', elinewidth=0.5, capsize=1)
     
     plt.xlim([0, max(window_sizes)+10])
     plt.ylim([0, 1.1])
@@ -296,7 +277,7 @@ def main():
         
     exclude_list  = [17]
     ids = [i for i in ids if i not in exclude_list] 
-    # ids = [3]
+    print(ids) 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
         
@@ -305,19 +286,17 @@ def main():
     
     
     
-    window_size = 50
-    threshold = 1.9
-    threshold_idx = 4
-    
-    if args.rocOn:
-        plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
 
+    if args.rocOn:
+        for window_size in args.window_sizes:
+            plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
         
     if args.accOn:
-        plot_acc(ids, window_sizes, threshold, threshold_idx, args.results_dir, args.save_dir)
+        for i, threshold in enumerate(args.thresholds):
+            plot_acc(ids, window_sizes, threshold, i, args.results_dir, args.save_dir)
         
-    if args.prOn:
-        plot_PR(ids, threshes, window_size, args.results_dir, args.save_dir)
+    #if args.prOn:
+    #    plot_PR(ids, threshes, window_size, args.results_dir, args.save_dir)
 
 
 
