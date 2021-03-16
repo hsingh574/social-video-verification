@@ -346,8 +346,8 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--thresholds", nargs="+", default=[1.3])
+    parser.add_argument("--thresholds", nargs="+", default=[1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
+    # parser.add_argument("--thresholds", nargs="+", default=[1.3])
 
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
     # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
@@ -355,8 +355,8 @@ def parse_args():
 
 
 
-    # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
-    parser.add_argument("--window-sizes", nargs="+", default=[50])
+    parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    # parser.add_argument("--window-sizes", nargs="+", default=[50])
 
     # parser.add_argument("--window-sizes", nargs="+", default=[5])
 
