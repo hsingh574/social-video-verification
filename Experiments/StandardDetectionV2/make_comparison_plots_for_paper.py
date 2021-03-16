@@ -154,10 +154,10 @@ def plot_vs_baselines_acc(ids, window_sizes, threshold, threshold_idx, results, 
     for method in results:
         curMeans,curStds = plot_acc(ids, window_sizes, threshold, threshold_idx, results[method], save_dir)
 
-        ax0.errorbar(window_sizes, curMeans[0,:]+np.random.normal(0,0.1,5), yerr = curStds[0,:], label = method)
-        ax1.errorbar(window_sizes, curMeans[1,:]+np.random.normal(0,0.1,5), yerr = curStds[1,:], label = method)
-        ax2.errorbar(window_sizes, curMeans[2,:]+np.random.normal(0,0.1,5), yerr = curStds[2,:], label = method)
-        ax3.errorbar(window_sizes, curMeans[3,:]+np.random.normal(0,0.1,5), yerr = curStds[3,:], label = method)
+        ax0.errorbar(window_sizes, curMeans[0,:], yerr = curStds[0,:], label = method)
+        ax1.errorbar(window_sizes, curMeans[1,:], yerr = curStds[1,:], label = method)
+        ax2.errorbar(window_sizes, curMeans[2,:], yerr = curStds[2,:], label = method)
+        ax3.errorbar(window_sizes, curMeans[3,:], yerr = curStds[3,:], label = method)
 
 
     # Setting all the graph stuff
