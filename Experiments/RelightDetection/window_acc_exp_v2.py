@@ -274,33 +274,6 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("fake1 norm", fake1_norm)
     # print("fake2 norm", fake2_norm)
 
-    # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
-    # cam1PCA = mahalanobis_calculate(cams[1][start:end,:], num_pcs)
-    # cam2PCA = mahalanobis_calculate(cams[2][start:end,:], num_pcs)
-    # cam3PCA = mahalanobis_calculate(cams[3][start:end,:], num_pcs)
-    # cam4PCA = mahalanobis_calculate(cams[4][start:end,:], num_pcs)
-    # cam5PCA = mahalanobis_calculate(cams[5][start:end,:], num_pcs)
-    # fake0PCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
-
-    # cam0_weighted = weighted_SH_coords_sum(cams[0][start:end,:])
-    # cam1_weighted = weighted_SH_coords_sum(cams[1][start:end,:])
-    # cam2_weighted = weighted_SH_coords_sum(cams[2][start:end,:])
-    # cam3_weighted = weighted_SH_coords_sum(cams[3][start:end,:])
-    # cam4_weighted = weighted_SH_coords_sum(cams[4][start:end,:])
-    # cam5_weighted = weighted_SH_coords_sum(cams[5][start:end,:])
-    # fake_weighted = weighted_SH_coords_sum(fake0[start:end,:])
-
-    # cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
-    # cam1out = np.linalg.norm(cams[1][start:end, :], axis = 1)
-    # cam2out = np.linalg.norm(cams[2][start:end, :], axis = 1)
-    # cam3out = np.linalg.norm(cams[3][start:end, :], axis = 1)
-    # cam4out = np.linalg.norm(cams[4][start:end, :], axis = 1)
-    # cam5out = np.linalg.norm(cams[5][start:end, :], axis = 1)
-
-    # cam0PreNorm = cams[5][start:end, :]
-    # cam1PreNorm = cams[1][start:end, :]
-    # fake0PreNorm = fake2[start:end, :]
-
     # print("cam0 dims", cam0PreNorm.shape)
     # print("fake0 dims", fake0PreNorm.shape)
 
@@ -373,7 +346,7 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    parser.add_argument("--thresholds", nargs="+", default=[1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
     # parser.add_argument("--thresholds", nargs="+", default=[1.3])
 
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
