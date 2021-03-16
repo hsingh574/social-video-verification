@@ -383,7 +383,9 @@ def parse_args():
 
 
 
-    parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    parser.add_argument("--window-sizes", nargs="+", default=[300])
+
     # parser.add_argument("--window-sizes", nargs="+", default=[5])
 
     # parser.add_argument("--window-sizes", nargs="+", default=[300])
@@ -642,8 +644,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    # ids = [i for i in ids if i not in exclude_list] 
-    ids = [1]
+    ids = [i for i in ids if i not in exclude_list] 
+    # ids = [1]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
