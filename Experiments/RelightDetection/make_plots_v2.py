@@ -300,7 +300,7 @@ def main():
     
     
     
-    window_size = 300
+    window_size = 50
     threshold = 1.9
     threshold_idx = 4
     
