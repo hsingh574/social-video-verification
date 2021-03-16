@@ -242,17 +242,17 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
     # # print("got norm!", cam0_norm)
 
-    # plt.title("cams plotted with L2 distance to all others, red is fake")
-    # plt.plot(cam0_norm, 'tab:blue')
-    # plt.plot(cam1_norm, 'tab:orange')
-    # plt.plot(cam2_norm, 'tab:green')
-    # plt.plot(cam3_norm, 'tab:purple')
-    # plt.plot(cam4_norm, 'tab:brown')
-    # plt.plot(cam5_norm, 'tab:pink')
-    # plt.plot(fake0_norm, 'tab:red')
-    # plt.plot(fake1_norm, 'tab:red')
-    # plt.plot(fake2_norm, 'tab:red')
-    # plt.show()
+    plt.title("cams plotted with L2 distance to all others, red is fake")
+    plt.plot(cam0_norm, 'tab:blue')
+    plt.plot(cam1_norm, 'tab:orange')
+    plt.plot(cam2_norm, 'tab:green')
+    plt.plot(cam3_norm, 'tab:purple')
+    plt.plot(cam4_norm, 'tab:brown')
+    plt.plot(cam5_norm, 'tab:pink')
+    plt.plot(fake0_norm, 'tab:red')
+    plt.plot(fake1_norm, 'tab:red')
+    plt.plot(fake2_norm, 'tab:red')
+    plt.show()
     
     # cam0_norm = L2_sum_mean(allCamsTrim, 0)
     # cam1_norm = L2_sum_mean(allCamsTrim, 1)
@@ -644,8 +644,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    ids = [i for i in ids if i not in exclude_list] 
-    # ids = [1]
+    # ids = [i for i in ids if i not in exclude_list] 
+    ids = [1]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
