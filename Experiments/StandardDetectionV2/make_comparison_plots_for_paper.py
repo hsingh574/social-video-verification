@@ -265,7 +265,7 @@ def main():
     threshold_idx = 1
 
     # Change dictionary entry titles depending on your baselines/baseline order input
-    results = {'Ours':args.results_dir, 'Baseline 1': args.results_dir_baseline1, 'Baseline 2': args.results_dir_baseline2}
+    results = {'Ours':args.results_dir, 'Baseline 1': args.results_dir_base1, 'Baseline 2': args.results_dir_base2}
 
     plot_vs_baselines_acc(ids, window_sizes, threshold, threshold_idx, results, args.save_dir)
     plot_vs_baselines_ROC(ids, threshes, window_size, results, args.save_dir)      
