@@ -84,10 +84,10 @@ def linkage_L2(linkage_matrix):
 
 def detectFakesTree(link, thresh, fakesNum):
     ratio = link[-1][-2] / link[-2][-2]
-    last_dist = link[-1][-2]
+    # last_dist = link[-1][-2]
 
     print("ratio: ", ratio, ", num fakes: ", fakesNum)
-    print("last dist: ", link[-1][-2], ", num fakes: ", fakesNum)
+    # print("last dist: ", link[-1][-2], ", num fakes: ", fakesNum)
 
     if ratio > thresh: #TODO
         c = fcluster(link, 2,criterion='maxclust')
@@ -118,7 +118,7 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     # X2 = np.delete(X2, badInds, axis = 1)
     # X3 = np.delete(X3, badInds, axis = 1)
 
-    print("dims X0: ", X0.shape)
+    # print("dims X0: ", X0.shape)
     
 
     link0 = linkage(X0)
@@ -216,17 +216,22 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        allCamsTrim.append(c[start:end, :])
-        camsOut.append(np.mean(c, axis = 0))
+        # allCamsTrim.append(c[start:end, :])
+        allCamsTrim.append(c)
+        # camsOut.append(np.mean(c, axis = 0))
         # camsOut.append(c)
 
     
 
 
 
-    allCamsTrim.append(fake0[start:end, :])
-    allCamsTrim.append(fake1[start:end, :])
-    allCamsTrim.append(fake2[start:end, :])
+    # allCamsTrim.append(fake0[start:end, :])
+    # allCamsTrim.append(fake1[start:end, :])
+    # allCamsTrim.append(fake2[start:end, :])
+
+    allCamsTrim.append(fake0)
+    allCamsTrim.append(fake1)
+    allCamsTrim.append(fake2)
 
     cam0_norm = L2_sum(allCamsTrim, 0)
     cam1_norm = L2_sum(allCamsTrim, 1)
@@ -238,21 +243,21 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake1_norm = L2_sum(allCamsTrim, 7)
     fake2_norm = L2_sum(allCamsTrim, 8)
 
-    # camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
+    camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
 
     # # print("got norm!", cam0_norm)
 
-    plt.title("cams plotted with L2 distance to all others, red is fake")
-    plt.plot(cam0_norm, 'tab:blue')
-    plt.plot(cam1_norm, 'tab:orange')
-    plt.plot(cam2_norm, 'tab:green')
-    plt.plot(cam3_norm, 'tab:purple')
-    plt.plot(cam4_norm, 'tab:brown')
-    plt.plot(cam5_norm, 'tab:pink')
-    plt.plot(fake0_norm, 'tab:red')
-    plt.plot(fake1_norm, 'tab:red')
-    plt.plot(fake2_norm, 'tab:red')
-    plt.show()
+    # plt.title("cams plotted with L2 distance to all others, red is fake")
+    # plt.plot(cam0_norm, 'tab:blue')
+    # plt.plot(cam1_norm, 'tab:orange')
+    # plt.plot(cam2_norm, 'tab:green')
+    # plt.plot(cam3_norm, 'tab:purple')
+    # plt.plot(cam4_norm, 'tab:brown')
+    # plt.plot(cam5_norm, 'tab:pink')
+    # plt.plot(fake0_norm, 'tab:red')
+    # plt.plot(fake1_norm, 'tab:red')
+    # plt.plot(fake2_norm, 'tab:red')
+    # plt.show()
     
     # cam0_norm = L2_sum_mean(allCamsTrim, 0)
     # cam1_norm = L2_sum_mean(allCamsTrim, 1)
@@ -274,33 +279,6 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("fake1 norm", fake1_norm)
     # print("fake2 norm", fake2_norm)
 
-    # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
-    # cam1PCA = mahalanobis_calculate(cams[1][start:end,:], num_pcs)
-    # cam2PCA = mahalanobis_calculate(cams[2][start:end,:], num_pcs)
-    # cam3PCA = mahalanobis_calculate(cams[3][start:end,:], num_pcs)
-    # cam4PCA = mahalanobis_calculate(cams[4][start:end,:], num_pcs)
-    # cam5PCA = mahalanobis_calculate(cams[5][start:end,:], num_pcs)
-    # fake0PCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
-
-    # cam0_weighted = weighted_SH_coords_sum(cams[0][start:end,:])
-    # cam1_weighted = weighted_SH_coords_sum(cams[1][start:end,:])
-    # cam2_weighted = weighted_SH_coords_sum(cams[2][start:end,:])
-    # cam3_weighted = weighted_SH_coords_sum(cams[3][start:end,:])
-    # cam4_weighted = weighted_SH_coords_sum(cams[4][start:end,:])
-    # cam5_weighted = weighted_SH_coords_sum(cams[5][start:end,:])
-    # fake_weighted = weighted_SH_coords_sum(fake0[start:end,:])
-
-    # cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
-    # cam1out = np.linalg.norm(cams[1][start:end, :], axis = 1)
-    # cam2out = np.linalg.norm(cams[2][start:end, :], axis = 1)
-    # cam3out = np.linalg.norm(cams[3][start:end, :], axis = 1)
-    # cam4out = np.linalg.norm(cams[4][start:end, :], axis = 1)
-    # cam5out = np.linalg.norm(cams[5][start:end, :], axis = 1)
-
-    # cam0PreNorm = cams[5][start:end, :]
-    # cam1PreNorm = cams[1][start:end, :]
-    # fake0PreNorm = fake2[start:end, :]
-
     # print("cam0 dims", cam0PreNorm.shape)
     # print("fake0 dims", fake0PreNorm.shape)
 
@@ -317,13 +295,13 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("cam0pca dims: ", camsOutPCA[0].shape)
     # print("cam0 dims: ", camsOut[0].shape)
 
-    # fake0Out = fake0_norm
-    # fake1Out = fake1_norm
-    # fake2Out = fake2_norm
+    fake0Out = fake0_norm
+    fake1Out = fake1_norm
+    fake2Out = fake2_norm
 
-    fake0Out = np.mean(fake0, axis = 0)
-    fake1Out = np.mean(fake1, axis = 0)
-    fake2Out = np.mean(fake2, axis = 0)
+    # fake0Out = np.mean(fake0, axis = 0)
+    # fake1Out = np.mean(fake1, axis = 0)
+    # fake2Out = np.mean(fake2, axis = 0)
 
     # plt.title("mean SH coords, red is fake")
     # plt.plot(camsOut[0], 'tab:blue')
@@ -373,17 +351,20 @@ def parse_args():
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
     # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--thresholds", nargs="+", default=[1.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
+    # parser.add_argument("--thresholds", nargs="+", default=[1.3])
 
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
-    # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
     # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
 
 
 
 
-    parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
+
+    # parser.add_argument("--window-sizes", nargs="+", default=[50])
+
     # parser.add_argument("--window-sizes", nargs="+", default=[5])
 
     # parser.add_argument("--window-sizes", nargs="+", default=[300])
@@ -643,7 +624,7 @@ def main():
         
     exclude_list  = [17]
     # ids = [i for i in ids if i not in exclude_list] 
-    ids = [1]
+    ids = [3]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
