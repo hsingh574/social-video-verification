@@ -212,9 +212,9 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     cam4_norm = L2_sum(allCamsTrim, 4)
     cam5_norm = L2_sum(allCamsTrim, 5)
     # cam6_norm = L2_sum(allCamsTrim, 6)
-    fake0_norm = L2_sum(allCamsTrim, 7)
-    fake1_norm = L2_sum(allCamsTrim, 8)
-    fake2_norm = L2_sum(allCamsTrim, 9)
+    fake0_norm = L2_sum(allCamsTrim, 6)
+    fake1_norm = L2_sum(allCamsTrim, 7)
+    fake2_norm = L2_sum(allCamsTrim, 8)
 
     all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, fake0_norm, fake1_norm, fake2_norm])
 
