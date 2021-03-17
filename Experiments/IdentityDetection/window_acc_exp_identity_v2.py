@@ -224,7 +224,7 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     all_cams -= mean_all_cams
     all_cams /= std_all_cams
 
-    X0, X1, X2, X3 = build_test_arrays(all_cams[0:7], all_cams[7], all_cams[8], all_cams[9])
+    X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
