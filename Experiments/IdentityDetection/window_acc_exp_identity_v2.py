@@ -193,7 +193,7 @@ def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     fake2Out = np.mean(fake2[start:end], axis=0)
 
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
-    return cluster_helper(X0, X1, X2, X3, thresh)
+    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
 def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     allCamsTrim = []
