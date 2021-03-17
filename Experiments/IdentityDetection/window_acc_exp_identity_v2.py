@@ -417,7 +417,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                     isFake = True
                 
                 numFakes0, numFakes1, numFakes2, numFakes3, c0, c1, c2, c3, p0, p1, p2, p3 = \
-                    adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                    only_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                     
                 if zero_start:    
                     all_ones = np.ones((num_cams+1,))
