@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_false',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     parser.add_argument("--num-jobs", type=int, default=-1)
     
@@ -211,17 +211,20 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     cam3_norm = L2_sum(allCamsTrim, 3)
     cam4_norm = L2_sum(allCamsTrim, 4)
     cam5_norm = L2_sum(allCamsTrim, 5)
-    fake0_norm = L2_sum(allCamsTrim, 6)
-    fake1_norm = L2_sum(allCamsTrim, 7)
-    fake2_norm = L2_sum(allCamsTrim, 8)
+    cam6_norm = L2_sum(allCamsTrim, 6)
+    fake0_norm = L2_sum(allCamsTrim, 7)
+    fake1_norm = L2_sum(allCamsTrim, 8)
+    fake2_norm = L2_sum(allCamsTrim, 9)
 
-    camsOut = [cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm]
+    all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, cam6_norm, fake0_norm, fake1_norm, fake2_norm])
 
-    fake0Out = np.mean(fake0_norm, axis = 0)
-    fake1Out = np.mean(fake1_norm, axis = 0)
-    fake2Out = np.mean(fake2_norm, axis = 0)
+    mean_all_cams = np.mean(all_cams)
+    std_all_cams = np.std(all_cams)
 
-    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    all_cams -= mean_all_cams
+    all_cams /= std_all_cams
+
+    X0, X1, X2, X3 = build_test_arrays(all_cams[0:7], all_cams[7], all_cams[8], all_cams[9])
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
@@ -495,7 +498,7 @@ def main():
     print(len(fake_cams_dict.keys()))
     
     #whether or not to use alternative procedure for fakes#
-    alternative = True
+    alternative = False
     
 # =============================================================================
 #     for i in ids:
