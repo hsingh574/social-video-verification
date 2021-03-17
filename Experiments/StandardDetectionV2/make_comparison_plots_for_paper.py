@@ -154,10 +154,10 @@ def plot_vs_baselines_acc(ids, window_sizes, threshold, threshold_idx, results, 
     for method in results:
         curMeans,curStds = plot_acc(ids, window_sizes, threshold, threshold_idx, results[method], save_dir)
 
-        ax0.errorbar(window_sizes, curMeans[0,:], yerr = curStds[0,:], label = method)
-        ax1.errorbar(window_sizes, curMeans[1,:], yerr = curStds[1,:], label = method)
-        ax2.errorbar(window_sizes, curMeans[2,:], yerr = curStds[2,:], label = method)
-        ax3.errorbar(window_sizes, curMeans[3,:], yerr = curStds[3,:], label = method)
+        ax0.errorbar(window_sizes, curMeans[0,:], yerr = curStds[0,:], label = method, elinewidth=0.5, capsize=1)
+        ax1.errorbar(window_sizes, curMeans[1,:], yerr = curStds[1,:], label = method, elinewidth=0.5, capsize=1)
+        ax2.errorbar(window_sizes, curMeans[2,:], yerr = curStds[2,:], label = method, elinewidth=0.5, capsize=1)
+        ax3.errorbar(window_sizes, curMeans[3,:], yerr = curStds[3,:], label = method, elinewidth=0.5, capsize=1)
 
 
     # Setting all the graph stuff
@@ -209,6 +209,7 @@ def plot_vs_baselines_ROC(ids, threshes, window_size, results, save_dir):
         ax0.errorbar(oneFake[:,0], oneFake[:,1], yerr = stdTP[:,0], xerr = stdFP[:,0], label = method)
         ax1.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = method)
         ax2.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdTP[:,2], xerr = stdFP[:,2], label = method)
+
 
     # Graphing settings
     ax0.set_xlim([0, 1])
