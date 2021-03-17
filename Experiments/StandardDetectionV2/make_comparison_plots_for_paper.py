@@ -29,8 +29,8 @@ def parse_args():
                     help='Directory to save results plots')
     
     
-    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
-    parser.add_argument("--window-sizes", nargs="+", default=[10,20,30,40,50])
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
+    parser.add_argument("--window-sizes", nargs="+", default=[10,20,30,40,50,60])
     
     
     args = parser.parse_args()
@@ -262,7 +262,7 @@ def main():
     
     window_size = 60
     threshold = 1.5
-    threshold_idx = 1
+    threshold_idx = 2
 
     # Change dictionary entry titles depending on your baselines/baseline order input
     results = {'Ours':args.results_dir, 'Baseline 1': args.results_dir_base1, 'Baseline 2': args.results_dir_base2}
