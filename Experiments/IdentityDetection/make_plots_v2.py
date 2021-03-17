@@ -7,6 +7,7 @@ import os
 import numpy as np
 from scipy.io import loadmat
 import re
+from sklearn.metrics import roc_curve
 
 
 
@@ -31,8 +32,7 @@ def parse_args():
     parser.add_argument('--save-dir', type=str, default='Plots',
                     help='Directory to save results plots')
     
-    
-    parser.add_argument("--thresholds", nargs="+", default=[1.3, 1.5, 1.7, 1.9, 2.1])
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     
     
@@ -171,86 +171,65 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
     plt.legend(loc = 'lower right')
     plt.title('Detection Accuracy v Window Size. Threshold = {}'.format(threshold))
     plt.savefig(os.path.join(save_dir, 'acc_plot_thresh_{}.png'.format(threshold)))
-        
-            
 
-def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
-    
-    threshNum = len(threshes)
-    numPeople = len(ids)
-    skipID = False
-    tpResults = np.zeros((threshNum,3,numPeople))
-    fpResults = np.zeros((threshNum,3,numPeople))
-    fpZeroFake = np.zeros((threshNum,1,numPeople))
-    
+def plot_ROC_v2(ids, threshes, window_size, results_dir, save_dir):
+    y_true_0 = None
+    y_score_0 = None
+
+    y_true_1 = None
+    y_score_1 = None
+
+    y_true_2 = None
+    y_score_2 = None
+
+    y_true_3 = None
+    y_score_3 = None
     for i,ID in enumerate(ids):
-        if skipID:
-            continue
-        for j, t in enumerate(threshes):
+        for j, threshold in enumerate(threshes):
             try:
                 results = loadmat(os.path.join(results_dir, 'ID{}'.format(ID),
-                                           'thresh_{}'.format(j), 
-                                           "window_{}.mat".format(window_size)))
-                skipID = False
+                                            'thresh_{}'.format(j), 
+                                            "p_window_{}.mat".format(window_size)))
             except FileNotFoundError:
-                skipID = True
-                break
-           
-            denom = np.sum(results['acc1'][0,:]) + np.sum(results['acc1'][3,:]) 
-            tpResults[j,0,i] = (np.sum(results['acc1'][0,:]) / (1 if denom == 0 else denom))
+                print("not found")
+                continue
 
-            denom = np.sum(results['acc2'][0,:]) + np.sum(results['acc2'][3,:]) 
-            tpResults[j,1,i] = (np.sum(results['acc2'][0,:]) / (1 if denom == 0 else denom))
-            
-            denom = np.sum(results['acc3'][0,:]) + np.sum(results['acc3'][3,:]) 
-            tpResults[j,2,i] = (np.sum(results['acc3'][0,:]) / (1 if denom == 0 else denom))
-            
+            if i == 0 and j == 0:
+                y_score_0 = results['p0'][0, :]
+                y_true_0 = results['p0'][1, :]
 
-            denom = (np.sum(results['acc1'][2,:]) + np.sum(results['acc1'][1,:]))
-            fpResults[j,0,i] = np.sum(results['acc1'][2,:]) / (1 if denom == 0 else denom)
-            
-            denom = (np.sum(results['acc2'][2,:]) + np.sum(results['acc2'][1,:]))
-            fpResults[j,1,i] = np.sum(results['acc2'][2,:]) / (1 if denom == 0 else denom)
-            
-            denom = np.sum(results['acc3'][2,:]) + np.sum(results['acc3'][1,:])
-            fpResults[j,2,i] = (np.sum(results['acc3'][2,:]) / (1 if denom == 0 else denom))
-            
+                y_score_1 = results['p1'][0, :]
+                y_true_1 = results['p1'][1, :]
 
-            if (np.sum(results['acc0'][2,:]) + np.sum(results['acc0'][1,:])==0):
-                fpZeroFake[j,0,i] = 0
+                y_score_2 = results['p2'][0, :]
+                y_true_2 = results['p2'][1, :]
+
+                y_score_3 = results['p3'][0, :]
+                y_true_3 = results['p3'][1, :]
             else:
-                fpZeroFake[j,0,i] = (np.sum(results['acc0'][2,:]) / (np.sum(results['acc0'][2,:]) + 
-                                                                 np.sum(results['acc0'][1,:])))
+                y_score_0 = np.hstack([y_score_0, results['p0'][0, :]])
+                y_true_0 = np.hstack([y_true_0, results['p0'][1, :]])
 
-    meanTP = np.mean(tpResults,axis = 2)
-    meanFP = np.mean(fpResults,axis = 2)
-    stdTP = np.std(tpResults,axis = 2, ddof=1)
-    stdFP = np.std(fpResults, axis = 2, ddof=1)
-    
-    print('ROC False Positive Rates')
-    print(meanFP)
-    print(stdFP)
+                y_score_1 = np.hstack([y_score_1, results['p1'][0, :]])
+                y_true_1 = np.hstack([y_true_1, results['p1'][1, :]])
 
-    #zeroFakeMean = np.mean(fpZeroFake,axis = 2)
-    #zeroFakeStd = np.std(fpZeroFake,axis = 2)
+                y_score_2 = np.hstack([y_score_2, results['p2'][0, :]])
+                y_true_2 = np.hstack([y_true_2, results['p2'][1, :]])
 
-    #reformat & order by recall values
-    #sort rows by first column
-    
-    oneFake = np.column_stack([meanFP[:,0], meanTP[:,0]])
-    twoFake = np.column_stack([meanFP[:,1], meanTP[:,1]])
-    thrFake = np.column_stack([meanFP[:,2], meanTP[:,2]])
-    
-    oneFake = oneFake[np.argsort(oneFake[:, 0])]
-    twoFake = twoFake[np.argsort(twoFake[:, 0])]
-    thrFake = thrFake[np.argsort(thrFake[:, 0])]
+                y_score_3 = np.hstack([y_score_3, results['p3'][0, :]])
+                y_true_3 = np.hstack([y_true_3, results['p3'][1, :]])
+        
+    #fpr0, tpr0, _  = roc_curve(y_true_0, y_score_0)
+    fpr1, tpr1, _  = roc_curve(y_true_1, y_score_1)
+    fpr2, tpr2, _  = roc_curve(y_true_2, y_score_2)
+    fpr3, tpr3, _  = roc_curve(y_true_3, y_score_3)
 
     plt.figure()
 
-    plt.errorbar(oneFake[:,0], oneFake[:,1],yerr = stdTP[:,0], xerr = stdFP[:,0], label = 'One Fake', elinewidth=0.5, capsize=1)
-    plt.errorbar(twoFake[:,0], twoFake[:,1], yerr = stdTP[:,1], xerr = stdFP[:,1], label = 'Two Fakes', elinewidth=0.5,  capsize=1)
-    plt.errorbar(thrFake[:,0], thrFake[:,1], yerr = stdTP[:,2], xerr = stdFP[:,2], label = 'Three Fakes', elinewidth=0.5,  capsize=1)
-    
+    #plt.plot(fpr0, tpr0, label = 'Zero Fake')
+    plt.plot(fpr1, tpr1, label = 'One Fake')
+    plt.plot(fpr2, tpr2, label = 'Two Fake')
+    plt.plot(fpr3, tpr3, label = 'Three Fake')
     plt.xlim([0, 1])
     plt.ylim([0, 1.1])
     plt.ylabel('True Positive Rate')
@@ -258,8 +237,7 @@ def plot_ROC(ids, threshes, window_size, results_dir, save_dir):
     plt.legend(loc = 'lower right')
     plt.title('ROC Curve, Window size = {}'.format(window_size))
     plt.savefig(os.path.join(save_dir, 'roc_plot_window_size_{}.png'.format(window_size)))
-
-
+    
 
 def main():
     
@@ -280,16 +258,13 @@ def main():
     print(ids) 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
-        
     threshes = args.thresholds
     window_sizes = args.window_sizes
-    
-    
     
 
     if args.rocOn:
         for window_size in args.window_sizes:
-            plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)
+            plot_ROC_v2(ids, threshes, window_size, args.results_dir, args.save_dir)
         
     if args.accOn:
         for i, threshold in enumerate(args.thresholds):

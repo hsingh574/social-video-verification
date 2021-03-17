@@ -50,7 +50,9 @@ def parse_args():
 
 
 
-    parser.add_argument("--window-sizes", nargs="+", default=[50, 100, 150, 200, 250, 300])
+    # parser.add_argument("--window-sizes", nargs="+", default=[50, 100, 150, 200, 250, 300])
+    parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
+
     
     
     args = parser.parse_args()
@@ -295,8 +297,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    ids = [i for i in ids if i not in exclude_list] 
-    # ids = [3]
+    # ids = [i for i in ids if i not in exclude_list] 
+    ids = [3]
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
         
@@ -305,9 +307,9 @@ def main():
     
     
     
-    window_size = 50
-    threshold = 1.9
-    threshold_idx = 4
+    window_size = 300
+    threshold = 1.1
+    threshold_idx = 0
     
     if args.rocOn:
         plot_ROC(ids, threshes, window_size, args.results_dir, args.save_dir)

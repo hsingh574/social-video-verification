@@ -14,37 +14,6 @@ from joblib import Parallel, delayed
 
 from matplotlib import pyplot as plt
 
-
-zerodist = []
-onedist = []
-twodist = []
-threedist = []
-
-        
-def l2_calculate(data, upper_lip_start, lower_lip_start, num_points):
-    
-    length = len(data)
-    upper_lip = data[:, upper_lip_start:(upper_lip_start+num_points)]
-    lower_lip = data[:, lower_lip_start:(lower_lip_start+num_points)]
-    
-    #upper_lip = np.reshape(upper_lip, (length, -1, 2))
-    #lower_lip = np.reshape(lower_lip, (length, -1, 2))
-    
-    return np.linalg.norm(upper_lip - lower_lip, axis = -1)
-
-
-def mahalanobis(T, eigenval):
-    
-    cov = np.linalg.pinv(np.diag(eigenval.T))
-    return np.sqrt(np.sum(np.multiply(np.matmul(T, cov), T), axis=1)) #T @ cov, T), axis = 1))
-
-
-def mahalanobis_calculate(data, num_pcs):
-    pca = PCA(num_pcs)
-    T = pca.fit_transform(data)
-    eigenval = pca.explained_variance_
-    return mahalanobis(T, eigenval)
-
 #for a cam, sum the L2 distances across all other cams in the list
 def L2_sum(cams, index):
     curr_cam = cams[index]
@@ -65,22 +34,6 @@ def L2_sum_mean(cams, index):
         sum += np.linalg.norm(np.mean(cam, axis = 0) - curr_cam, axis = 0)
     # print("sum return: ", sum)
     return sum
-
-#determine L2 difference between clusters
-def linkage_L2(linkage_matrix):
-    print("Linkage matrix: ")
-    print(linkage_matrix)
-
-#previous version: This takes longer and 
-#returns a different value from the matlab version   
-# =============================================================================
-#     T = pca.fit_transform(StandardScaler(with_std=False).fit_transform(data))
-#     # fit a Minimum Covariance Determinant (MCD) robust estimator to data 
-#     robust_cov = MinCovDet().fit(T)
-#     # Get the Mahalanobis distance
-#     m = robust_cov.mahalanobis(T)
-#     return m
-# =============================================================================
 
 def detectFakesTree(link, thresh, fakesNum):
     ratio = link[-1][-2] / link[-2][-2]
@@ -106,21 +59,6 @@ def detectFakesTree(link, thresh, fakesNum):
 
 def cluster_helper(X0, X1, X2, X3, thresh):
     
-    #Test for tracking failures and remove
-    #delete the columns which have an element greater than 10
-    # badInds = []
-    # for i, row in enumerate(X0.T):
-    #     if np.max(row) >= 10:
-    #         badInds.append(i)
-    
-    # X0 = np.delete(X0, badInds, axis = 1)
-    # X1 = np.delete(X1, badInds, axis = 1)
-    # X2 = np.delete(X2, badInds, axis = 1)
-    # X3 = np.delete(X3, badInds, axis = 1)
-
-    # print("dims X0: ", X0.shape)
-    
-
     link0 = linkage(X0)
     print("link0", link0)
     link1 = linkage(X1)
@@ -129,22 +67,6 @@ def cluster_helper(X0, X1, X2, X3, thresh):
     print("link2", link2)
     link3 = linkage(X3)
     print("link3", link3)
-
-
-    # print("0:", link0)
-    # print("0 one elt:", link0[-1, 2])
-
-    # zerodist.append(link0[-1, 2])
-    # onedist.append(link1[-1, 2])
-    # twodist.append(link2[-1, 2])
-    # threedist.append(link3[-1, 2])
-
-    # print("0:", link0[-1, 2])
-    # print("1:", link1[-1, 2])
-    # print("2:", link2[-1, 2])
-    # print("3:", link3[-1, 2])
-
-    # linkage_L2(link1)
     
     numFakes0, _ = detectFakesTree(link0, thresh, 0)
     numFakes1, c1 = detectFakesTree(link1, thresh, 1)
@@ -172,35 +94,6 @@ def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
     X3 = temp
     
     return X0, X1, X2, X3
-    
-    
-# =============================================================================
-# Take the l2 distance between the
-# upper and lower lip for each frame of each camera 
-# and cluster (as described in Tursman et al. 2020)
-# =============================================================================
-def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
-    
-    #Can tweak these later to check performance on other facial landmarks
-    upper_lip_start = 0
-    lower_lip_start = 14
-    num_points = 4
-    
-    camsOut = []
-    for c in cams:
-        camsOut.append(l2_calculate(c[start:end,:], upper_lip_start, lower_lip_start, num_points))
-    
-    fake0Out = l2_calculate(fake0[start:end,:], upper_lip_start, lower_lip_start, num_points)
-    fake1Out = l2_calculate(fake1[start:end,:], upper_lip_start, lower_lip_start, num_points)
-    fake2Out = l2_calculate(fake2[start:end,:], upper_lip_start, lower_lip_start, num_points)
-    
-    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
-    
-    return cluster_helper(X0, X1, X2, X3, thresh)
-
-def weighted_SH_coords_sum(coords):
-    weights = np.array([9,8,7,6,5,4,3,2,1])
-    return np.sum(coords * np.power(10, weights), axis = 1)
 
 ## for debugging lighting results: don't use PCA/mahalanobis for clustering. Trying difference methods such as summing SH coords
 def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
@@ -216,7 +109,8 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
         # camsOut.append(c[start:end,:])
         # camsOutPCA.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-        allCamsTrim.append(c[start:end, :])
+        # allCamsTrim.append(c[start:end, :])
+        allCamsTrim.append(c)
         # camsOut.append(np.mean(c, axis = 0))
         # camsOut.append(c)
 
@@ -224,9 +118,13 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
 
 
-    allCamsTrim.append(fake0[start:end, :])
-    allCamsTrim.append(fake1[start:end, :])
-    allCamsTrim.append(fake2[start:end, :])
+    # allCamsTrim.append(fake0[start:end, :])
+    # allCamsTrim.append(fake1[start:end, :])
+    # allCamsTrim.append(fake2[start:end, :])
+
+    allCamsTrim.append(fake0)
+    allCamsTrim.append(fake1)
+    allCamsTrim.append(fake2)
 
     cam0_norm = L2_sum(allCamsTrim, 0)
     cam1_norm = L2_sum(allCamsTrim, 1)
@@ -274,33 +172,6 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     # print("fake1 norm", fake1_norm)
     # print("fake2 norm", fake2_norm)
 
-    # cam0PCA = mahalanobis_calculate(cams[0][start:end,:], num_pcs)
-    # cam1PCA = mahalanobis_calculate(cams[1][start:end,:], num_pcs)
-    # cam2PCA = mahalanobis_calculate(cams[2][start:end,:], num_pcs)
-    # cam3PCA = mahalanobis_calculate(cams[3][start:end,:], num_pcs)
-    # cam4PCA = mahalanobis_calculate(cams[4][start:end,:], num_pcs)
-    # cam5PCA = mahalanobis_calculate(cams[5][start:end,:], num_pcs)
-    # fake0PCA = mahalanobis_calculate(fake0[start:end,:], num_pcs)
-
-    # cam0_weighted = weighted_SH_coords_sum(cams[0][start:end,:])
-    # cam1_weighted = weighted_SH_coords_sum(cams[1][start:end,:])
-    # cam2_weighted = weighted_SH_coords_sum(cams[2][start:end,:])
-    # cam3_weighted = weighted_SH_coords_sum(cams[3][start:end,:])
-    # cam4_weighted = weighted_SH_coords_sum(cams[4][start:end,:])
-    # cam5_weighted = weighted_SH_coords_sum(cams[5][start:end,:])
-    # fake_weighted = weighted_SH_coords_sum(fake0[start:end,:])
-
-    # cam0out = np.linalg.norm(cams[0][start:end, :], axis = 1)
-    # cam1out = np.linalg.norm(cams[1][start:end, :], axis = 1)
-    # cam2out = np.linalg.norm(cams[2][start:end, :], axis = 1)
-    # cam3out = np.linalg.norm(cams[3][start:end, :], axis = 1)
-    # cam4out = np.linalg.norm(cams[4][start:end, :], axis = 1)
-    # cam5out = np.linalg.norm(cams[5][start:end, :], axis = 1)
-
-    # cam0PreNorm = cams[5][start:end, :]
-    # cam1PreNorm = cams[1][start:end, :]
-    # fake0PreNorm = fake2[start:end, :]
-
     # print("cam0 dims", cam0PreNorm.shape)
     # print("fake0 dims", fake0PreNorm.shape)
 
@@ -341,25 +212,6 @@ def noPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     return cluster_helper(X0, X1, X2, X3, thresh)
 
-def onlyPCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
-    
-    camsOut = []
-    for c in cams:
-        camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
-    
-    fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
-    fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
-    fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
-
-    print("fake dims:", fake0Out.shape)
-    print("cam len:", len(camsOut))
-    print("cam dims:", camsOut[0].shape)
-
-    
-    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
-    
-    return cluster_helper(X0, X1, X2, X3, thresh)
-
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
 
@@ -372,23 +224,13 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_true',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    # parser.add_argument("--thresholds", nargs="+", default=[0.5, 0.7, 0.9, 1.1, 1.3, 1.5])
+
     parser.add_argument("--thresholds", nargs="+", default=[1.1, 1.3, 1.5, 1.7, 1.9, 2.1])
-    # parser.add_argument("--thresholds", nargs="+", default=[1.3])
-
     # parser.add_argument("--thresholds", nargs="+", default=[2.1, 2.3, 2.5, 2.7, 2.9])
-    # parser.add_argument("--thresholds", nargs="+", default=[7.0, 7.2, 7.4, 7.6, 7.8])
-    # parser.add_argument("--thresholds", nargs="+", default=[0.1, 0.5, 1.0, 1.5, 2.0, 5.0])
 
+    # parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
+    parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
 
-
-
-    parser.add_argument("--window-sizes", nargs="+", default=[50,100,150,200,250,300])
-    # parser.add_argument("--window-sizes", nargs="+", default=[300])
-
-    # parser.add_argument("--window-sizes", nargs="+", default=[5])
-
-    # parser.add_argument("--window-sizes", nargs="+", default=[300])
 
     parser.add_argument("--num-jobs", type=int, default=-1)
     
@@ -644,8 +486,8 @@ def main():
             continue
         
     exclude_list  = [17]
-    ids = [i for i in ids if i not in exclude_list] 
-    # ids = [1]
+    # ids = [i for i in ids if i not in exclude_list] 
+    ids = [3]
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)

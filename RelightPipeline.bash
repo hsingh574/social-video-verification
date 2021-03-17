@@ -40,7 +40,7 @@ function relight_id { #params: id, camera to relight
 
 }
 
-ids=(1 2 3)
+ids=(4 5 6 7 8 9 10 11 12)
 
 for id in ${ids[@]};
 do
