@@ -183,7 +183,7 @@ def only_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
-def no_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     camsOut = []
 
     for c in cams:
@@ -225,18 +225,6 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     all_cams /= std_all_cams
 
     X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
-    
-    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
-
-def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
-    camsOut = []
-    for c in cams:
-        camsOut.append(np.mean(c, axis = 0))
-    fake0out = np.mean(fake0, axis = 0)
-    fake1out = np.mean(fake1, axis = 0)
-    fake2out = np.mean(fake2, axis = 0)
-
-    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0out, fake1out, fake2out)
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
@@ -429,7 +417,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                     isFake = True
                 
                 numFakes0, numFakes1, numFakes2, numFakes3, c0, c1, c2, c3, p0, p1, p2, p3 = \
-                    adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                    mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, t)
                     
                 if zero_start:    
                     all_ones = np.ones((num_cams+1,))
