@@ -262,8 +262,8 @@ def main():
     window_sizes = args.window_sizes
     
     window_size = 60
-    threshold = 2.5
-    threshold_idx = 6
+    threshold = 2.1
+    threshold_idx = 5
 
     # Change dictionary entry titles depending on your baselines/baseline order input
     results = {'Ours':args.results_dir, 'Baseline 1': args.results_dir_base1, 'Baseline 2': args.results_dir_base2}
