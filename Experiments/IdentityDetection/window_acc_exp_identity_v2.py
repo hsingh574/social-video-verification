@@ -226,7 +226,7 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
 
     X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
     
-    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
+    return cluster_helper(X0, X1, X2, X3, thresh)
 
 def L2_sum(cams, index):
     curr_cam = cams[index]
