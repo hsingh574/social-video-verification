@@ -150,10 +150,12 @@ def plot_acc(ids, window_sizes, threshold, threshold_idx, results_dir, save_dir)
             accs[3,j] = acc_helper(results['acc3'])
         accResults[:,:,i] = accs
     
-    print("mean: ", meanRes)
     meanRes = np.mean(accResults, axis = 2)
-    print("std: ", stdRes)
+    print("mean: ", meanRes)
+
     stdRes = np.std(accResults, axis = 2, ddof=1)
+    print("std: ", stdRes)
+
     
     print(meanRes)
     print(stdRes)
