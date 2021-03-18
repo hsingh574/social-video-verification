@@ -152,6 +152,7 @@ def plot_vs_baselines_acc(ids, window_sizes, threshold, threshold_idx, results, 
  
     # For each method, plot 0-3 fakes
     for method in results:
+        print("Method: ")
         curMeans,curStds = plot_acc(ids, window_sizes, threshold, threshold_idx, results[method], save_dir)
 
         ax0.errorbar(window_sizes, curMeans[0,:], yerr = curStds[0,:], label = method, elinewidth=0.5, capsize=1)
