@@ -262,7 +262,27 @@ def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thre
     return None, None, None, None, c[0], c[1], c[2], c[3], \
         confidence[0], confidence[1], confidence[2], confidence[3]
 
+def calculate_acc_helper_old(option0, option1, c):
+    acc = np.zeros((4,))
 
+    real = np.argmax(np.bincount(c.astype('int64')))
+    fake = 1 if real == 0 else 0
+    C = (option1 if real == 0 else option0)
+    correctAnswer = np.count_nonzero(C == fake)
+    numFakes = np.count_nonzero(c == fake)
+    
+    if numFakes == correctAnswer:
+        if numFakes == 0:
+            acc[1] = 1
+        elif (np.all(c == C)):
+            acc[0] = 1 #TP, detected some number of fakes where there was some
+        else:
+            acc[3] = 1 #FN, failed to detect some number of fakes where there was some
+    elif not(numFakes == 0):
+        acc[2] = 1 #FP deteected some number of fakes, but was wrong number of fakes
+    else:
+        acc[3] = 1 #FN incorrectly got no fakes
+    return acc
 
 # option1 (1 == real), option0 (0 == real)
 def calculate_acc_helper(option0, option1, c):
