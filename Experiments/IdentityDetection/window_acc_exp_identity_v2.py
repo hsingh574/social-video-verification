@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_false',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     parser.add_argument("--num-jobs", type=int, default=-1)
     
@@ -169,7 +169,7 @@ def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
     
     return X0, X1, X2, X3
 
-def only_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+def PCA_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     
     camsOut = []
     for c in cams:
@@ -183,7 +183,7 @@ def only_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
-def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     camsOut = []
 
     for c in cams:
@@ -195,7 +195,7 @@ def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
-def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     allCamsTrim = []
 
     for c in cams:
@@ -211,20 +211,26 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
     cam3_norm = L2_sum(allCamsTrim, 3)
     cam4_norm = L2_sum(allCamsTrim, 4)
     cam5_norm = L2_sum(allCamsTrim, 5)
-    # cam6_norm = L2_sum(allCamsTrim, 6)
-    fake0_norm = L2_sum(allCamsTrim, 6)
-    fake1_norm = L2_sum(allCamsTrim, 7)
-    fake2_norm = L2_sum(allCamsTrim, 8)
+    if zero_start:
+        cam6_norm = L2_sum(allCamsTrim, 6)
+    fake0_norm = L2_sum(allCamsTrim, 7)
+    fake1_norm = L2_sum(allCamsTrim, 8)
+    fake2_norm = L2_sum(allCamsTrim, 9)
 
-    all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, fake0_norm, fake1_norm, fake2_norm])
-
+    if zero_start:
+        all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, cam6_norm, fake0_norm, fake1_norm, fake2_norm])
+    else:
+        all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, fake0_norm, fake1_norm, fake2_norm])
     mean_all_cams = np.mean(all_cams)
     std_all_cams = np.std(all_cams)
-
+    
     all_cams -= mean_all_cams
     all_cams /= std_all_cams
 
-    X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
+    if zero_start:
+        X0, X1, X2, X3 = build_test_arrays(all_cams[0:7], all_cams[7], all_cams[8], all_cams[9])
+    else:
+        X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
     
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
@@ -237,7 +243,7 @@ def L2_sum(cams, index):
         sum += np.linalg.norm(cam - curr_cam, axis = 1)
     return sum
 
-def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thresh):
+def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     c = np.random.randint(2, size=4*len(cams))
     confidence = np.ones(4*len(cams))
     partition0 = len(np.argwhere(c==0))
@@ -412,12 +418,15 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                     continue
                 
                 if not alternative:
-                    isFake = (len(set(range(start, end)).intersection(set(range(intervalWin, 2*intervalWin)))) == 0)
+                    fakeSet = set(range(0, intervalWin-1)).union(set(range(2*intervalWin, fullLen-1)))
+                    currentWindowSet = set(range(start, end))
+                    intersection = currentWindowSet.intersection(fakeSet)
+                    isFake = len(intersection) > 0 # Some frames in the window are faked
                 else:
                     isFake = True
                 
                 numFakes0, numFakes1, numFakes2, numFakes3, c0, c1, c2, c3, p0, p1, p2, p3 = \
-                    only_PCA(cams, fake0, fake1, fake2, start, end, num_pcs, t)
+                    adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, t,  zero_start)
                     
                 if zero_start:    
                     all_ones = np.ones((num_cams+1,))
@@ -440,13 +449,13 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 triple_fake_zeros[1] = 1
                 
                 acc0[:, start] = calculate_acc_helper(all_ones, all_zeros, c0)
-                acc1[:, start] = calculate_acc_helper(single_fake_ones, 
-                    single_fake_zeros, c1)
-                acc2[:,start] = calculate_acc_helper(double_fake_ones, 
-                    double_fake_zeros, c2)
-                acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
-                    triple_fake_zeros, c3)
-
+                if isFake:
+                    acc1[:, start] = calculate_acc_helper(single_fake_ones, 
+                        single_fake_zeros, c1)
+                    acc2[:,start] = calculate_acc_helper(double_fake_ones, 
+                        double_fake_zeros, c2)
+                    acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
+                        triple_fake_zeros, c3)
                 p = np.hstack([p0, p1, p2, p3])
                 c = np.hstack([all_zeros, single_fake_zeros, double_fake_zeros, triple_fake_zeros])
 
@@ -454,14 +463,16 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
 
                 if start == 0:
                     p0_total = np.vstack([p0, all_zeros])
-                    p1_total = np.vstack([p1, single_fake_zeros])
-                    p2_total = np.vstack([p2, double_fake_zeros])
-                    p3_total = np.vstack([p3, triple_fake_zeros])
+                    if isFake:
+                        p1_total = np.vstack([p1, single_fake_zeros])
+                        p2_total = np.vstack([p2, double_fake_zeros])
+                        p3_total = np.vstack([p3, triple_fake_zeros])
                 else:
                     p0_total = np.hstack([p0_total, np.vstack([p0, all_zeros])])
-                    p1_total = np.hstack([p1_total, np.vstack([p1, single_fake_zeros])])
-                    p2_total = np.hstack([p2_total, np.vstack([p2, double_fake_zeros])])
-                    p3_total = np.hstack([p3_total, np.vstack([p3, triple_fake_zeros])])
+                    if isFake:
+                        p1_total = np.hstack([p1_total, np.vstack([p1, single_fake_zeros])])
+                        p2_total = np.hstack([p2_total, np.vstack([p2, double_fake_zeros])])
+                        p3_total = np.hstack([p3_total, np.vstack([p3, triple_fake_zeros])])
 
             saveDir = os.path.join(save_dir,"ID{}".format(i),"thresh_{}".format(ind))
             if not(os.path.isdir(saveDir)):
