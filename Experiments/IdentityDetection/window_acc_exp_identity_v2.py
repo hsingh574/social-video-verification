@@ -421,6 +421,8 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
             if numWin <= 0:
                 print("Skipping  window size " + str(j) + " for ID " + str(i) + " , as it is larger than the total number of available frames")
                 continue
+
+
             acc0 = np.zeros((4, numWin))
             acc1 = np.zeros((4, numWin))
             acc2 = np.zeros((4, numWin))
@@ -468,6 +470,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 triple_fake_zeros = double_fake_zeros.copy()
                 triple_fake_zeros[1] = 1
                 
+
                 acc0[:, start] = calculate_acc_helper(all_ones, all_zeros, c0)
                 if isFake:
                     acc1[:, start] = calculate_acc_helper(single_fake_ones, 
@@ -476,6 +479,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         double_fake_zeros, c2)
                     acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
                         triple_fake_zeros, c3)
+
                 p = np.hstack([p0, p1, p2, p3])
                 c = np.hstack([all_zeros, single_fake_zeros, double_fake_zeros, triple_fake_zeros])
 
@@ -497,10 +501,12 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
             saveDir = os.path.join(save_dir,"ID{}".format(i),"thresh_{}".format(ind))
             if not(os.path.isdir(saveDir)):
                 os.makedirs(saveDir)
+
             saveDict = {'acc0':acc0, 'acc1': acc1, 
                         'acc2':acc2, 'acc3': acc3, 
                         'thresh': t, 'window_size':j }
             savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
+
             pDict = {'p0': p0_total, 'p1':p1_total, 'p2':p2_total, 'p3':p3_total}
             savemat(os.path.join(saveDir, "p_window_{}.mat".format(j)), pDict)
 
