@@ -213,9 +213,13 @@ def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_sta
     cam5_norm = L2_sum(allCamsTrim, 5)
     if zero_start:
         cam6_norm = L2_sum(allCamsTrim, 6)
-    fake0_norm = L2_sum(allCamsTrim, 7)
-    fake1_norm = L2_sum(allCamsTrim, 8)
-    fake2_norm = L2_sum(allCamsTrim, 9)
+        fake0_norm = L2_sum(allCamsTrim, 7)
+        fake1_norm = L2_sum(allCamsTrim, 8)
+        fake2_norm = L2_sum(allCamsTrim, 9)
+    else:
+        fake0_norm = L2_sum(allCamsTrim, 6)
+        fake1_norm = L2_sum(allCamsTrim, 7)
+        fake2_norm = L2_sum(allCamsTrim, 8)
 
     if zero_start:
         all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, cam6_norm, fake0_norm, fake1_norm, fake2_norm])
@@ -440,7 +444,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                     continue
                 
                 if not alternative:
-                    fakeSet = set(range(0, intervalWin-1)).union(set(range(2*intervalWin, fullLen-1)))
+                    fakeSet = set(range(0, intervalWin)).union(set(range(2*intervalWin, fullLen)))
                     currentWindowSet = set(range(start, end))
                     intersection = currentWindowSet.intersection(fakeSet)
                     isFake = len(intersection) > 0 # Some frames in the window are faked
