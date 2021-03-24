@@ -20,17 +20,17 @@ def parse_args():
     parser.add_argument('--results-dir', type=str, default='Adam method Results',
                     help='Directory where results have been saved')
     parser.add_argument('--thresholds-main', nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
-    parser.add_argument('--threshold-idx-main', type=int, default=1)
+    parser.add_argument('--threshold-idx-main', type=int, default=2)
 
     parser.add_argument('--results-dir-base1', type=str, default='Mean feature method Results',
                     help='Directory where baseline 1 results have been saved')
     parser.add_argument('--thresholds-base1', nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
-    parser.add_argument('--threshold-idx-base1', type=int, default=1)
+    parser.add_argument('--threshold-idx-base1', type=int, default=2)
 
     parser.add_argument('--results-dir-base2', type=str, default='PCA method Results',
                     help='Directory where baseline 2 results have been saved')
     parser.add_argument('--thresholds-base2', nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
-    parser.add_argument('--threshold-idx-base2', type=int, default=1)
+    parser.add_argument('--threshold-idx-base2', type=int, default=2)
 
     parser.add_argument('--save-dir', type=str, default='Comparison Plots',
                     help='Directory to save results plots')
