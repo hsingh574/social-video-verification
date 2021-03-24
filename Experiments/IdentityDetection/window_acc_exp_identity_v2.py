@@ -59,22 +59,22 @@ def cluster_helper(X0, X1, X2, X3, thresh, mode='kmeans'):
         clusters2 = kmeans(X2, 2)
         clusters3 = kmeans(X3, 2)
 
-        num_fakes0, c0, p0 = detect_fakes(clusters0, X0, thresh, mode='kmeans', correct=0)
-        num_fakes1, c1, p1 = detect_fakes(clusters1, X1, thresh, mode='kmeans', correct=1)
-        num_fakes2, c2, p2 = detect_fakes(clusters2, X2, thresh, mode='kmeans', correct=2)
-        num_fakes3, c3, p3 = detect_fakes(clusters3, X3, thresh, mode='kmeans', correct=3)
+        c0, r0 = detect_fakes(clusters0, X0, thresh, mode='kmeans', correct=0)
+        c1, r1 = detect_fakes(clusters1, X1, thresh, mode='kmeans', correct=1)
+        c2, r2 = detect_fakes(clusters2, X2, thresh, mode='kmeans', correct=2)
+        c3, r3 = detect_fakes(clusters3, X3, thresh, mode='kmeans', correct=3)
     else:
         link0 = linkage(X0)
         link1 = linkage(X1)
         link2 = linkage(X2)
         link3 = linkage(X3)
 
-        num_fakes0, c0, p0 = detect_fakes(link0, X0, thresh, mode='linkage')
-        num_fakes1, c1, p1 = detect_fakes(link1, X1, thresh, mode='linkage')
-        num_fakes2, c2, p2 = detect_fakes(link2, X2, thresh, mode='linkage')
-        num_fakes3, c3, p3 = detect_fakes(link3, X3, thresh, mode='linkage')
+        c0, r0 = detect_fakes(link0, X0, thresh, mode='linkage')
+        c1, r1 = detect_fakes(link1, X1, thresh, mode='linkage')
+        c2, r2 = detect_fakes(link2, X2, thresh, mode='linkage')
+        c3, r3 = detect_fakes(link3, X3, thresh, mode='linkage')
 
-    return num_fakes0, num_fakes1, num_fakes2, num_fakes3, c0, c1, c2, c3, p0, p1, p2, p3
+    return c0, c1, c2, c3, r0, r1, r2, r3
 
 def detect_fakes(clusters, X, thresh, mode='kmeans', correct=-1):
     if mode == 'kmeans':
@@ -85,50 +85,23 @@ def detect_fakes(clusters, X, thresh, mode='kmeans', correct=-1):
         if ratio > thresh:
             # Determine which cluster each camera belongs 
             c = np.zeros(len(X))
-            confidence = np.ones(len(X))
 
-            average_dist_0 = 0
-            average_dist_1 = 0
             for i in range(len(X)):
                 dist_0 = np.linalg.norm(centroids[0]-X[i]) 
                 dist_1 = np.linalg.norm(centroids[1]-X[i])
                 if dist_0 > dist_1:
                     c[i] = 1
-                    confidence[i] *= dist_0 / (dist_1 if dist_1 > 0 else 1)
                 else:
                     c[i] = 0
-                    confidence[i] *= dist_1 / (dist_0 if dist_0 > 0 else 1)
             partition0 = len(np.argwhere(c==0))
             partition1 = len(np.argwhere(c==1))
-            numFakes = min(partition0, partition1)
 
-            # Negate the confidence of the real class so they reflect our confidence
-            # that they belong to the fake class
             if partition1 > partition0:
                 c[c==1] = 2
                 c[c==0] = 1
                 c[c==2] = 0
-
-            confidence[c==0] *= -1
         else:
-            numFakes = 0
-            c = np.ones(len(X))
-
-            confidence = np.ones(len(X))
-
-            for i in range(len(X)):
-                dist_0 = np.linalg.norm(centroids[0]-X[i]) 
-                dist_1 = np.linalg.norm(centroids[1]-X[i])
-                if dist_0 > dist_1:
-                    # Confidence we don't belong to the other cluster
-                    confidence[i] *= -1 * dist_0 / (dist_1 if dist_1 > 0 else 1)
-                    # Confidence compared to other cameras in this cluster
-                    #confidence[i] *= average_dist_1 / (dist_1 if dist_1 > 0 else 1)
-                else:
-                    # Confidence we don't belong to the other cluster
-                    confidence[i] *= -1* dist_1 / (dist_0 if dist_0 > 0 else 1)
-                    # Confidence compared to other cameras in this cluster
-                    #confidence[i] *= average_dist_0 / (dist_0 if dist_0 > 0 else 1)
+            c = np.zeros(len(X))
     else:
         link = clusters
         ratio = link[-1][2] / link[-2][-2]
@@ -138,20 +111,14 @@ def detect_fakes(clusters, X, thresh, mode='kmeans', correct=-1):
             c[c==2] = 0
             partition0 = len(np.argwhere(c==0))
             partition1 = len(np.argwhere(c==1))
-            numFakes = min(partition0, partition1)
 
             if partition1 > partition0:
                 c[c==1] = 2
                 c[c==0] = 1
                 c[c==2] = 0
-
-            confidence = np.ones(len(c)) * ratio
-            confidence[c==0] *= -1 
         else:
-            numFakes = 0
             c = np.zeros(len(X))
-            confidence = np.ones(len(c))*-1
-    return numFakes, c, confidence
+    return c, ratio
     
 def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
     #X0 is no fakes, X1 is 1 fake, etc.
@@ -249,6 +216,7 @@ def L2_sum(cams, index):
 
 def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     c = np.random.randint(2, size=4*len(cams))
+    c = np.reshape(c, (4, -1))
     confidence = np.ones(4*len(cams))
     partition0 = len(np.argwhere(c==0))
     partition1 = len(np.argwhere(c==1))
@@ -258,15 +226,9 @@ def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thre
         c[c==0] = 1
         c[c==2] = 0
 
-    confidence[c==0] *= -1
+    return c[0], c[1], c[2], c[3], 1, 1, 1, 1
 
-    c = np.reshape(c, (4, -1))
-    confidence = np.reshape(confidence, (4, -1))
-
-    return None, None, None, None, c[0], c[1], c[2], c[3], \
-        confidence[0], confidence[1], confidence[2], confidence[3]
-
-def calculate_acc_helper_old(option0, option1, c):
+def calculate_acc_helper(option0, option1, c):
     acc = np.zeros((4,))
 
     real = np.argmax(np.bincount(c.astype('int64')))
@@ -277,7 +239,7 @@ def calculate_acc_helper_old(option0, option1, c):
     
     if numFakes == correctAnswer:
         if numFakes == 0:
-            acc[1] = 1
+            acc[1] = 1 #TN
         elif (np.all(c == C)):
             acc[0] = 1 #TP, detected some number of fakes where there was some
         else:
@@ -288,8 +250,35 @@ def calculate_acc_helper_old(option0, option1, c):
         acc[3] = 1 #FN incorrectly got no fakes
     return acc
 
+def generate_prediction_confidence(option0, option1, c, ratio):
+    y = np.zeros((2,1))
+
+    real = np.argmax(np.bincount(c.astype('int64')))
+    fake = 1 if real == 0 else 0
+    C = (option1 if real == 0 else option0)
+    correctAnswer = np.count_nonzero(C == fake)
+    numFakes = np.count_nonzero(c == fake)
+    
+    if numFakes == correctAnswer:
+        if numFakes == 0:
+            y[0] = -1 * ratio
+            y[1] = 0 #TN label
+        elif (np.all(c == C)):
+            y[0] = ratio
+            y[1] = 1 #TP, detected some number of fakes where there was some
+        else:
+            y[0] = -1 * ratio
+            y[1] = 1 #FN, failed to detect some number of fakes where there was some
+    elif not(numFakes == 0):
+        y[0] = ratio
+        y[1] = 0 #FP detected some number of fakes, but was wrong number of fakes
+    else:
+        y[0] = -1 * ratio
+        y[1] = 1 #FN incorrectly got no fakes
+    return y
+
 # option1 (1 == real), option0 (0 == real)
-def calculate_acc_helper(option0, option1, c):
+def calculate_acc_helper_per_camera(option0, option1, c):
     """
     Required: from scipy.special import softmax
     
@@ -375,8 +364,6 @@ def get_cams(data, num_cams, zero_start, fullLen):
     
     return cams_list
 
-
-
 #Note: fake_cams is 0-indexed
 #Note: first fake at index 3, second at index 2, third at index 1
 
@@ -413,11 +400,6 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
     #Generate the fakes, using a standard or alternative procedure
     fake0, fake1, fake2 = split_procedure(data0, data1, data2, real_cam0, 
                                           real_cam1, real_cam2, alternative, fullLen, intervalWin)
-    
-    #total = 0
-    #for i in window_sizes:
-    #    total += max(fullLen-i, 0)
-    #pbar = tqdm(total=total, position=pos)
 
     for ind, t in enumerate(threshes):
         for ind2, j in enumerate(window_sizes):
@@ -451,8 +433,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 else:
                     isFake = True
                 
-                numFakes0, numFakes1, numFakes2, numFakes3, c0, c1, c2, c3, p0, p1, p2, p3 = \
-                    adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, t,  zero_start)
+                c0, c1, c2, c3, r0, r1, r2, r3 = adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, t, zero_start)
                     
                 if zero_start:    
                     all_ones = np.ones((num_cams+1,))
@@ -473,7 +454,6 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 triple_fake_ones[1] = 0
                 triple_fake_zeros = double_fake_zeros.copy()
                 triple_fake_zeros[1] = 1
-                
 
                 acc0[:, start] = calculate_acc_helper(all_ones, all_zeros, c0)
                 if isFake:
@@ -483,24 +463,34 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         double_fake_zeros, c2)
                     acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
                         triple_fake_zeros, c3)
+                else:
+                    acc1[:, start] = calculate_acc_helper(all_ones, all_zeros, c1)
+                    acc2[:, start] = calculate_acc_helper(all_ones, all_zeros, c2)
+                    acc3[:, start] = calculate_acc_helper(all_ones, all_zeros, c3)
 
-                p = np.hstack([p0, p1, p2, p3])
-                c = np.hstack([all_zeros, single_fake_zeros, double_fake_zeros, triple_fake_zeros])
-
-                y = np.vstack([p, c])
+                p0 = generate_prediction_confidence(all_ones, all_zeros, c0, r0)
+                if isFake:
+                    p1 = generate_prediction_confidence(single_fake_ones,
+                        single_fake_zeros, c1, r1)
+                    p2 = generate_prediction_confidence(double_fake_ones,
+                        double_fake_zeros, c2, r2)
+                    p3 = generate_prediction_confidence(triple_fake_ones,
+                        triple_fake_zeros, c3, r3)
+                else:
+                    p1 = generate_prediction_confidence(all_ones, all_zeros, c1, r1)
+                    p2 = generate_prediction_confidence(all_ones, all_zeros, c2, r2)
+                    p3 = generate_prediction_confidence(all_ones, all_zeros, c3, r3)
 
                 if start == 0:
-                    p0_total = np.vstack([p0, all_zeros])
-                    if isFake:
-                        p1_total = np.vstack([p1, single_fake_zeros])
-                        p2_total = np.vstack([p2, double_fake_zeros])
-                        p3_total = np.vstack([p3, triple_fake_zeros])
+                    p0_total = p0
+                    p1_total = p1
+                    p2_total = p2
+                    p3_total = p3
                 else:
-                    p0_total = np.hstack([p0_total, np.vstack([p0, all_zeros])])
-                    if isFake:
-                        p1_total = np.hstack([p1_total, np.vstack([p1, single_fake_zeros])])
-                        p2_total = np.hstack([p2_total, np.vstack([p2, double_fake_zeros])])
-                        p3_total = np.hstack([p3_total, np.vstack([p3, triple_fake_zeros])])
+                    p0_total = np.hstack([p0_total, p0])
+                    p1_total = np.hstack([p1_total, p1])
+                    p2_total = np.hstack([p2_total, p2])
+                    p3_total = np.hstack([p3_total, p3])
 
             saveDir = os.path.join(save_dir,"ID{}".format(i),"thresh_{}".format(ind))
             if not(os.path.isdir(saveDir)):
