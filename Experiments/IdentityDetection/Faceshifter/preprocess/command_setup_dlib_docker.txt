@@ -1,0 +1,1 @@
+docker run -itd --ipc host -v /media/eleanor/New-Volume/faceshifter/preprocess:/workspace -v /media/eleanor/New-Volume/identity-data/ID219/real/cam5/frames:/DATA -v /media/eleanor/New-Volume/identity-data/ID219/real/cam5/cropped:/RESULT --name dlib -t dlib:0.0

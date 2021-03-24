@@ -1,0 +1,1 @@
+python3 embedding_npy_to_mat.py --input_dir_fake /home/socialvv/socialvv/ID1-identity/cam2-identity/identity_embeddings --input_dir_real /media/eleanor/New-Volume/deepfake-data/Dataset/ID1 --faked_cam 2 --num_frames 900 --ID 1 --output_dir results

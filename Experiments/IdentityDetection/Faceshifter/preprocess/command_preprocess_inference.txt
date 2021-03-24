@@ -1,0 +1,1 @@
+python preprocess_inference.py --frames_dir /DATA --output_dir /RESULT

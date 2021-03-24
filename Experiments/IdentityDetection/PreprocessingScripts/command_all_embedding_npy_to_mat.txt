@@ -1,0 +1,1 @@
+python all_embedding_npy_to_mat.py --root ../ID219 --num_cams 7 --faked_cams 1 3 5 --ID 219 --experiment_dir ~/social-video-verification-v2/social-video-verification/Experiments/IdentityDetection/Data/

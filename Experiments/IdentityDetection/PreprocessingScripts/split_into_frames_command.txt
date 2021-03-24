@@ -1,0 +1,1 @@
+ffmpeg -i *.mp4 -loglevel quiet -q:v 2 frames/frames%04d.jpg

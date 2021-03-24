@@ -1,0 +1,1 @@
+bash -i preprocess_inference.bash /media/eleanor/New-Volume/identity-data/ID63/ /media/eleanor/New-Volume/deepfake-data/Dataset/DeepForensicsReal/ID63/ /media/eleanor/New-Volume/faceshifter/preprocess/
