@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_false',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9])
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     parser.add_argument("--num-jobs", type=int, default=-1)
     
