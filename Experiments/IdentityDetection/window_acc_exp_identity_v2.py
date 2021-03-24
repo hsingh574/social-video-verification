@@ -433,7 +433,7 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                 else:
                     isFake = True
                 
-                c0, c1, c2, c3, r0, r1, r2, r3 = PCA_method(cams, fake0, fake1, fake2, start, end, num_pcs, t, zero_start)
+                c0, c1, c2, c3, r0, r1, r2, r3 = mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, t, zero_start)
                     
                 if zero_start:    
                     all_ones = np.ones((num_cams+1,))
