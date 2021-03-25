@@ -1,0 +1,586 @@
+#!/usr/bin/env python3
+
+# -*- coding: utf-8 -*-
+import argparse
+import os
+import re
+import numpy as np
+from matplotlib import pyplot as plt
+from tqdm import tqdm
+from sklearn.decomposition import PCA
+from rpca import *
+from scipy.io import loadmat, savemat
+from scipy.cluster.hierarchy import linkage, fcluster
+from scipy.cluster.vq import kmeans, whiten
+from scipy.special import softmax
+from collections import defaultdict, Counter
+
+from joblib import Parallel, delayed
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
+
+    parser.add_argument('--data-dir', type=str, default='DataEleanorShort',
+                    help='Directory where processed landmark files live')
+    parser.add_argument('--num_pcs', type=int, default=5,
+                    help='Number of principal components to use')
+    parser.add_argument('--save-dir', type=str, default='Results',
+                    help='Directory to save results')
+    parser.add_argument('--zero-start', action='store_false',
+                    help='Whether or not there is a cam0')
+    parser.add_argument("--num-cams", type=int, default=6)
+    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3])
+    parser.add_argument("--window-sizes", nargs="+", default=[50, 150, 250, 350])
+    parser.add_argument("--num-jobs", type=int, default=-1)
+    
+    args = parser.parse_args()
+    return args
+
+def mahalanobis(T, eigenval):
+    cov = np.linalg.pinv(np.diag(eigenval.T))
+    return np.sqrt(np.sum(np.multiply(np.matmul(T, cov), T), axis=1)) #T @ cov, T), axis = 1))
+
+def mahalanobis_calculate(data, num_pcs, useRPCA = True):
+    if useRPCA:
+        data, _, _, _ = stoc_rpca(data, 100)
+    pca = PCA(num_pcs)
+    T = pca.fit_transform(data)
+    eigenval = pca.explained_variance_
+    return mahalanobis(T, eigenval)
+
+def cluster_helper(X0, X1, X2, X3, thresh, mode='linkage'):   
+    if mode == 'kmeans':
+        X0 = whiten(X0)
+        X1 = whiten(X1)
+        X2 = whiten(X2)
+        X3 = whiten(X3)
+        clusters0 = kmeans(X0, 2)
+        clusters1 = kmeans(X1, 2)
+        clusters2 = kmeans(X2, 2)
+        clusters3 = kmeans(X3, 2)
+
+        c0, r0 = detect_fakes(clusters0, X0, thresh, mode='kmeans', correct=0)
+        c1, r1 = detect_fakes(clusters1, X1, thresh, mode='kmeans', correct=1)
+        c2, r2 = detect_fakes(clusters2, X2, thresh, mode='kmeans', correct=2)
+        c3, r3 = detect_fakes(clusters3, X3, thresh, mode='kmeans', correct=3)
+    else:
+        badInds = []
+        for i, row in enumerate(X0.T):
+            if np.max(row) >= 10:
+                badInds.append(i)
+        
+        X0 = np.delete(X0, badInds, axis = 1)
+        X1 = np.delete(X1, badInds, axis = 1)
+        X2 = np.delete(X2, badInds, axis = 1)
+        X3 = np.delete(X3, badInds, axis = 1)
+
+        link0 = linkage(X0)
+        link1 = linkage(X1)
+        link2 = linkage(X2)
+        link3 = linkage(X3)
+
+        c0, r0 = detect_fakes(link0, X0, thresh, mode='linkage')
+        c1, r1 = detect_fakes(link1, X1, thresh, mode='linkage')
+        c2, r2 = detect_fakes(link2, X2, thresh, mode='linkage')
+        c3, r3 = detect_fakes(link3, X3, thresh, mode='linkage')
+
+    return c0, c1, c2, c3, r0, r1, r2, r3
+
+def detect_fakes(clusters, X, thresh, mode='kmeans', correct=-1):
+    if mode == 'kmeans':
+        centroids, mean_distance = clusters
+
+        ratio = np.linalg.norm(centroids[0]-centroids[1]) / mean_distance
+
+        if ratio > thresh:
+            # Determine which cluster each camera belongs 
+            c = np.zeros(len(X))
+
+            for i in range(len(X)):
+                dist_0 = np.linalg.norm(centroids[0]-X[i]) 
+                dist_1 = np.linalg.norm(centroids[1]-X[i])
+                if dist_0 > dist_1:
+                    c[i] = 1
+                else:
+                    c[i] = 0
+            partition0 = len(np.argwhere(c==0))
+            partition1 = len(np.argwhere(c==1))
+
+            if partition1 > partition0:
+                c[c==1] = 2
+                c[c==0] = 1
+                c[c==2] = 0
+        else:
+            c = np.zeros(len(X))
+    else:
+        link = clusters
+        ratio = link[-1][2] / link[-2][-2]
+
+        if ratio > thresh:
+            c = fcluster(link, 2, criterion='maxclust')
+            c[c==2] = 0
+            partition0 = len(np.argwhere(c==0))
+            partition1 = len(np.argwhere(c==1))
+
+            if partition1 > partition0:
+                c[c==1] = 2
+                c[c==0] = 1
+                c[c==2] = 0
+        else:
+            c = np.zeros(len(X))
+    return c, ratio
+    
+def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
+    #X0 is no fakes, X1 is 1 fake, etc.
+    X0 = np.array(camsOut)
+    #print(X0)
+    temp = X0.copy()
+    temp[3] = fake0Out
+    X1 = temp
+    temp = X1.copy()
+    temp[2] = fake1Out
+    X2 = temp
+    temp = X2.copy()
+    temp[1] = fake2Out
+    X3 = temp
+    
+    return X0, X1, X2, X3
+
+def l2_calculate(data, upper_lip_start, lower_lip_start, num_points):
+    
+    length = len(data)
+    upper_lip = data[:, upper_lip_start:(upper_lip_start+num_points)]
+    lower_lip = data[:, lower_lip_start:(lower_lip_start+num_points)]
+    
+    #upper_lip = np.reshape(upper_lip, (length, -1, 2))
+    #lower_lip = np.reshape(lower_lip, (length, -1, 2))
+    
+    return np.linalg.norm(upper_lip - lower_lip, axis = -1)
+
+def onlyL2(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    
+    #Can tweak these later to check performance on other facial landmarks
+    upper_lip_start = 0
+    lower_lip_start = 14
+    num_points = 4
+    
+    camsOut = []
+    for c in cams:
+        camsOut.append(l2_calculate(c[start:end,:], upper_lip_start, lower_lip_start, num_points))
+    
+    fake0Out = l2_calculate(fake0[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    fake1Out = l2_calculate(fake1[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    fake2Out = l2_calculate(fake2[start:end,:], upper_lip_start, lower_lip_start, num_points)
+    
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    
+    return cluster_helper(X0, X1, X2, X3, thresh)
+
+def PCA_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    
+    camsOut = []
+    for c in cams:
+        camsOut.append(mahalanobis_calculate(c[start:end,:], num_pcs))
+    
+    fake0Out = mahalanobis_calculate(fake0[start:end,:], num_pcs)
+    fake1Out = mahalanobis_calculate(fake1[start:end,:], num_pcs)
+    fake2Out = mahalanobis_calculate(fake2[start:end,:], num_pcs)
+    
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    
+    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
+
+def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    camsOut = []
+
+    for c in cams:
+        camsOut.append(np.mean(c[start:end], axis=0))
+    fake0Out = np.mean(fake0[start:end], axis=0)
+    fake1Out = np.mean(fake1[start:end], axis=0)
+    fake2Out = np.mean(fake2[start:end], axis=0)
+
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
+
+def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    allCamsTrim = []
+
+    for c in cams:
+        allCamsTrim.append(c[start:end, :])
+
+    allCamsTrim.append(fake0[start:end, :])
+    allCamsTrim.append(fake1[start:end, :])
+    allCamsTrim.append(fake2[start:end, :])
+
+    cam0_norm = L2_sum(allCamsTrim, 0)
+    cam1_norm = L2_sum(allCamsTrim, 1)
+    cam2_norm = L2_sum(allCamsTrim, 2)
+    cam3_norm = L2_sum(allCamsTrim, 3)
+    cam4_norm = L2_sum(allCamsTrim, 4)
+    cam5_norm = L2_sum(allCamsTrim, 5)
+    if zero_start:
+        cam6_norm = L2_sum(allCamsTrim, 6)
+        fake0_norm = L2_sum(allCamsTrim, 7)
+        fake1_norm = L2_sum(allCamsTrim, 8)
+        fake2_norm = L2_sum(allCamsTrim, 9)
+    else:
+        fake0_norm = L2_sum(allCamsTrim, 6)
+        fake1_norm = L2_sum(allCamsTrim, 7)
+        fake2_norm = L2_sum(allCamsTrim, 8)
+
+    if zero_start:
+        all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, cam6_norm, fake0_norm, fake1_norm, fake2_norm])
+    else:
+        all_cams = np.vstack([cam0_norm, cam1_norm, cam2_norm, cam3_norm, cam4_norm, cam5_norm, fake0_norm, fake1_norm, fake2_norm])
+    mean_all_cams = np.mean(all_cams)
+    std_all_cams = np.std(all_cams)
+    
+    all_cams -= mean_all_cams
+    all_cams /= std_all_cams
+
+    if zero_start:
+        X0, X1, X2, X3 = build_test_arrays(all_cams[0:7], all_cams[7], all_cams[8], all_cams[9])
+    else:
+        X0, X1, X2, X3 = build_test_arrays(all_cams[0:6], all_cams[6], all_cams[7], all_cams[8])
+    
+    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
+
+def L2_sum(cams, index):
+    curr_cam = cams[index]
+    other_cams = cams.copy()
+    other_cams.pop(index)
+    sum = 0
+    for cam in other_cams:
+        sum += np.linalg.norm(cam - curr_cam, axis = 1)
+    return sum
+
+def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    c = np.random.randint(2, size=4*len(cams))
+    c = np.reshape(c, (4, -1))
+    confidence = np.ones(4*len(cams))
+    partition0 = len(np.argwhere(c==0))
+    partition1 = len(np.argwhere(c==1))
+
+    if partition1 > partition0:
+        c[c==1] = 2
+        c[c==0] = 1
+        c[c==2] = 0
+
+    return c[0], c[1], c[2], c[3], 1, 1, 1, 1
+
+def calculate_acc_helper(option0, option1, c):
+    acc = np.zeros((4,))
+
+    real = np.argmax(np.bincount(c.astype('int64')))
+    fake = 1 if real == 0 else 0
+    C = (option1 if real == 0 else option0)
+    correctAnswer = np.count_nonzero(C == fake)
+    numFakes = np.count_nonzero(c == fake)
+    
+    if numFakes == correctAnswer:
+        if numFakes == 0:
+            acc[1] = 1 #TN
+        elif (np.all(c == C)):
+            acc[0] = 1 #TP, detected some number of fakes where there was some
+        else:
+            acc[3] = 1 #FN, failed to detect some number of fakes where there was some
+    elif not(numFakes == 0):
+        acc[2] = 1 #FP deteected some number of fakes, but was wrong number of fakes
+    else:
+        acc[3] = 1 #FN incorrectly got no fakes
+    return acc
+
+def generate_prediction_confidence(option0, option1, c, ratio):
+    y = np.zeros((2,1))
+
+    real = np.argmax(np.bincount(c.astype('int64')))
+    fake = 1 if real == 0 else 0
+    C = (option1 if real == 0 else option0)
+    correctAnswer = np.count_nonzero(C == fake)
+    numFakes = np.count_nonzero(c == fake)
+    
+    if numFakes == correctAnswer:
+        if numFakes == 0:
+            y[0] = -1 * ratio
+            y[1] = 0 #TN label
+        elif (np.all(c == C)):
+            y[0] = ratio
+            y[1] = 1 #TP, detected some number of fakes where there was some
+        else:
+            y[0] = -1 * ratio
+            y[1] = 1 #FN, failed to detect some number of fakes where there was some
+    elif not(numFakes == 0):
+        y[0] = ratio
+        y[1] = 0 #FP detected some number of fakes, but was wrong number of fakes
+    else:
+        y[0] = -1 * ratio
+        y[1] = 1 #FN incorrectly got no fakes
+    return y
+
+# option1 (1 == real), option0 (0 == real)
+def calculate_acc_helper_per_camera(option0, option1, c):
+    """
+    Required: from scipy.special import softmax
+    
+    Justifying examples:
+    C = [1  1  1  2  1  1  1]   (2 == fake)
+    c = [1  1  1  1  1  1  1]
+
+        Of the real videos, we have gotten all of them correct,
+        giving us a preadjustment TN rating of 1. 
+        Of the fake videos we have gotten them all wrong, giving
+        us a preadjustment FN rating of 1.
+
+        [0  1  0  1] ==> softmax[-inf  1  -inf  1] ==> [0  0.5  0  0.5]
+
+    C = [1  2  2  2  1  1  1]
+    c = [1  1  1  2  1  1  2]
+
+        Of the real videos, we have correctly classified 3/4 (TN) of them 
+        and incorrectly classified 1/4 of them (FP).
+        Of the fake videos, we have correctly classified 1/3 (TP) of them
+        and incorrectly classified 2/3 of them (FN).
+
+        [.33  .75  .25  .66] ==> softmax[.33  .75  .25  .66] ~~> [.21  .31  .19  .29]
+    """
+    acc = np.zeros((4,))
+
+    real = np.argmax(np.bincount(c.astype('int64')))
+    fake = 1 if real == 0 else 0
+    C = (option1 if real == 0 else option0)
+    number_of_fakes = np.count_nonzero(C == fake)
+
+    for correct_guess, guess in zip(C, c):
+        if correct_guess == guess == fake:
+            acc[0] += 1/number_of_fakes #TP
+        elif correct_guess == guess == real:
+            acc[1] += 1/(len(c)-number_of_fakes) #TN
+        elif correct_guess != guess == fake:
+            acc[2] += 1/(len(c)-number_of_fakes) #FP
+        elif correct_guess != guess == real:
+            acc[3] += 1/number_of_fakes #FN
+   
+    acc[acc==0] = -np.inf
+
+    return softmax(acc)
+    #return acc
+
+def split_procedure(data0, data1, data2, real_cam0, real_cam1, 
+                    real_cam2, alternative, fullLen, intervalWin):
+    
+    #split into two thirds (fake, real, fake)
+    if not alternative:
+        fake0 = np.vstack([data0['fake'][:intervalWin,:], 
+                           real_cam0[intervalWin:(2*intervalWin),:], 
+                           data0['fake'][(2*intervalWin):fullLen,:]])
+    
+        fake1 = np.vstack([data1['fake'][:intervalWin,:], 
+                           real_cam1[intervalWin:(2*intervalWin),:], 
+                           data1['fake'][(2*intervalWin):fullLen,:]])
+    
+        fake2 = np.vstack([data2['fake'][:intervalWin,:], 
+                           real_cam2[intervalWin:(2*intervalWin),:], 
+                           data2['fake'][(2*intervalWin):fullLen,:]])
+    else:
+        #alternative procedure: keep the fake as a fake throughout all frames
+        fake0 = data0['fake'][:fullLen,:]
+        fake1 = data1['fake'][:fullLen,:]
+        fake2 = data2['fake'][:fullLen,:]
+        
+    return fake0, fake1, fake2
+    
+    
+#Note: zero_start is whether or not there is a cam0    
+
+def get_cams(data, num_cams, zero_start, fullLen):
+    
+    cams_list = []
+    if zero_start:
+        for i in range(num_cams+1):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    else:
+        for i in range(1, num_cams+1):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    
+    return cams_list
+
+#Note: fake_cams is 0-indexed
+#Note: first fake at index 3, second at index 2, third at index 1
+
+def gen_results(i, fake_cams, num_cams, zero_start, data_dir, 
+                alternative, threshes, window_sizes, num_pcs, save_dir):
+    data0 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[0], i))) 
+    data1 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[1], i)))
+    data2 = loadmat(os.path.join(data_dir, "mouth-data-fake{}-ID{}.mat".format(fake_cams[2], i)))
+
+    fullLen = min(data0['cam1'].shape[0], data1['cam1'].shape[0], data2['cam1'].shape[0])
+    intervalWin = fullLen // 3
+    
+    #Get the non-faked camera views. Arbitrarily pick data1
+    #because the non-faked views should be the same across all 
+    #files for a given ID    
+    cams = get_cams(data1, num_cams, zero_start, fullLen)
+
+    #Get the real camera to weave in with the fake camera
+    try:
+        if zero_start:
+            real_cam0 = cams[fake_cams[0]]
+            real_cam1 = cams[fake_cams[1]]
+            real_cam2 = cams[fake_cams[2]]
+        else:
+            real_cam0 = cams[fake_cams[0]-1]
+            real_cam1 = cams[fake_cams[1]-1]
+            real_cam2 = cams[fake_cams[2]-1]
+    except IndexError:
+        print("Number of cams",len(cams))
+        print('First Fake cam: ',fake_cams[0])
+        print('Second Fake cam: ',fake_cams[1])
+        print('Third Fake cam: ',fake_cams[2])
+    
+    #Generate the fakes, using a standard or alternative procedure
+    fake0, fake1, fake2 = split_procedure(data0, data1, data2, real_cam0, 
+                                          real_cam1, real_cam2, alternative, fullLen, intervalWin)
+
+    for ind, t in enumerate(threshes):
+        for ind2, j in enumerate(window_sizes):
+            print('Working on window size', str(j), 'for ID', str(i))
+            numWin = fullLen - j
+            if numWin <= 0:
+                print("Skipping  window size " + str(j) + " for ID " + str(i) + " , as it is larger than the total number of available frames")
+                continue
+
+
+            acc0 = np.zeros((4, numWin))
+            acc1 = np.zeros((4, numWin))
+            acc2 = np.zeros((4, numWin))
+            acc3 = np.zeros((4, numWin))
+
+            p0_total = None
+            p1_total = None
+            p2_total = None
+            p3_total = None
+
+            for start in range(fullLen):
+                end = start + j
+                #pbar.update(1)
+                if end > fullLen-1:
+                    continue
+                
+                if not alternative:
+                    fakeSet = set(range(0, intervalWin)).union(set(range(2*intervalWin, fullLen)))
+                    currentWindowSet = set(range(start, end))
+                    intersection = currentWindowSet.intersection(fakeSet)
+                    isFake = len(intersection) > 0 # Some frames in the window are faked
+                else:
+                    isFake = True
+                
+                c0, c1, c2, c3, r0, r1, r2, r3 = PCA_method(cams, fake0, fake1, fake2, start, end, num_pcs, t, zero_start)
+                    
+                if zero_start:    
+                    all_ones = np.ones((num_cams+1,))
+                    all_zeros = np.zeros((num_cams+1,))
+                else:
+                    all_ones = np.ones((num_cams,))
+                    all_zeros = np.zeros((num_cams,))
+                    
+                single_fake_ones = all_ones.copy()
+                single_fake_ones[3] = 0
+                single_fake_zeros = all_zeros.copy()
+                single_fake_zeros[3] = 1
+                double_fake_ones = single_fake_ones.copy()
+                double_fake_ones[2] = 0
+                double_fake_zeros = single_fake_zeros.copy()
+                double_fake_zeros[2] = 1
+                triple_fake_ones = double_fake_ones.copy()
+                triple_fake_ones[1] = 0
+                triple_fake_zeros = double_fake_zeros.copy()
+                triple_fake_zeros[1] = 1
+
+                acc0[:, start] = calculate_acc_helper(all_ones, all_zeros, c0)
+                if isFake:
+                    acc1[:, start] = calculate_acc_helper(single_fake_ones, 
+                        single_fake_zeros, c1)
+                    acc2[:,start] = calculate_acc_helper(double_fake_ones, 
+                        double_fake_zeros, c2)
+                    acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
+                        triple_fake_zeros, c3)
+                else:
+                    acc1[:, start] = calculate_acc_helper(all_ones, all_zeros, c1)
+                    acc2[:, start] = calculate_acc_helper(all_ones, all_zeros, c2)
+                    acc3[:, start] = calculate_acc_helper(all_ones, all_zeros, c3)
+
+                p0 = generate_prediction_confidence(all_ones, all_zeros, c0, r0)
+                if isFake:
+                    p1 = generate_prediction_confidence(single_fake_ones,
+                        single_fake_zeros, c1, r1)
+                    p2 = generate_prediction_confidence(double_fake_ones,
+                        double_fake_zeros, c2, r2)
+                    p3 = generate_prediction_confidence(triple_fake_ones,
+                        triple_fake_zeros, c3, r3)
+                else:
+                    p1 = generate_prediction_confidence(all_ones, all_zeros, c1, r1)
+                    p2 = generate_prediction_confidence(all_ones, all_zeros, c2, r2)
+                    p3 = generate_prediction_confidence(all_ones, all_zeros, c3, r3)
+
+                if start == 0:
+                    p0_total = p0
+                    p1_total = p1
+                    p2_total = p2
+                    p3_total = p3
+                else:
+                    p0_total = np.hstack([p0_total, p0])
+                    p1_total = np.hstack([p1_total, p1])
+                    p2_total = np.hstack([p2_total, p2])
+                    p3_total = np.hstack([p3_total, p3])
+
+            saveDir = os.path.join(save_dir,"ID{}".format(i),"thresh_{}".format(ind))
+            if not(os.path.isdir(saveDir)):
+                os.makedirs(saveDir)
+
+            saveDict = {'acc0':acc0, 'acc1': acc1, 
+                        'acc2':acc2, 'acc3': acc3, 
+                        'thresh': t, 'window_size':j }
+            savemat(os.path.join(saveDir,"window_{}.mat".format(j)), saveDict)
+
+            pDict = {'p0': p0_total, 'p1':p1_total, 'p2':p2_total, 'p3':p3_total}
+            savemat(os.path.join(saveDir, "p_window_{}.mat".format(j)), pDict)
+
+def main():  
+    
+    args = parse_args()
+    
+    ids = set()
+    fake_cams_dict = defaultdict(list)
+    
+    for f in os.listdir(args.data_dir):
+        try:
+            x = re.search(r"fake([0-9]*)-ID([0-9]*).mat", f)
+            ID = int(x.group(2))
+            fake_cam = int(x.group(1))
+            fake_cams_dict[ID].append(fake_cam)
+            ids.add(ID)
+        except AttributeError:
+            continue
+        
+    exclude_list  = [17]
+    ids = [i for i in ids if i not in exclude_list] 
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
+    ids = [1,2,3,4,5,6,7,8]
+
+    print(len(fake_cams_dict.keys()))
+    
+    #whether or not to use alternative procedure for fakes#
+    alternative = False
+    
+# =============================================================================
+#     for i in ids:
+#         gen_results(i, args.data_dir, alternative, threshes, window_sizes, args.num_pcs, args.save_dir)
+# =============================================================================
+    Parallel(n_jobs=args.num_jobs)(delayed(gen_results)(i, fake_cams_dict[i], 
+             args.num_cams, args.zero_start, args.data_dir, alternative, args.thresholds, 
+             args.window_sizes, args.num_pcs, args.save_dir) for i in ids)
+
+
+if __name__ == "__main__":
+    main()
