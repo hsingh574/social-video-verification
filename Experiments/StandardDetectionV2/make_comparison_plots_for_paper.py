@@ -253,11 +253,11 @@ def main():
     window_sizes = args.window_sizes
     
     window_size = 20
-    thresholds = {'Ours':args.thresholds_main, 'Mean feature': args.thresholds_base1, 'PCA': args.thresholds_base2}
-    threshold_idx = {'Ours':args.threshold_idx_main, 'Mean feature': args.threshold_idx_base1, 'PCA': args.threshold_idx_base2}
+    thresholds = {'Exhaustive L2':args.thresholds_main, 'L2': args.thresholds_base1, 'Classical PCA': args.thresholds_base2}
+    threshold_idx = {'Exhaustive L2':args.threshold_idx_main, 'L2': args.threshold_idx_base1, 'Classical PCA': args.threshold_idx_base2}
 
     # Change dictionary entry titles depending on your baselines/baseline order input
-    results = {'Ours':args.results_dir, 'Mean feature': args.results_dir_base1, 'PCA': args.results_dir_base2}
+    results = {'Exhaustive L2':args.results_dir, 'L2': args.results_dir_base1, 'Classical PCA': args.results_dir_base2}
     thresholds
 
     plot_vs_baselines_acc(ids, window_sizes, thresholds, threshold_idx, results, args.save_dir)
