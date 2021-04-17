@@ -17,17 +17,17 @@ def parse_args():
     parser.add_argument('--data-dir', type=str, default='Data',
                     help='Directory where data has been saved')
     
-    parser.add_argument('--results-dir', type=str, default='Adam method Results',
+    parser.add_argument('--results-dir', type=str, default='Exhaustive L2 Results',
                     help='Directory where results have been saved')
     parser.add_argument('--thresholds-main', nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9])
     parser.add_argument('--threshold-idx-main', type=int, default=3)
 
-    parser.add_argument('--results-dir-base1', type=str, default='Mean feature method Results',
+    parser.add_argument('--results-dir-base1', type=str, default='Mean Results',
                     help='Directory where baseline 1 results have been saved')
     parser.add_argument('--thresholds-base1', nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9])
     parser.add_argument('--threshold-idx-base1', type=int, default=0)
 
-    parser.add_argument('--results-dir-base2', type=str, default='PCA method Results',
+    parser.add_argument('--results-dir-base2', type=str, default='PCA Results',
                     help='Directory where baseline 2 results have been saved')
     parser.add_argument('--thresholds-base2', nargs="+", default=[1.05, 1.1, 1.15, 1.2])
     parser.add_argument('--threshold-idx-base2', type=int, default=1)
@@ -253,11 +253,11 @@ def main():
     window_sizes = args.window_sizes
     
     window_size = 20
-    thresholds = {'Ours':args.thresholds_main, 'Mean feature': args.thresholds_base1, 'PCA': args.thresholds_base2}
-    threshold_idx = {'Ours':args.threshold_idx_main, 'Mean feature': args.threshold_idx_base1, 'PCA': args.threshold_idx_base2}
+    thresholds = {'Exhaustive L2':args.thresholds_main, 'L2': args.thresholds_base1, 'PCA': args.thresholds_base2}
+    threshold_idx = {'Exhaustive L2':args.threshold_idx_main, 'L2': args.threshold_idx_base1, 'PCA': args.threshold_idx_base2}
 
     # Change dictionary entry titles depending on your baselines/baseline order input
-    results = {'Ours':args.results_dir, 'Mean feature': args.results_dir_base1, 'PCA': args.results_dir_base2}
+    results = {'Exhaustive L2':args.results_dir, 'L2': args.results_dir_base1, 'PCA': args.results_dir_base2}
     thresholds
 
     plot_vs_baselines_acc(ids, window_sizes, thresholds, threshold_idx, results, args.save_dir)

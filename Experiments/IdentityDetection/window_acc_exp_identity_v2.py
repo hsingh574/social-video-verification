@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--zero-start', action='store_false',
                     help='Whether or not there is a cam0')
     parser.add_argument("--num-cams", type=int, default=6)
-    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
+    parser.add_argument("--thresholds", nargs="+", default=[1.05, 1.1, 1.15, 1.2])#[1.2, 1.3, 1.5, 1.7, 1.9])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     parser.add_argument("--num-jobs", type=int, default=-1)
     
@@ -162,6 +162,21 @@ def mean_feature_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, 
     X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
     return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
 
+def L2_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    camsOut = []
+
+    for c in cams:
+        camsOut.append(c[start:end])
+    fake0Out = fake0[start:end]
+    fake1Out = fake1[start:end]
+    fake2Out = fake2[start:end]
+
+    X0, X1, X2, X3 = build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out)
+
+    print(X0.shape)
+
+    return cluster_helper(X0, X1, X2, X3, thresh, mode='linkage')
+
 def adam_method(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
     allCamsTrim = []
 
@@ -227,6 +242,11 @@ def chance_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thre
         c[c==2] = 0
 
     return c[0], c[1], c[2], c[3], 1, 1, 1, 1
+
+def naive_performance_test(cams, fake0, fake1, fake2, start, end, num_pcs, thresh, zero_start):
+    zeros = np.zeros(len(cams))
+
+    return zeros, zeros, zeros, zeros, 1, 1, 1, 1
 
 def calculate_acc_helper(option0, option1, c):
     acc = np.zeros((4,))
@@ -463,10 +483,10 @@ def gen_results(i, fake_cams, num_cams, zero_start, data_dir,
                         double_fake_zeros, c2)
                     acc3[:,start] = calculate_acc_helper(triple_fake_ones, 
                         triple_fake_zeros, c3)
-                else:
-                    acc1[:, start] = calculate_acc_helper(all_ones, all_zeros, c1)
-                    acc2[:, start] = calculate_acc_helper(all_ones, all_zeros, c2)
-                    acc3[:, start] = calculate_acc_helper(all_ones, all_zeros, c3)
+                #else:
+                #    acc1[:, start] = calculate_acc_helper(all_ones, all_zeros, c1)
+                #    acc2[:, start] = calculate_acc_helper(all_ones, all_zeros, c2)
+                #    acc3[:, start] = calculate_acc_helper(all_ones, all_zeros, c3)
 
                 p0 = generate_prediction_confidence(all_ones, all_zeros, c0, r0)
                 if isFake:

@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument('--save-dir', type=str, default='Plots',
                     help='Directory to save results plots')
     
-    parser.add_argument("--thresholds", nargs="+", default=[1.2, 1.3, 1.5, 1.7, 1.9, 2.1, 2.5])
+    parser.add_argument("--thresholds", nargs="+", default=[1.05, 1.1, 1.15, 1.2])#[1.2, 1.3, 1.5, 1.7, 1.9])
     parser.add_argument("--window-sizes", nargs="+", default=[10, 20, 30, 40, 50, 60])
     
     
