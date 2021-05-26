@@ -1,17 +1,11 @@
 import argparse
 import os
 import re
-import sys
-import math
 import networkx as nx
-from numpy.core.numeric import full
-import dimod
-import dwave_networkx as dnx
 import itertools
 import more_itertools
 import numpy as np
 import scipy.stats as st
-import matplotlib.pyplot as plt
 from scipy.io import loadmat, savemat
 from collections import defaultdict
 from matplotlib import pyplot as plt
@@ -24,15 +18,21 @@ def parse_args():
                     help='Directory where processed landmark files live')
     parser.add_argument('--save-dir', type=str, default='Results',
                     help='Directory to save results')
-    parser.add_argument("--num-cams", type=int, default=7)
+    parser.add_argument("--num-cams", type=int, default=6)
+    parser.add_argument('--zero-start', action='store_false',
+                    help='Whether or not there is a cam0')
     
     args = parser.parse_args()
     return args
 
-def get_cams(data, num_cams, fullLen):
+def get_cams(data, num_cams, fullLen, zero_start):
     cams_list = []
-    for i in range(num_cams):
-        cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    if zero_start:
+        for i in range(num_cams+1):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
+    else:
+        for i in range(1, num_cams+1):
+            cams_list.append(data['cam{}'.format(i)][:fullLen,:])
     
     return cams_list
 
@@ -51,7 +51,7 @@ def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
     
     return X0, X1, X2, X3
 
-def gen_results(ID, fake_cams, data_dir, num_cams):
+def gen_results(ID, fake_cams, data_dir, num_cams, zero_start):
     data0 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[0], ID))) 
     data1 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[1], ID)))
     data2 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[2], ID)))
@@ -65,28 +65,32 @@ def gen_results(ID, fake_cams, data_dir, num_cams):
     #Get the non-faked camera views. Arbitrarily pick data1
     #because the non-faked views should be the same across all 
     #files for a given ID    
-    cams = get_cams(data1, num_cams, num_frames)
+    cams = get_cams(data1, num_cams, num_frames, zero_start)
 
     X0, X1, X2, X3 = build_test_arrays(cams, fake0, fake1, fake2)
 
-    U = set(range(num_cams))
+    if zero_start:
+        U = set(range(num_cams+1))
+    else:
+        U = set(range(num_cams))
+    
     L0 = {}
     L1 = {3}
     L2 = {2,3}
     L3 = {1,2,3}
 
     correct = [
-        graph_cut_partition(num_frames, num_cams, X0, L0, U),
-        graph_cut_partition(num_frames, num_cams, X1, L1, U),
-        graph_cut_partition(num_frames, num_cams, X2, L2, U),
-        graph_cut_partition(num_frames, num_cams, X3, L3, U),
+        graph_cut_partition(num_frames, X0, L0, U),
+        graph_cut_partition(num_frames, X1, L1, U),
+        graph_cut_partition(num_frames, X2, L2, U),
+        graph_cut_partition(num_frames, X3, L3, U),
     ]
 
     total = num_frames
 
     return correct, total
     
-def graph_cut_partition(num_frames, num_cams, X, L, U):
+def graph_cut_partition(num_frames, X, L, U):
     correct = 0
     for frame in range(num_frames):
         G = nx.Graph()
@@ -172,7 +176,7 @@ def main():
     correct = [0,0,0,0]
     total = 0
     for id in tqdm(ids):
-        c, t = gen_results(id, fake_cams_dict[219], args.data_dir, args.num_cams)
+        c, t = gen_results(id, fake_cams_dict[219], args.data_dir, args.num_cams, args.zero_start)
         for i in range(len(c)):
             correct[i] += c[i]
         total += t
