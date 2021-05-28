@@ -1,15 +1,20 @@
 import argparse
 import os
 import re
+from more_itertools.more import interleave
 import networkx as nx
 import itertools
 import more_itertools
 import numpy as np
 import scipy.stats as st
+from dip import diptst
+from unidip import *
 from scipy.io import loadmat, savemat
 from collections import defaultdict
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+
+from joblib import Parallel, delayed
 
 def parse_args():
     parser = argparse.ArgumentParser(description='DeepFake Detection Experiment')
@@ -51,7 +56,7 @@ def build_test_arrays(camsOut, fake0Out, fake1Out, fake2Out):
     
     return X0, X1, X2, X3
 
-def gen_results(ID, fake_cams, data_dir, num_cams, zero_start):
+def gen_results(ID, fake_cams, data_dir, num_cams, zero_start, save_dir):
     data0 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[0], ID))) 
     data1 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[1], ID)))
     data2 = loadmat(os.path.join(data_dir, "fake{}-ID{}.mat".format(fake_cams[2], ID)))
@@ -92,7 +97,7 @@ def gen_results(ID, fake_cams, data_dir, num_cams, zero_start):
     
 def graph_cut_partition(num_frames, X, L, U):
     correct = 0
-    for frame in range(num_frames):
+    for frame in range(num_frames): #tqdm(range(num_frames)):
         G = nx.Graph()
         G.add_nodes_from(U)
 
@@ -104,16 +109,38 @@ def graph_cut_partition(num_frames, X, L, U):
         for (i, j) in itertools.combinations(U, 2):
             l2 = np.linalg.norm(X[i, frame, :] - X[j, frame, :], axis = 0)
             l2s.insert(0, l2)
-        mean = np.mean(l2s)
-        std = np.std(l2s)
 
-        # Weight each l2 value according to the its probablity and add its value to the
-        # appropriate edge in the graph.
+        # Calculate the probability that the distribution of l2s is unimodal. When there are 0
+        # fakes we expect the distribution to be a single normal curve. When there are some number
+        # of fakes we expect to see another area of density to the far right which represents the
+        # distribution of l2s for edges connecting real and fake nodes.
+
+        dat = sorted(l2s)
+        _, pval, _ = diptst(dat, False, 100)
+        intervals = UniDip(dat, alpha=0.25).run()
+
+        if intervals:
+            leftmost_dist = intervals[0]
+            l2s_slice = l2s[leftmost_dist[0]:leftmost_dist[1]]
+            mean = np.mean(l2s_slice)
+            std = np.std(l2s_slice) + 0.00001
+        else:
+            mean = np.mean(l2s)
+            std = np.std(l2s)
+
+        #plt.hist(sorted(l2s), 20, facecolor='blue', alpha=0.5)
+        #plt.show()
+
+        # Generate the edge weights for the graph.
 
         for (i, j) in itertools.combinations(U, 2):
             l2 = l2s.pop()
             z = (l2 - mean) / std
-            prob = 1 - st.norm.cdf(z)
+
+            # Probability that this l2 value could have taken on its value or greater assuming its
+            # in the leftmost distribution
+
+            prob = 1 - st.norm.cdf(z) + 0.00001
             weighted_l2 = (1/prob**0.5)**4
 
             G.add_edge(i, j, weight=weighted_l2)
@@ -133,17 +160,18 @@ def graph_cut_partition(num_frames, X, L, U):
                 max_cut_value = cut_value
                 partition = p
 
+        #plt.hist(sorted(cuts), 20, facecolor='blue', alpha=0.5)
+        #plt.show()
+
         partition = set(partition)
 
         # Assuming the values of the cuts are normally distributed, determine the probability
-        # that the max cut would take on the its value or higher. If this probability is greater
-        # than 0.025 (that the cut doesn't seem too extraordinary), we assume that we are looking
-        # at the 0 fake case.
+        # that the max cut would take on the its value or higher.
 
         z = (max_cut_value - np.mean(cuts)) / np.std(cuts)
         cut_prob = 1 - st.norm.cdf(z)
 
-        if cut_prob > 0.025:
+        if cut_prob*pval > 0.01:
             partition = {}
 
         # Determine if our answer was correct.
@@ -173,10 +201,22 @@ def main():
 
     print(len(fake_cams_dict.keys()))
 
+    """
     correct = [0,0,0,0]
     total = 0
     for id in tqdm(ids):
-        c, t = gen_results(id, fake_cams_dict[219], args.data_dir, args.num_cams, args.zero_start)
+        c, t = gen_results(id, fake_cams_dict[id], args.data_dir, args.num_cams, args.zero_start)
+        for i in range(len(c)):
+            correct[i] += c[i]
+        total += t
+    print(correct[0]/total, correct[1]/total, correct[2]/total, correct[3]/total)
+    """
+    corrects, totals = zip(*Parallel(n_jobs=-1)(delayed(gen_results)(
+        id, fake_cams_dict[id], args.data_dir, args.num_cams, args.zero_start, args.save_dir) for id in ids))
+    
+    correct = [0,0,0,0]
+    total = 0
+    for c, t in zip(corrects, totals):
         for i in range(len(c)):
             correct[i] += c[i]
         total += t
