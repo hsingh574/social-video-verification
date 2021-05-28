@@ -116,8 +116,8 @@ def graph_cut_partition(num_frames, X, L, U):
         # distribution of l2s for edges connecting real and fake nodes.
 
         dat = sorted(l2s)
-        _, pval, _ = diptst(dat, False, 100)
-        intervals = UniDip(dat, alpha=0.25).run()
+        _, pval, _ = diptst(dat, False, 2)
+        intervals = UniDip(dat, alpha=0.25, ntrials=2).run()
 
         if intervals:
             leftmost_dist = intervals[0]
@@ -201,15 +201,15 @@ def main():
 
     print(len(fake_cams_dict.keys()))
 
-    """
     correct = [0,0,0,0]
     total = 0
     for id in tqdm(ids):
-        c, t = gen_results(id, fake_cams_dict[id], args.data_dir, args.num_cams, args.zero_start)
+        c, t = gen_results(id, fake_cams_dict[id], args.data_dir, args.num_cams, args.zero_start, args.save_dir)
         for i in range(len(c)):
             correct[i] += c[i]
         total += t
     print(correct[0]/total, correct[1]/total, correct[2]/total, correct[3]/total)
+
     """
     corrects, totals = zip(*Parallel(n_jobs=-1)(delayed(gen_results)(
         id, fake_cams_dict[id], args.data_dir, args.num_cams, args.zero_start, args.save_dir) for id in ids))
@@ -221,6 +221,7 @@ def main():
             correct[i] += c[i]
         total += t
     print(correct[0]/total, correct[1]/total, correct[2]/total, correct[3]/total)
+    """
 
 if __name__ == "__main__":
     main()
