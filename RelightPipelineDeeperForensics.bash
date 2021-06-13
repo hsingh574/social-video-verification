@@ -41,7 +41,8 @@ function relight_id { #params: id, camera to relight
     "python" "analyze_lighting_multiple.py" "--videos_path" "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/" "--frames" "600" "--mat_path" "/${IMAGE_RELIGHT_OUTPUT}/mat_files/fake${CAMERA_NUM}-ID${1}.mat" "--fake_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}/camera${CAMERA_NUM}.avi"
 
     echo 'Copying over reals for id ' ${1}
-    for cam_num in (0 1 2 3 4 5 6);
+    cams=(0 1 2 3 4 5 6)
+    for cam_num in ${cams[@]};
     do
         mkdir -p "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/real/cam${cam_num}/"
         cp "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/camera${cam_num}.mp4" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/real/cam${cam_num}/camera${cam_num}.mp4"
