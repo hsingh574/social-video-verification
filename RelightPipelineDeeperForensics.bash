@@ -30,7 +30,7 @@ function relight_id { #params: id, camera to relight
 
     cd image-relighting
 
-    mkdir -p "/${IMAGE_RELIGHT_OUTPUT}/ID${1}"
+    mkdir -p "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}"
 
     echo 'Creating deep fake for id '${1} 'and camera' ${CAMERA_NUM}
     "python" "live_lighting_transfer.py" "--light_text" "${IMAGE_RELIGHT_LIGHTING_DIR}/rotate_light_0${ROTATE_LIGHT}.txt" "--input_path" "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/camera${CAMERA_NUM}.mp4" "--output_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}/camera${CAMERA_NUM}.avi"
