@@ -38,7 +38,7 @@ function relight_id { #params: id, camera to relight
     mkdir -p "/${IMAGE_RELIGHT_OUTPUT}/mat_files"
 
     echo 'Getting sh coords for id '${1}
-    "python" "analyze_lighting_multiple.py" "--videos_path" "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/" "--frames" "1500" "--mat_path" "/${IMAGE_RELIGHT_OUTPUT}/mat_files/fake${CAMERA_NUM}-ID${1}.mat" "--fake_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}/camera${CAMERA_NUM}.avi"
+    "python" "analyze_lighting_multiple.py" "--videos_path" "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/" "--frames" "600" "--mat_path" "/${IMAGE_RELIGHT_OUTPUT}/mat_files/fake${CAMERA_NUM}-ID${1}.mat" "--fake_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}/camera${CAMERA_NUM}.avi"
 
     echo 'Copying over reals for id ' ${1}
     for cam_num in (0 1 2 3 4 5 6);
