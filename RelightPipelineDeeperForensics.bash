@@ -40,6 +40,7 @@ function relight_id { #params: id, camera to relight
     echo 'Getting sh coords for id '${1}
     "python" "analyze_lighting_multiple.py" "--videos_path" "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/" "--frames" "600" "--mat_path" "/${IMAGE_RELIGHT_OUTPUT}/mat_files/fake${CAMERA_NUM}-ID${1}.mat" "--fake_path" "/${IMAGE_RELIGHT_OUTPUT}/ID${1}/fake/cam${CAMERA_NUM}/camera${CAMERA_NUM}.avi"
 
+    #TODO this doesn't need to happen multiple times per ID if the same ID is used with different fake num
     echo 'Copying over reals for id ' ${1}
     cams=(0 1 2 3 4 5 6)
     for cam_num in ${cams[@]};
@@ -56,9 +57,9 @@ ids=(1020 1084 150 219 419 501 63 679 685 785 800 875 908 949)
 
 for id in ${ids[@]};
 do
-    relight_id ${id} 1 #relight most head-on IDs for this dataset
-    relight_id ${id} 3
-    relight_id ${id} 5
+    relight_id ${id} 0 #relight most head-on IDs for this dataset
+    relight_id ${id} 1
+    relight_id ${id} 6
 done
 
 cd ..
