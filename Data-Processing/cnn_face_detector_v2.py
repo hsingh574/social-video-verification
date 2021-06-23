@@ -6,8 +6,8 @@ import sys
 import os
 import face_detection
 
-print("Dlib using cuda?")
-print(dlib.DLIB_USE_CUDA)
+# print("Dlib using cuda?")
+# print(dlib.DLIB_USE_CUDA)
 
 
 face_detector_path = sys.argv[1]
