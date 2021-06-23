@@ -16,6 +16,7 @@ function move_id { #params: id, camera to relight
         mkdir -p "/${EXPRESSION_OUTPUT}/ID${1}/real/cam${cam_num}/"
         cp "/home/socialvv/Dataset/DeepForensicsReal/ID${1}/camera${cam_num}.mp4" "/${EXPRESSION_OUTPUT}/ID${1}/real/cam${cam_num}/camera${cam_num}.mp4"
 
+        #TODO this won't work because it should only copy over for cams that actually have a fake
         mkdir -p "/${EXPRESSION_OUTPUT}/ID${1}/fake/cam${cam_num}/"
         cp "/home/socialvv/Dataset/DeepForensicsFake/ID${1}/camera${cam_num}.mp4" "/${EXPRESSION_OUTPUT}/ID${1}/fake/cam${cam_num}/camera${cam_num}.mp4"
 
