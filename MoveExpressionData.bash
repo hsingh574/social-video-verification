@@ -26,7 +26,7 @@ function move_id { #params: id, camera to relight
 }
 
 # ids=(1020 1084 150 219 419 501 63 679 685 785 800 875 908 949)
-ids = (1020)
+ids=(1020)
 
 for id in ${ids[@]};
 do
